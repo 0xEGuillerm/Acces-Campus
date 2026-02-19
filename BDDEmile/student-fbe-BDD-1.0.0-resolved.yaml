@@ -1,0 +1,558 @@
+openapi: 3.0.0
+info:
+  title: API BDD Accès Campus
+  description: Prototype API Accès Campus
+  contact:
+    email: you@your-company.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0
+  description: SwaggerHub API Auto Mocking
+security:
+- bearerAuth: []
+tags:
+- name: developers
+  description: PSW BAE PEA PGS
+paths:
+  /psw/login:
+    post:
+      tags:
+      - developers
+      summary: Authentifier auprès du PSW
+      description: S'authentifier grâce à un username et un mot de passe. Il renvoie un JWT.
+      requestBody:
+        description: Mot de passe et login à verifié
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/userLogin"
+      responses:
+        "200":
+          description: Utilisateur authentifié
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/token_jwt"
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+                expire_dans: 1200
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+        "401":
+          description: Identifiant ou mot de passe invalide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 401
+                message: Identifiant ou mot de passe invalide
+      security: []
+  /psw/historique_eleve:
+    get:
+      tags:
+      - developers
+      summary: Obtenir les informations d'absence et présence élève
+      description: Obtenir les informations d'absence et présence de l'élève déjà identifier.
+      responses:
+        "200":
+          description: Retour d'une liste d'absence et retard avec la dates horaire et le cours
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/absence"
+              example:
+              - absence: 1
+                absenceBool: true
+                horaire_du_cours: 2026-03-15T09:30:00Z
+              - absence: 2
+                absenceBool: false
+                horaire_du_cours: 2021-04-11T09:72:00Z
+                temps_retard: 10
+              - absence: 3
+                absenceBool: false
+                horaire_du_cours: 2026-06-10T09:90:00Z
+                temps_retard: 22
+        "204":
+          description: Pas d'historique
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Pas historique disponible
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+        "401":
+          description: Le token n'es plus valide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 401
+                message: Token invalide
+        "403":
+          description: La personne qui accède à l'onglet historique est professeur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 403
+                message: Vous êtes professeur
+  /psw/afficher_salle_crenaux:
+    get:
+      tags:
+      - developers
+      summary: Envoyer salle disponible aux créneau
+      description: Permet de lister les salles disponible pour un crénaux et renvoie une liste de salles.
+      parameters:
+      - name: horaire
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+        example: 2026-03-15T09:30:00Z
+      responses:
+        "200":
+          description: Retour d'une liste de salle disponible pour le créneau choisit
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/salle"
+              example:
+              - salle: 1
+                numero: 101
+              - salle: 2
+                numero: 202
+              - salle: 3
+                numero: 315
+        "204":
+          description: Pas de salles disponible
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Pas de salle disponible
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+        "401":
+          description: Le token n'es plus valide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 401
+                message: Token invalide
+  /psw/reserver_salle:
+    post:
+      tags:
+      - developers
+      summary: Reserver une salle
+      description: Permet de de reserver une salle.
+      requestBody:
+        description: numéro salle
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/salle"
+      responses:
+        "200":
+          description: La salle à bien été reserver
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/salle"
+              example:
+                code: 200
+                message: Salle 218 reservé
+        "204":
+          description: Salle déjà reservé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: La salle à été reservé
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+        "401":
+          description: Le token n'es plus valide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 401
+                message: Token invalide
+  /psw/planning:
+    get:
+      tags:
+      - developers
+      summary: Voire le planning d'une salle
+      description: Permet d'obtenir les horaires de reservation d'une salle
+      parameters:
+      - name: salle
+        in: query
+        required: true
+        schema:
+          type: integer
+        example: 112
+      responses:
+        "200":
+          description: Horaire à laquelle une reservation est présente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/reservation"
+              example:
+              - reservation: 1
+                horaire: 2026-03-15T09:30:00Z
+              - reservation: 2
+                horaire: 2026-04-11T09:72:00Z
+              - reservation: 3
+                horaire: 2026-06-10T09:90:00Z
+        "204":
+          description: Pas de reservations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Pas de reservations pour cette salle enregistré
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+        "401":
+          description: Le token n'es plus valide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 401
+                message: Token invalide
+  /psw/etat_salle:
+    get:
+      tags:
+      - developers
+      summary: Voire état salle
+      description: Permet d'obtenir quelle élève est présent dans une salle ! uniquement pour le personnl enseignant !
+      parameters:
+      - name: salle
+        in: query
+        required: true
+        schema:
+          type: integer
+        example: 112
+      responses:
+        "200":
+          description: Liste d'élève présent
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/utilisateur"
+              example:
+              - utilisateur: 1
+                nom_user: Emile
+                prenom_user: Guillerm
+                present: true
+              - utilisateur: 2
+                nom_user: Mathis
+                prenom_user: Blanchard
+                present: false
+              - utilisateur: 3
+                nom_user: Mael
+                prenom_user: Guillon
+                present: false
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+        "401":
+          description: Le token n'es plus valide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 401
+                message: Token invalide
+  /pgs/planning:
+    get:
+      tags:
+      - developers
+      summary: Voire le planning d'une salle
+      description: Permet d'obtenir les horaires de reservation d'une salle
+      parameters:
+      - name: salle
+        in: query
+        required: true
+        schema:
+          type: integer
+        example: 112
+      responses:
+        "200":
+          description: Horaire à laquelle une reservation est présente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/reservation"
+              example:
+              - reservation: 1
+                horaire: 2026-03-15T09:30:00Z
+              - reservation: 2
+                horaire: 2026-04-11T09:72:00Z
+              - reservation: 3
+                horaire: 2026-06-10T09:90:00Z
+        "204":
+          description: Pas de reservations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Pas de reservations pour cette salle enregistré
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+  /pgs/etat_salle:
+    get:
+      tags:
+      - developers
+      summary: Voire état salle
+      description: Permet d'obtenir quelle élève est présent dans une salle
+      parameters:
+      - name: salle
+        in: query
+        required: true
+        schema:
+          type: integer
+        example: 112
+      responses:
+        "200":
+          description: Liste d'élève présent
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/utilisateur"
+              example:
+              - utilisateur: 1
+                nom_user: Emile
+                prenom_user: Guillerm
+                present: true
+              - utilisateur: 2
+                nom_user: Mathis
+                prenom_user: Blanchard
+                present: false
+              - utilisateur: 3
+                nom_user: Mael
+                prenom_user: Guillon
+                present: false
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+  /pgs/reserver_salle:
+    post:
+      tags:
+      - developers
+      summary: Reserver une salle
+      description: Permet de de reserver une salle.
+      requestBody:
+        description: numéro salle
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/salle"
+      responses:
+        "200":
+          description: La salle à bien été reserver
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/salle"
+              example:
+                code: 200
+                message: Salle 218 reservé
+        "204":
+          description: Salle déjà reservé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: La salle à été reservé
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+components:
+  schemas:
+    utilisateur:
+      required:
+      - nom_user
+      - prenom_user
+      properties:
+        nom_user:
+          type: string
+          example: Guillerm
+        prenom_user:
+          type: string
+          example: Emile
+        present:
+          type: boolean
+          example: true
+    userLogin:
+      required:
+      - login_user
+      - motdepasse
+      type: object
+      properties:
+        login_user:
+          type: string
+          example: eguillerm
+        motdepasse:
+          type: string
+          example: helloworld1234!
+    erreur_code:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    token_jwt:
+      required:
+      - expire_dans
+      - token
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token JWT
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+        expire_dans:
+          type: integer
+          description: Durée en seconde de la durée de vie
+          example: 1200
+    absence:
+      required:
+      - absenceBool
+      - horaire_du_cours
+      type: object
+      properties:
+        absenceBool:
+          type: boolean
+          description: True = absence False = retard
+          example: true
+        horaire_du_cours:
+          type: string
+          description: Horaire du retard
+          format: date-time
+          example: 2026-03-15T09:30:00Z
+        temps_retard:
+          type: integer
+          description: Temps de retard en minute
+          example: 59
+    salle:
+      required:
+      - numero
+      type: object
+      properties:
+        numero:
+          type: integer
+          description: numero de la salle
+          example: 218
+    reservation:
+      type: object
+      properties:
+        horaire:
+          type: string
+          description: Horaire du début de la reservation
+          format: date-time
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
