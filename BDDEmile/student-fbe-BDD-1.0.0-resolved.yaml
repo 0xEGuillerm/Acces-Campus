@@ -14,13 +14,19 @@ servers:
 security:
 - bearerAuth: []
 tags:
-- name: developers
-  description: PSW BAE PEA PGS
+- name: PGS
+  description: Poste Gestion salle
+- name: PSW
+  description: Post Serveur Web
+- name: PEA
+  description: Poignée éléctrique autonome
+- name: BAE
+  description: Borne Appel Etudiant
 paths:
   /psw/login:
     post:
       tags:
-      - developers
+      - PSW
       summary: Authentifier auprès du PSW
       description: S'authentifier grâce à un username et un mot de passe. Il renvoie un JWT.
       requestBody:
@@ -61,7 +67,7 @@ paths:
   /psw/historique_eleve:
     get:
       tags:
-      - developers
+      - PSW
       summary: Obtenir les informations d'absence et présence élève
       description: Obtenir les informations d'absence et présence de l'élève déjà identifier.
       responses:
@@ -124,7 +130,7 @@ paths:
   /psw/afficher_salle_crenaux:
     get:
       tags:
-      - developers
+      - PSW
       summary: Envoyer salle disponible aux créneau
       description: Permet de lister les salles disponible pour un crénaux et renvoie une liste de salles.
       parameters:
@@ -181,7 +187,7 @@ paths:
   /psw/reserver_salle:
     post:
       tags:
-      - developers
+      - PSW
       summary: Reserver une salle
       description: Permet de de reserver une salle.
       requestBody:
@@ -230,7 +236,7 @@ paths:
   /psw/planning:
     get:
       tags:
-      - developers
+      - PSW
       summary: Voire le planning d'une salle
       description: Permet d'obtenir les horaires de reservation d'une salle
       parameters:
@@ -286,7 +292,7 @@ paths:
   /psw/etat_salle:
     get:
       tags:
-      - developers
+      - PSW
       summary: Voire état salle
       description: Permet d'obtenir quelle élève est présent dans une salle ! uniquement pour le personnl enseignant !
       parameters:
@@ -339,7 +345,7 @@ paths:
   /pgs/planning:
     get:
       tags:
-      - developers
+      - PGS
       summary: Voire le planning d'une salle
       description: Permet d'obtenir les horaires de reservation d'une salle
       parameters:
@@ -386,7 +392,7 @@ paths:
   /pgs/etat_salle:
     get:
       tags:
-      - developers
+      - PGS
       summary: Voire état salle
       description: Permet d'obtenir quelle élève est présent dans une salle
       parameters:
@@ -430,7 +436,7 @@ paths:
   /pgs/reserver_salle:
     post:
       tags:
-      - developers
+      - PGS
       summary: Reserver une salle
       description: Permet de de reserver une salle.
       requestBody:
@@ -467,6 +473,85 @@ paths:
               example:
                 code: 400
                 message: Requête mal formulé
+  /pgs/badges/{badgeid}:
+    get:
+      tags:
+      - PGS
+      summary: Information badge
+      description: Permet d'obtenir les informations d'un badge
+      parameters:
+      - name: badgeid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Permet de renvoyer les informations d'un badge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utilisateur"
+              example:
+                code: 200
+                message: Info utilisateur
+        "204":
+          description: L'UUID entrée n'existe pas dans la base de donnée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: La salle à été reservé
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+    delete:
+      tags:
+      - PGS
+      summary: Supprimer un badge
+      description: Permet de supprimer un badge de la base de donnée et donc supprimer son association avec l'individu
+      parameters:
+      - name: badgeid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Confirmation de la suppresion du badge de la base de donnée. Son UUID n'ai plus connu
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badges"
+              example:
+                code: 200
+                message: Le badge est supprimé
+        "204":
+          description: L'UUID entrée n'existe pas dans la base de donnée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Cette UUID n existe pas ou à été supprimé
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
 components:
   schemas:
     utilisateur:
@@ -483,6 +568,15 @@ components:
         present:
           type: boolean
           example: true
+        classe:
+          type: string
+          example: CIEL2
+        statut:
+          type: string
+          example: eleve
+          enum:
+          - eleve
+          - professeur
     userLogin:
       required:
       - login_user
@@ -551,6 +645,13 @@ components:
           type: string
           description: Horaire du début de la reservation
           format: date-time
+    badges:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID d'un badge
+          format: UUID
   securitySchemes:
     bearerAuth:
       type: http
