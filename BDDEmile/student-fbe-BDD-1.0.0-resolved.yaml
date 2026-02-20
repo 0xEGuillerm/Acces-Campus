@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API BDD Accès Campus
-  description: Prototype API Accès Campus
+  description: "Prototype de l'API du projet Accès Campus. Fournit l'API de la base de donnée pour le PGS, PSW, BAE et PEA"
   contact:
     email: you@your-company.com
   license:
