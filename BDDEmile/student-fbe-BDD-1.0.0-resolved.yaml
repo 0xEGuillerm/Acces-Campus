@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
   title: API BDD Accès Campus
-  description: Prototype API Accès Campus
+  description: "Prototype de l'API du projet Accès Campus. Fournit la documentation de l'API de la base de donnée pour le PGS, PSW, BAE et PEA"
   contact:
-    email: you@your-company.com
+    email: emile.guillerm@saintaubinlasalle.fr
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -14,24 +14,30 @@ servers:
 security:
 - bearerAuth: []
 tags:
-- name: developers
-  description: PSW BAE PEA PGS
+- name: PGS
+  description: Poste Gestion salle
+- name: PSW
+  description: Post Serveur Web
+- name: PEA
+  description: Poignée éléctrique autonome
+- name: BAE
+  description: Borne Appel Etudiant
 paths:
   /psw/login:
     post:
       tags:
-      - developers
-      summary: Authentifier auprès du PSW
-      description: S'authentifier grâce à un username et un mot de passe. Il renvoie un JWT.
+      - PSW
+      summary: Authentification
+      description: S'authentifier grâce à un username et un mot de passe. Il renvoie un token JWT. Cela permet l'accès de tout les modules à tous les utilisateurs.
       requestBody:
-        description: Mot de passe et login à verifié
+        description: Mot de passe et identifiant à verifié sous forme d'une structure.
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/userLogin"
       responses:
         "200":
-          description: Utilisateur authentifié
+          description: Authentification réussi. Renvoie un token JWT lié à un utilisateur permettant d'accèder aux modules.
           content:
             application/json:
               schema:
@@ -40,7 +46,7 @@ paths:
                 token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
                 expire_dans: 1200
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -49,7 +55,7 @@ paths:
                 code: 400
                 message: Requête mal formulé
         "401":
-          description: Identifiant ou mot de passe invalide
+          description: Opération échouée. Identifiant ou mot de passe invalide
           content:
             application/json:
               schema:
@@ -61,12 +67,12 @@ paths:
   /psw/historique_eleve:
     get:
       tags:
-      - developers
-      summary: Obtenir les informations d'absence et présence élève
-      description: Obtenir les informations d'absence et présence de l'élève déjà identifier.
+      - PSW
+      summary: Absence/retard élève
+      description: Obtenir les informations d'absence et présence de l'élève déjà identifier à partir de son token JWT.
       responses:
         "200":
-          description: Retour d'une liste d'absence et retard avec la dates horaire et le cours
+          description: "Opération réussi. Retour d'une liste avec: absence ou retard, l'horaire du cours et le temps de retard pour une retard en minutes"
           content:
             application/json:
               schema:
@@ -86,7 +92,7 @@ paths:
                 horaire_du_cours: 2026-06-10T09:90:00Z
                 temps_retard: 22
         "204":
-          description: Pas d'historique
+          description: Opération partiellement réussie. Pas d'historique disponible
           content:
             application/json:
               schema:
@@ -95,7 +101,7 @@ paths:
                 code: 204
                 message: Pas historique disponible
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -104,7 +110,7 @@ paths:
                 code: 400
                 message: Requête mal formulé
         "401":
-          description: Le token n'es plus valide
+          description: Opération échouée. Le token n'es plus valide
           content:
             application/json:
               schema:
@@ -113,7 +119,7 @@ paths:
                 code: 401
                 message: Token invalide
         "403":
-          description: La personne qui accède à l'onglet historique est professeur
+          description: Opération échouée. La personne qui accède à l'onglet historique est professeur et n'as pas accès à cette information
           content:
             application/json:
               schema:
@@ -124,8 +130,8 @@ paths:
   /psw/afficher_salle_crenaux:
     get:
       tags:
-      - developers
-      summary: Envoyer salle disponible aux créneau
+      - PSW
+      summary: Planning des salles
       description: Permet de lister les salles disponible pour un crénaux et renvoie une liste de salles.
       parameters:
       - name: horaire
@@ -137,7 +143,7 @@ paths:
         example: 2026-03-15T09:30:00Z
       responses:
         "200":
-          description: Retour d'une liste de salle disponible pour le créneau choisit
+          description: Opération réussie. Retour d'une liste de salle disponible pour le créneau choisit
           content:
             application/json:
               schema:
@@ -152,7 +158,7 @@ paths:
               - salle: 3
                 numero: 315
         "204":
-          description: Pas de salles disponible
+          description: Opération partiellement réussie. Pas de salles disponible
           content:
             application/json:
               schema:
@@ -161,7 +167,7 @@ paths:
                 code: 204
                 message: Pas de salle disponible
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -170,7 +176,7 @@ paths:
                 code: 400
                 message: Requête mal formulé
         "401":
-          description: Le token n'es plus valide
+          description: Opération échouée. Le token n'es plus valide
           content:
             application/json:
               schema:
@@ -181,18 +187,18 @@ paths:
   /psw/reserver_salle:
     post:
       tags:
-      - developers
+      - PSW
       summary: Reserver une salle
-      description: Permet de de reserver une salle.
+      description: Permet de reserver une salle à partir de son numéro et d'un utilisateur authentifier (l'utilisateur ne peut pas avoir plus de 3 réservations).
       requestBody:
-        description: numéro salle
+        description: Numéro de la salle à reserver et horaire de la reservation avec de token JWT.
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/salle"
       responses:
         "200":
-          description: La salle à bien été reserver
+          description: Opération réussie. La salle à bien été reserver
           content:
             application/json:
               schema:
@@ -201,16 +207,16 @@ paths:
                 code: 200
                 message: Salle 218 reservé
         "204":
-          description: Salle déjà reservé
+          description: Opération partiellement réussie. Salle déjà reservé
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
                 code: 204
-                message: La salle à été reservé
+                message: La salle à déjà été reservé. La reservation n'est pas possible
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -219,7 +225,7 @@ paths:
                 code: 400
                 message: Requête mal formulé
         "401":
-          description: Le token n'es plus valide
+          description: Opération échouée. Le token n'es plus valide
           content:
             application/json:
               schema:
@@ -230,7 +236,7 @@ paths:
   /psw/planning:
     get:
       tags:
-      - developers
+      - PSW
       summary: Voire le planning d'une salle
       description: Permet d'obtenir les horaires de reservation d'une salle
       parameters:
@@ -242,7 +248,7 @@ paths:
         example: 112
       responses:
         "200":
-          description: Horaire à laquelle une reservation est présente
+          description: Opération réussie. Horaire à laquelle une reservation est présente
           content:
             application/json:
               schema:
@@ -257,7 +263,7 @@ paths:
               - reservation: 3
                 horaire: 2026-06-10T09:90:00Z
         "204":
-          description: Pas de reservations
+          description: Opération partiellement réussie. Pas de reservations
           content:
             application/json:
               schema:
@@ -266,7 +272,7 @@ paths:
                 code: 204
                 message: Pas de reservations pour cette salle enregistré
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -275,7 +281,7 @@ paths:
                 code: 400
                 message: Requête mal formulé
         "401":
-          description: Le token n'es plus valide
+          description: Opération échouée. Le token n'es plus valide
           content:
             application/json:
               schema:
@@ -286,9 +292,9 @@ paths:
   /psw/etat_salle:
     get:
       tags:
-      - developers
+      - PSW
       summary: Voire état salle
-      description: Permet d'obtenir quelle élève est présent dans une salle ! uniquement pour le personnl enseignant !
+      description: Permet d'obtenir quelle élève est présent dans une salle (prend le numéro d'une salle en entrée) ! uniquement pour le personnl enseignant !
       parameters:
       - name: salle
         in: query
@@ -298,7 +304,7 @@ paths:
         example: 112
       responses:
         "200":
-          description: Liste d'élève présent
+          description: Opération réussie. Liste d'élève présent
           content:
             application/json:
               schema:
@@ -318,8 +324,17 @@ paths:
                 nom_user: Mael
                 prenom_user: Guillon
                 present: false
+        "204":
+          description: Opération partiellement réussie. Salle vide d'élève
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: La salle est vide.
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -328,7 +343,7 @@ paths:
                 code: 400
                 message: Requête mal formulé
         "401":
-          description: Le token n'es plus valide
+          description: Opération échouée. Le token n'es plus valide
           content:
             application/json:
               schema:
@@ -339,7 +354,7 @@ paths:
   /pgs/planning:
     get:
       tags:
-      - developers
+      - PGS
       summary: Voire le planning d'une salle
       description: Permet d'obtenir les horaires de reservation d'une salle
       parameters:
@@ -351,7 +366,7 @@ paths:
         example: 112
       responses:
         "200":
-          description: Horaire à laquelle une reservation est présente
+          description: Opération réussie. Horaire à laquelle une reservation est présente
           content:
             application/json:
               schema:
@@ -366,7 +381,7 @@ paths:
               - reservation: 3
                 horaire: 2026-06-10T09:90:00Z
         "204":
-          description: Pas de reservations
+          description: Opération partiellement réussie. Pas de reservations possible pour cette salle.
           content:
             application/json:
               schema:
@@ -375,7 +390,7 @@ paths:
                 code: 204
                 message: Pas de reservations pour cette salle enregistré
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -386,9 +401,9 @@ paths:
   /pgs/etat_salle:
     get:
       tags:
-      - developers
+      - PGS
       summary: Voire état salle
-      description: Permet d'obtenir quelle élève est présent dans une salle
+      description: Permet d'obtenir la liste des élèves présent(et absent) dans une salle
       parameters:
       - name: salle
         in: query
@@ -398,7 +413,7 @@ paths:
         example: 112
       responses:
         "200":
-          description: Liste d'élève présent
+          description: Opération réussie. Liste d'élève présent
           content:
             application/json:
               schema:
@@ -418,8 +433,70 @@ paths:
                 nom_user: Mael
                 prenom_user: Guillon
                 present: false
+        "204":
+          description: Opération partiellement réussie. Salle vide d'élève
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: La salle est vide.
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+  /pgs/utilisateur:
+    get:
+      tags:
+      - PGS
+      summary: Liste utilisateur
+      description: Permet d'obtenir la liste des élèves portant le nom ou prénom entrée.
+      parameters:
+      - name: prenom
+        in: query
+        required: true
+        schema:
+          type: string
+        example: 'emile'
+      - name: nom
+        in: query
+        required: true
+        schema:
+          type: string
+        example: 'guillerm'
+      responses:
+        "200":
+          description: Opération réussie. Liste d'élève portant le nom et ou prénom entrée
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/utilisateur"
+              example:
+              - utilisateur: 1
+                nom_user: Emile
+                prenom_user: Guillerm
+              - utilisateur: 2
+                nom_user: Emile
+                prenom_user: Zola
+        "204":
+          description: Opération partiellement réussie. Aucun élève porte se nom et ou prénom
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Pas de correspondances
+        "400":
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -430,9 +507,9 @@ paths:
   /pgs/reserver_salle:
     post:
       tags:
-      - developers
-      summary: Reserver une salle
-      description: Permet de de reserver une salle.
+      - PGS
+      summary: Reservation salle
+      description: Permet de de reserver une salle (pas besoin d'ID) à partir du numéro de salle et de l'horaire.
       requestBody:
         description: numéro salle
         content:
@@ -441,7 +518,7 @@ paths:
               $ref: "#/components/schemas/salle"
       responses:
         "200":
-          description: La salle à bien été reserver
+          description: Opération réussie. La salle à bien été reserver
           content:
             application/json:
               schema:
@@ -450,7 +527,7 @@ paths:
                 code: 200
                 message: Salle 218 reservé
         "204":
-          description: Salle déjà reservé
+          description: Opération partiellement réussie. Salle déjà reservé
           content:
             application/json:
               schema:
@@ -459,7 +536,7 @@ paths:
                 code: 204
                 message: La salle à été reservé
         "400":
-          description: Requête mal formulé
+          description: Opération échouée. Requête mal formulé
           content:
             application/json:
               schema:
@@ -467,6 +544,133 @@ paths:
               example:
                 code: 400
                 message: Requête mal formulé
+  /pgs/badges/{badgeid}:
+    get:
+      tags:
+      - PGS
+      summary: Information badge
+      description: Permet d'obtenir les informations d'un badge (nom, prénom, classe, statut) à partir de son UUID
+      parameters:
+      - name: badgeid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Opération réussie. Permet de renvoyer les informations d'un badge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utilisateur"
+              example:
+                code: 200
+                message: Info utilisateur
+        "204":
+          description: Opération partiellement réussie. L'UUID entrée n'existe pas dans la base de donnée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: La salle à été reservé
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+    delete:
+      tags:
+      - PGS
+      summary: Supprimer un badge
+      description: Permet de supprimer un badge de la base de donnée et donc supprimer son association avec l'individu
+      parameters:
+      - name: badgeid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Opération réussie. Confirmation de la suppresion du badge de la base de donnée. Son UUID n'ai plus connu
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badges"
+              example:
+                code: 200
+                message: Le badge est supprimé
+        "204":
+          description: Opération partiellement réussie. L'UUID entrée n'existe pas dans la base de donnée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Cette UUID n existe pas ou à été supprimé
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+    post:
+      tags:
+      - PGS
+      summary: Ajout d'un badge
+      description: Permet d'ajouter un badge à la base de donnée. Il doit être lié à un UUID
+      requestBody:
+        description: UUID badge et UUID utilisateur
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid_badge:
+                  type: string
+                  description: UUID du badge à ajouter
+                uuid_user:
+                  type: string
+                  description: UUID de l'utilisateur à qui le badge vas être associé
+      responses:
+        "200":
+          description: Opération réussie. Confirmation de l'association du badge à l'utilisateur.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badges"
+              example:
+                code: 200
+                message: Le badge est associé à l'utilisateur
+        "409":
+          description: Opération échouée. 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 409
+                message: L'UUID du badge est déjà associée à un utilisateur / L'UUID de l'utilisateur possède déjà un badge
+                
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+
 components:
   schemas:
     utilisateur:
@@ -483,6 +687,15 @@ components:
         present:
           type: boolean
           example: true
+        classe:
+          type: string
+          example: CIEL2
+        statut:
+          type: string
+          example: eleve
+          enum:
+          - eleve
+          - professeur
     userLogin:
       required:
       - login_user
@@ -551,6 +764,13 @@ components:
           type: string
           description: Horaire du début de la reservation
           format: date-time
+    badges:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID d'un badge
+          format: UUID
   securitySchemes:
     bearerAuth:
       type: http
