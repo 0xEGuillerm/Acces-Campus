@@ -451,6 +451,59 @@ paths:
               example:
                 code: 400
                 message: Requête mal formulé
+  /pgs/utilisateur:
+    get:
+      tags:
+      - PGS
+      summary: Liste utilisateur
+      description: Permet d'obtenir la liste des élèves portant le nom ou prénom entrée.
+      parameters:
+      - name: prenom
+        in: query
+        required: true
+        schema:
+          type: string
+        example: 'emile'
+      - name: nom
+        in: query
+        required: true
+        schema:
+          type: string
+        example: 'guillerm'
+      responses:
+        "200":
+          description: Opération réussie. Liste d'élève portant le nom et ou prénom entrée
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/utilisateur"
+              example:
+              - utilisateur: 1
+                nom_user: Emile
+                prenom_user: Guillerm
+              - utilisateur: 2
+                nom_user: Emile
+                prenom_user: Zola
+        "204":
+          description: Opération partiellement réussie. Aucun élève porte se nom et ou prénom
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Pas de correspondances
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
   /pgs/reserver_salle:
     post:
       tags:
@@ -570,6 +623,54 @@ paths:
               example:
                 code: 400
                 message: Requête mal formulé
+    post:
+      tags:
+      - PGS
+      summary: Ajout d'un badge
+      description: Permet d'ajouter un badge à la base de donnée. Il doit être lié à un UUID
+      requestBody:
+        description: UUID badge et UUID utilisateur
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid_badge:
+                  type: string
+                  description: UUID du badge à ajouter
+                uuid_user:
+                  type: string
+                  description: UUID de l'utilisateur à qui le badge vas être associé
+      responses:
+        "200":
+          description: Opération réussie. Confirmation de l'association du badge à l'utilisateur.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/badges"
+              example:
+                code: 200
+                message: Le badge est associé à l'utilisateur
+        "409":
+          description: Opération échouée. 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 409
+                message: L'UUID du badge est déjà associée à un utilisateur / L'UUID de l'utilisateur possède déjà un badge
+                
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+
 components:
   schemas:
     utilisateur:
