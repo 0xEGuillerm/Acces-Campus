@@ -7,7 +7,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
+  version: 1.1.0
 servers:
 - url: https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0
   description: SwaggerHub API Auto Mocking
@@ -91,14 +91,14 @@ paths:
                 absenceBool: false
                 horaire_du_cours: 2026-06-10T09:90:00Z
                 temps_retard: 22
-        "204":
+        "404":
           description: Opération partiellement réussie. Pas d'historique disponible
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: Pas historique disponible
         "400":
           description: Opération échouée. Requête mal formulé
@@ -157,14 +157,14 @@ paths:
                 numero: 202
               - salle: 3
                 numero: 315
-        "204":
+        "404":
           description: Opération partiellement réussie. Pas de salles disponible
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: Pas de salle disponible
         "400":
           description: Opération échouée. Requête mal formulé
@@ -196,24 +196,34 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/salle"
+              type: object
+              properties:
+                horaire:
+                  type: integer
+                  format: date-time
       responses:
         "200":
           description: Opération réussie. La salle à bien été reserver
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/salle"
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
               example:
                 code: 200
                 message: Salle 218 reservé
-        "204":
+        "404":
           description: Opération partiellement réussie. Salle déjà reservé
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: La salle à déjà été reservé. La reservation n'est pas possible
         "400":
           description: Opération échouée. Requête mal formulé
@@ -262,14 +272,14 @@ paths:
                 horaire: 2026-04-11T09:72:00Z
               - reservation: 3
                 horaire: 2026-06-10T09:90:00Z
-        "204":
+        "404":
           description: Opération partiellement réussie. Pas de reservations
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: Pas de reservations pour cette salle enregistré
         "400":
           description: Opération échouée. Requête mal formulé
@@ -324,14 +334,14 @@ paths:
                 nom_user: Mael
                 prenom_user: Guillon
                 present: false
-        "204":
+        "404":
           description: Opération partiellement réussie. Salle vide d'élève
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: La salle est vide.
         "400":
           description: Opération échouée. Requête mal formulé
@@ -380,14 +390,14 @@ paths:
                 horaire: 2026-04-11T09:72:00Z
               - reservation: 3
                 horaire: 2026-06-10T09:90:00Z
-        "204":
+        "404":
           description: Opération partiellement réussie. Pas de reservations possible pour cette salle.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: Pas de reservations pour cette salle enregistré
         "400":
           description: Opération échouée. Requête mal formulé
@@ -433,14 +443,14 @@ paths:
                 nom_user: Mael
                 prenom_user: Guillon
                 present: false
-        "204":
+        "404":
           description: Opération partiellement réussie. Salle vide d'élève
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: La salle est vide.
         "400":
           description: Opération échouée. Requête mal formulé
@@ -486,14 +496,14 @@ paths:
               - utilisateur: 2
                 nom_user: Emile
                 prenom_user: Zola
-        "204":
+        "404":
           description: Opération partiellement réussie. Aucun élève porte se nom et ou prénom
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: Pas de correspondances
         "400":
           description: Opération échouée. Requête mal formulé
@@ -504,6 +514,76 @@ paths:
               example:
                 code: 400
                 message: Requête mal formulé
+  /pgs/historique_badge:
+    get:
+      tags:
+      - PGS
+      summary: Historique badge
+      description: Obtenir les informations sur les modifications d'un utilisateur (badge, classe, etc...)
+      parameters:
+      - name: uuid_user
+        in: query
+        required: true
+        schema:
+          type: string
+          format: UUID
+      responses:
+        "200":
+          description: "Opération réussi. Retour d'une liste avec les derniere modification horodaté."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/historique_utilisateur"
+              example:
+              - absence: 1
+                absenceBool: true
+                horaire_du_cours: 2026-03-15T09:30:00Z
+              - absence: 2
+                absenceBool: false
+                horaire_du_cours: 2021-04-11T09:72:00Z
+                temps_retard: 10
+              - absence: 3
+                absenceBool: false
+                horaire_du_cours: 2026-06-10T09:90:00Z
+                temps_retard: 22
+        "404":
+          description: Opération partiellement réussie. Pas d'historique disponible
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 404
+                message: Pas historique disponible
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+        "401":
+          description: Opération échouée. Le token n'es plus valide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 401
+                message: Token invalide
+        "403":
+          description: Opération échouée. La personne qui accède à l'onglet historique est professeur et n'as pas accès à cette information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 403
+                message: Vous êtes professeur
   /pgs/reserver_salle:
     post:
       tags:
@@ -522,18 +602,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/salle"
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
               example:
                 code: 200
                 message: Salle 218 reservé
-        "204":
+        "404":
           description: Opération partiellement réussie. Salle déjà reservé
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: La salle à été reservé
         "400":
           description: Opération échouée. Requête mal formulé
@@ -566,15 +651,15 @@ paths:
               example:
                 code: 200
                 message: Info utilisateur
-        "204":
+        "404":
           description: Opération partiellement réussie. L'UUID entrée n'existe pas dans la base de donnée
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
-                message: La salle à été reservé
+                code: 404
+                message: La salle à été reservé avant vous
         "400":
           description: Opération échouée. Requête mal formulé
           content:
@@ -605,14 +690,14 @@ paths:
               example:
                 code: 200
                 message: Le badge est supprimé
-        "204":
+        "404":
           description: Opération partiellement réussie. L'UUID entrée n'existe pas dans la base de donnée
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/erreur_code"
               example:
-                code: 204
+                code: 404
                 message: Cette UUID n existe pas ou à été supprimé
         "400":
           description: Opération échouée. Requête mal formulé
@@ -660,6 +745,44 @@ paths:
               example:
                 code: 409
                 message: L'UUID du badge est déjà associée à un utilisateur / L'UUID de l'utilisateur possède déjà un badge
+                
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+    put:
+      tags:
+      - PGS
+      summary: Modifier un badge
+      description: Permet de modifier un utilisateur associé à un badge dans la base de donnée
+      requestBody:
+        description: UUID utilisateur
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/utilisateur"
+      responses:
+        "200":
+          description: Opération réussie. Modification des champs de l'utilisateur
+          content:
+            application/json:
+              example:
+                code: 200
+                message: Le badge a été modifiéé
+        "409":
+          description: Opération échouée. 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 409
+                message: Modification impossible (taille des champs)
                 
         "400":
           description: Opération échouée. Requête mal formulé
@@ -771,6 +894,17 @@ components:
           type: string
           description: UUID d'un badge
           format: UUID
+    historique_utilisateur:
+      type: object
+      properties:
+        type_action:
+          type: string
+          description: Type d'action effectuée
+          example: modification_badge
+        date_action:
+          type: integer
+          format: timestamp
+          description: Date de l'action effectué
   securitySchemes:
     bearerAuth:
       type: http
