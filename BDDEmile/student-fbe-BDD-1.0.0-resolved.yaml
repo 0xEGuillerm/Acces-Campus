@@ -504,6 +504,76 @@ paths:
               example:
                 code: 400
                 message: Requête mal formulé
+  /pgs/historique_badge:
+    get:
+      tags:
+      - PSW
+      summary: Historique badge
+      description: Obtenir les informations sur les modifications d'un utilisateur (badge, classe, etc...)
+      parameters:
+      - name: uuid_user
+        in: path
+        required: true
+        schema:
+          type: string
+          format: UUID
+      responses:
+        "200":
+          description: "Opération réussi. Retour d'une liste avec les derniere modification horodaté."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/historique_utilisateur"
+              example:
+              - absence: 1
+                absenceBool: true
+                horaire_du_cours: 2026-03-15T09:30:00Z
+              - absence: 2
+                absenceBool: false
+                horaire_du_cours: 2021-04-11T09:72:00Z
+                temps_retard: 10
+              - absence: 3
+                absenceBool: false
+                horaire_du_cours: 2026-06-10T09:90:00Z
+                temps_retard: 22
+        "204":
+          description: Opération partiellement réussie. Pas d'historique disponible
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 204
+                message: Pas historique disponible
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
+        "401":
+          description: Opération échouée. Le token n'es plus valide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 401
+                message: Token invalide
+        "403":
+          description: Opération échouée. La personne qui accède à l'onglet historique est professeur et n'as pas accès à cette information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 403
+                message: Vous êtes professeur
   /pgs/reserver_salle:
     post:
       tags:
@@ -670,6 +740,44 @@ paths:
               example:
                 code: 400
                 message: Requête mal formulé
+    put:
+      tags:
+      - PGS
+      summary: Modifier un badge
+      description: Permet de modifier un utilisateur associé à un badge dans la base de donnée
+      requestBody:
+        description: UUID utilisateur
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/utilisateur"
+      responses:
+        "200":
+          description: Opération réussie. Modification des champs de l'utilisateur
+          content:
+            application/json:
+              example:
+                code: 200
+                message: Le badge a été modifiéé
+        "409":
+          description: Opération échouée. 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 409
+                message: Modification impossible (taille des champs)
+                
+        "400":
+          description: Opération échouée. Requête mal formulé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/erreur_code"
+              example:
+                code: 400
+                message: Requête mal formulé
 
 components:
   schemas:
@@ -771,6 +879,17 @@ components:
           type: string
           description: UUID d'un badge
           format: UUID
+    historique_utilisateur:
+      type: object
+      properties:
+        type_action:
+          type: string
+          description: Type d'action effectuée
+          example: modification_badge
+        date_action:
+          type: integer
+          format: timestamp
+          description: Date de l'action effectué
   securitySchemes:
     bearerAuth:
       type: http
