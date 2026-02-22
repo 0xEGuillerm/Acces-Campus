@@ -195,12 +195,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/salle"
-              type: object
-              properties:
-                horaire:
-                  type: integer
-                  format: date-time
+              allOf:
+                - $ref: "#/components/schemas/salle"
+                - type: object
+                  properties:
+                    horaire:
+                      type: integer
+                      format: date-time
       responses:
         "200":
           description: Opération réussie. La salle à bien été reserver
@@ -713,6 +714,12 @@ paths:
       - PGS
       summary: Ajout d'un badge
       description: Permet d'ajouter un badge à la base de donnée. Il doit être lié à un UUID
+      parameters:
+      - name: badgeid
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         description: UUID badge et UUID utilisateur
         content:
@@ -760,12 +767,12 @@ paths:
       - PGS
       summary: Modifier un badge
       description: Permet de modifier un utilisateur associé à un badge dans la base de donnée
-      requestBody:
-        description: UUID utilisateur
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/utilisateur"
+      parameters:
+      - name: badgeid
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Opération réussie. Modification des champs de l'utilisateur
@@ -773,7 +780,7 @@ paths:
             application/json:
               example:
                 code: 200
-                message: Le badge a été modifiéé
+                message: L'utilisateur liée au badge a été modifiéé
         "409":
           description: Opération échouée. 
           content:
