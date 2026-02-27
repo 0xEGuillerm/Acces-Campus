@@ -7,7 +7,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.1.2
+  version: 2.0.0
 servers:
 - url: https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0
   description: SwaggerHub API Auto Mocking
@@ -45,24 +45,23 @@ paths:
               example:
                 token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
                 expire_dans: 1200
-        "400":
-          description: Opération échouée. Requête mal formulé
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
         "401":
           description: Opération échouée. Identifiant ou mot de passe invalide
+        "403":
+          description: Opération refusée/déclinée.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 401
-                message: Identifiant ou mot de passe invalide
+                example:
+                  Mauvaise informations:
+                    summary: Les informations entrées sont mauvaises
+                  Trop d'essai:
+                    summary: Trop d'essaie échoué
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"        
       security: []
   /psw/historique_eleve:
     get:
@@ -91,43 +90,29 @@ paths:
                 absenceBool: false
                 horaire_du_cours: 2026-06-10T09:90:00Z
                 temps_retard: 22
-        "404":
-          description: Opération partiellement réussie. Pas d'historique disponible
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 404
-                message: Pas historique disponible
-        "400":
-          description: Opération échouée. Requête mal formulé
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
         "401":
           description: Opération échouée. Le token n'es plus valide
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 401
-                message: Token invalide
         "403":
-          description: Opération échouée. La personne qui accède à l'onglet historique est professeur et n'as pas accès à cette information
+          description: Opération refusée/déclinée.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/erreur_code"
+                example:
+                  Professeur:
+                    summary: le professeur n'a pas d'historique
+        "404":
+          description: Ressource introuvable.
+          content:
+            application/json:
               example:
-                code: 403
-                message: Vous êtes professeur
-  /psw/afficher_salle_crenaux:
+                Pas d'historique:
+                  summary: L'élève n'a pas d'historique
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+  /psw/salle_crenaux:
     get:
       tags:
       - PSW
@@ -157,33 +142,28 @@ paths:
                 numero: 202
               - salle: 3
                 numero: 315
-        "404":
-          description: Opération partiellement réussie. Pas de salles disponible
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 404
-                message: Pas de salle disponible
-        "400":
-          description: Opération échouée. Requête mal formulé
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
         "401":
           description: Opération échouée. Le token n'es plus valide
+        "403":
+          description: Opération refusée/déclinée.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/erreur_code"
+                example:
+                  Pas de réservation possible:
+                    summary: Tout les horaire sont complet.
+        "404":
+          description: Ressource introuvable.
+          content:
+            application/json:
               example:
-                code: 401
-                message: Token invalide
+                Salle inconnue:
+                  summary: La salle est inconnue
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
   /psw/reserver_salle:
     post:
       tags:
@@ -191,7 +171,7 @@ paths:
       summary: Reserver une salle
       description: Permet de reserver une salle à partir de son numéro et d'un utilisateur authentifier (l'utilisateur ne peut pas avoir plus de 3 réservations).
       requestBody:
-        description: Numéro de la salle à reserver et horaire de la reservation avec de token JWT.
+        description: Numéro de la salle à reserver et horaire de la reservation.
         content:
           application/json:
             schema:
@@ -203,47 +183,30 @@ paths:
                       type: integer
                       format: date-time
       responses:
-        "200":
+        "204":
           description: Opération réussie. La salle à bien été reserver
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                  message:
-                    type: string
-              example:
-                code: 200
-                message: Salle 218 reservé
-        "404":
-          description: Opération partiellement réussie. Salle déjà reservé
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 404
-                message: La salle à déjà été reservé. La reservation n'est pas possible
-        "400":
-          description: Opération échouée. Requête mal formulé
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
         "401":
           description: Opération échouée. Le token n'es plus valide
+        "403":
+          description: Opération refusée/déclinée.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/erreur_code"
+                example:
+                  Salle déjà reservé:
+                    summary: La salle à déjà été reservé
+        "404":
+          description: Ressource introuvable.
+          content:
+            application/json:
               example:
-                code: 401
-                message: Token invalide
+                Salle inconnue:
+                  summary: La salle est inconnue
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
   /psw/planning:
     get:
       tags:
@@ -274,32 +237,19 @@ paths:
               - reservation: 3
                 horaire: 2026-06-10T09:90:00Z
         "404":
-          description: Opération partiellement réussie. Pas de reservations
+          description: Ressource introuvable.
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
               example:
-                code: 404
-                message: Pas de reservations pour cette salle enregistré
+                Pas de réservation:
+                  summary: Pas de réservation pour ses horaire/dates
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
         "401":
           description: Opération échouée. Le token n'es plus valide
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 401
-                message: Token invalide
   /psw/etat_salle:
     get:
       tags:
@@ -335,33 +285,22 @@ paths:
                 nom_user: Mael
                 prenom_user: Guillon
                 present: false
-        "404":
-          description: Opération partiellement réussie. Salle vide d'élève
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 404
-                message: La salle est vide.
-        "400":
-          description: Opération échouée. Requête mal formulé
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
         "401":
           description: Opération échouée. Le token n'es plus valide
+        "404":
+          description: Ressource introuvable.
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
               example:
-                code: 401
-                message: Token invalide
+                Salle vide:
+                  summary: La salle est vide.
+                Salle inconnue:
+                  summary: La salle est inconnue
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
   /pgs/planning:
     get:
       tags:
@@ -391,24 +330,27 @@ paths:
                 horaire: 2026-04-11T09:72:00Z
               - reservation: 3
                 horaire: 2026-06-10T09:90:00Z
+        "403":
+          description: Opération refusée/déclinée.
+          content:
+            application/json:
+              schema:
+                example:
+                  Pas de réservation possible:
+                    summary: La réservation est impossible pour la date rentré
         "404":
-          description: Opération partiellement réussie. Pas de reservations possible pour cette salle.
+          description: Ressource introuvable.
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
               example:
-                code: 404
-                message: Pas de reservations pour cette salle enregistré
+                Salle inconnue:
+                  summary: La salle est inconnue
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
   /pgs/etat_salle:
     get:
       tags:
@@ -445,28 +387,31 @@ paths:
                 prenom_user: Guillon
                 present: false
         "404":
-          description: Opération partiellement réussie. Salle vide d'élève
+          description: Ressource introuvable.
+          content:
+            application/json:
+              example:
+                Salle inconnue:
+                  summary: La salle est inconnue
+        "403":
+          description: Opération refusée/déclinée.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 404
-                message: La salle est vide.
+                example:
+                  Salle déjà reservé:
+                    summary: La salle n'a pas pu être réservé
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
-  /pgs/utilisateur:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
+  /pgs/recherche_utilisateur:
     get:
       tags:
       - PGS
-      summary: Liste utilisateur
+      summary: Recherche un utilisateur
       description: Permet d'obtenir la liste des élèves portant le nom ou prénom entrée.
       parameters:
       - name: prenom
@@ -498,23 +443,20 @@ paths:
                 nom_user: Emile
                 prenom_user: Zola
         "404":
-          description: Opération partiellement réussie. Aucun élève porte se nom et ou prénom
+          description: Ressource introuvable.
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
               example:
-                code: 404
-                message: Pas de correspondances
+                Aucun nom:
+                  summary: Aucun nom ne correspond à celui entrée
+                Aucun prénom:
+                  summary: Aucun prénom ne correspond à celui entrée
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
   /pgs/historique_badge:
     get:
       tags:
@@ -550,41 +492,20 @@ paths:
                 horaire_du_cours: 2026-06-10T09:90:00Z
                 temps_retard: 22
         "404":
-          description: Opération partiellement réussie. Pas d'historique disponible
+          description: Ressource introuvable.
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
               example:
-                code: 404
-                message: Pas historique disponible
+                Professeur:
+                  summary: La personne d'obtenir l'historique est professeur.
+                Pas d'historique:
+                  summary: Pas d'historique disponible
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
-        "401":
-          description: Opération échouée. Le token n'es plus valide
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 401
-                message: Token invalide
-        "403":
-          description: Opération échouée. La personne qui accède à l'onglet historique est professeur et n'as pas accès à cette information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 403
-                message: Vous êtes professeur
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
   /pgs/reserver_salle:
     post:
       tags:
@@ -592,44 +513,35 @@ paths:
       summary: Reservation salle
       description: Permet de de reserver une salle (pas besoin d'ID) à partir du numéro de salle et de l'horaire.
       requestBody:
-        description: numéro salle
+        description: Numéro salle
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/salle"
       responses:
-        "200":
+        "204":
           description: Opération réussie. La salle à bien été reserver
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                  message:
-                    type: string
-              example:
-                code: 200
-                message: Salle 218 reservé
         "404":
-          description: Opération partiellement réussie. Salle déjà reservé
+          description: Ressource introuvable.
+          content:
+            application/json:
+              example:
+                Badge Inconnue:
+                  summary: UUID du badge inconnu
+        "403":
+          description: Opération refusée/déclinée.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 404
-                message: La salle à été reservé
+                example:
+                  Salle déjà reservé:
+                    summary: La salle n'a pas pu être réservé
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
   /pgs/badges/{badgeid}:
     get:
       tags:
@@ -644,32 +556,24 @@ paths:
           type: string
       responses:
         "200":
-          description: Opération réussie. Permet de renvoyer les informations d'un badge
+          description: Opération réussie. Renvoie les informations du badge
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/utilisateur"
-              example:
-                code: 200
-                message: Info utilisateur
         "404":
-          description: Opération partiellement réussie. L'UUID entrée n'existe pas dans la base de donnée
+          description: Ressource introuvable.
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
               example:
-                code: 404
-                message: La salle à été reservé avant vous
+                Badge Inconnue:
+                  summary: UUID du badge inconnu
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
     delete:
       tags:
       - PGS
@@ -682,33 +586,20 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: Opération réussie. Confirmation de la suppresion du badge de la base de donnée. Son UUID n'ai plus connu
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/badges"
-              example:
-                code: 200
-                message: Le badge est supprimé
+        "204":
+          description: Opération réussie. Badge supprimé.
         "404":
-          description: Opération partiellement réussie. L'UUID entrée n'existe pas dans la base de donnée
+          description: Ressource introuvable.
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
               example:
-                code: 404
-                message: Cette UUID n existe pas ou à été supprimé
+                Badge Inconnue:
+                  summary: UUID du badge inconnu
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
     post:
       tags:
       - PGS
@@ -721,52 +612,47 @@ paths:
         schema:
           type: string
       requestBody:
-        description: UUID badge et UUID utilisateur
+        description: UUID utilisateur à associé
         content:
           application/json:
             schema:
               type: object
+              required:
+              - uuid_user
               properties:
-                uuid_badge:
-                  type: string
-                  description: UUID du badge à ajouter
                 uuid_user:
                   type: string
                   description: UUID de l'utilisateur à qui le badge vas être associé
       responses:
-        "200":
-          description: Opération réussie. Confirmation de l'association du badge à l'utilisateur.
+        "204":
+          description: Opération réussie. Badge liée.
+        "403":
+          description: Opération refusée/déclinée.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/badges"
-              example:
-                code: 200
-                message: Le badge est associé à l'utilisateur
-        "409":
-          description: Opération échouée. 
+                example:
+                  Utilisateur badge:
+                    summary: Ajout impossible l'utilisateur possède déjà un badge
+                  Badge utilisateur:
+                    summary: Le badge est déjà associée à un utilisateur
+        "404":
+          description: Ressource introuvable.
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
               example:
-                code: 409
-                message: L'UUID du badge est déjà associée à un utilisateur / L'UUID de l'utilisateur possède déjà un badge
-                
+                Badge Inconnue:
+                  summary: UUID du badge inconnu ou liée à aucun utilisateur
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/erreur_code"
-              example:
-                code: 400
-                message: Requête mal formulé
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
     put:
       tags:
       - PGS
       summary: Modifier un badge
-      description: Permet de modifier un utilisateur associé à un badge dans la base de donnée
+      description: Modifie les informations d'un utilisateur
       parameters:
       - name: badgeid
         in: path
@@ -774,32 +660,141 @@ paths:
         schema:
           type: string
       responses:
-        "200":
+        "204":
           description: Opération réussie. Modification des champs de l'utilisateur
-          content:
-            application/json:
-              example:
-                code: 200
-                message: L'utilisateur liée au badge a été modifiéé
-        "409":
-          description: Opération échouée. 
+        "403":
+          description: Opération refusée/déclinée.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/erreur_code"
+                example:
+                  Accès refusée:
+                    summary: Modification impossible (taille des champs)
+        "404":
+          description: Ressource introuvable.
+          content:
+            application/json:
               example:
-                code: 409
-                message: Modification impossible (taille des champs)
-                
+                Badge Inconnue:
+                  summary: UUID du badge inconnu ou liée à aucun utilisateur
+                Utilisateur inconnue:
+                  summary: L'UUID de l'utilisateur est inconnue
         "400":
-          description: Opération échouée. Requête mal formulé
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+
+
+
+  /pea/verifier_badge:
+    get:
+      tags:
+      - PEA
+      summary: Verifier l'accès
+      description: Vérifier que le badge à un droit d'accès à la salle.
+      parameters:
+      - name: badgeid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: salle
+        in: query
+        required: true
+        schema:
+          type: integer
+        example: 112
+      responses:
+        "200":
+          description: Opération réussie. Renvoie les informations de l'utilisateur liée au badge.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/erreur_code"
+                $ref: "#/components/schemas/utilisateur"
+        "403":
+          description: Opération refusée/déclinée.
+          content:
+            application/json:
+              schema:
+                example:
+                  Accès refusée:
+                    summary: L'utilisateur n'as pas accès à la salle
+        "404":
+          description: Ressource introuvable.
+          content:
+            application/json:
               example:
-                code: 400
-                message: Requête mal formulé
+                Equipement introuvable:
+                  summary: Adresse MAC inconnue
+                Badge Inconnue:
+                  summary: UUID du badge inconnu ou liée à aucun utilisateur
+                Salle inconnue:
+                  summary: Numéro de salle inconnu
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
+
+
+
+  /bae/scanner_badge:
+    post:
+      tags:
+      - BAE
+      summary: Pointer une présence
+      description: Permet de pointer une présence à partir de l'UUID d'un badge.
+      requestBody:
+        description: UUID du badge scanné et salle.
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: "#/components/schemas/badges"
+              - type: object
+                required:
+                  - salle
+                properties:
+                  salle:
+                    type: integer
+                    example: 112
+      responses:
+        "200":
+          description: Opération réussie. Confimration de l'enregistrement de l'utilisateur avec ses infos.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utilisateur"
+        "403":
+          description: Opération refusée/déclinée.
+          content:
+            application/json:
+              schema:
+                example:
+                  Pointage refusée:
+                    summary: L'utilisateur à déjà scanné sont badge
+                  Pas de cours:
+                    summary: Pas de cours auquelle pointée
+        "404":
+          description: Ressource introuvable.
+          content:
+            application/json:
+              example:
+                Equipement introuvable:
+                  summary: Adresse MAC inconnue
+                Badge Inconnue:
+                  summary: UUID du badge inconnu ou liée à aucun utilisateur
+                Salle inconnue:
+                  summary: Numéro de salle inconnu
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
+
 
 components:
   schemas:
