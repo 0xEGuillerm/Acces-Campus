@@ -1,0 +1,243 @@
+<div class="main-content">
+  <h2><a name=""></a></h2>
+  <p>This is the  API</p>
+
+  <h2><a name="pgsBadgesBadgeidDelete"></a>pgsBadgesBadgeidDelete</h2>
+  <hr>
+  <p></p>
+  <p>Permet de supprimer un badge de la base de donnée et donc supprimer son association avec l&#x27;individu</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/badges/{badgeid}</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>DELETE</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model=""><a href=""></a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      
+      <span class="param-in">Path: </span>
+      
+      
+      <span class="param-name">badgeid</span>
+      <span class="param-type">String</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pgsBadgesBadgeidGet"></a>pgsBadgesBadgeidGet</h2>
+  <hr>
+  <p></p>
+  <p>Permet d&#x27;obtenir les informations d&#x27;un badge (nom, prénom, classe, statut) à partir de son UUID</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/badges/{badgeid}</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="utilisateur"><a href="">utilisateur</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      
+      <span class="param-in">Path: </span>
+      
+      
+      <span class="param-name">badgeid</span>
+      <span class="param-type">String</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pgsBadgesBadgeidPost"></a>pgsBadgesBadgeidPost</h2>
+  <hr>
+  <p></p>
+  <p>Permet d&#x27;ajouter un badge à la base de donnée. Il doit être lié à un UUID</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/badges/{badgeid}</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>POST</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model=""><a href=""></a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      
+      <span class="param-in">Path: </span>
+      
+      
+      <span class="param-name">badgeid</span>
+      <span class="param-type">String</span>
+      
+      <p class="param-description"></p>
+	  </li>
+	  <li class="parameter">
+      
+      
+      
+      
+      <span class="param-in">Body: </span>
+      <span class="param-name">body</span>
+      <span class="param-type">Badges_badgeid_body(Badges_badgeid_body)</span>
+      
+      <p class="param-description">UUID utilisateur à associé</p>
+	  </li>
+  </ul>
+  <h2><a name="pgsBadgesBadgeidPut"></a>pgsBadgesBadgeidPut</h2>
+  <hr>
+  <p></p>
+  <p>Modifie les informations d&#x27;un utilisateur</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/badges/{badgeid}</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>PUT</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model=""><a href=""></a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      
+      <span class="param-in">Path: </span>
+      
+      
+      <span class="param-name">badgeid</span>
+      <span class="param-type">String</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pgsEtatSalleGet"></a>pgsEtatSalleGet</h2>
+  <hr>
+  <p></p>
+  <p>Permet d&#x27;obtenir la liste des élèves présent(et absent) dans une salle</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/etat_salle</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="utilisateur"><a href="">List</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      <span class="param-in">Query: </span>
+      
+      
+      
+      <span class="param-name">salle</span>
+      <span class="param-type">Integer</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pgsHistoriqueBadgeGet"></a>pgsHistoriqueBadgeGet</h2>
+  <hr>
+  <p></p>
+  <p>Obtenir les informations sur les modifications d&#x27;un utilisateur (badge, classe, etc...)</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/historique_badge</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="historique_utilisateur"><a href="">List</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      <span class="param-in">Query: </span>
+      
+      
+      
+      <span class="param-name">uuid_user</span>
+      <span class="param-type">String</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pgsPlanningGet"></a>pgsPlanningGet</h2>
+  <hr>
+  <p></p>
+  <p>Permet d&#x27;obtenir les horaires de reservation d&#x27;une salle</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/planning</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="reservation"><a href="">List</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      <span class="param-in">Query: </span>
+      
+      
+      
+      <span class="param-name">salle</span>
+      <span class="param-type">Integer</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pgsRechercheUtilisateurGet"></a>pgsRechercheUtilisateurGet</h2>
+  <hr>
+  <p></p>
+  <p>Permet d&#x27;obtenir la liste des élèves portant le nom ou prénom entrée.</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/recherche_utilisateur</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="utilisateur"><a href="">List</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      <span class="param-in">Query: </span>
+      
+      
+      
+      <span class="param-name">prenom</span>
+      <span class="param-type">String</span>
+      
+      <p class="param-description"></p>
+	  </li>
+	  <li class="parameter">
+      
+      <span class="param-in">Query: </span>
+      
+      
+      
+      <span class="param-name">nom</span>
+      <span class="param-type">String</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pgsReserverSallePost"></a>pgsReserverSallePost</h2>
+  <hr>
+  <p></p>
+  <p>Permet de de reserver une salle (pas besoin d&#x27;ID) à partir du numéro de salle et de l&#x27;horaire.</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/pgs/reserver_salle</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>POST</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model=""><a href=""></a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      
+      
+      
+      <span class="param-in">Body: </span>
+      <span class="param-name">body</span>
+      <span class="param-type">Salle(Salle)</span>
+      
+      <p class="param-description">Numéro salle</p>
+	  </li>
+  </ul>
+</div>

@@ -687,7 +687,7 @@ paths:
 
 
 
-  /pea/verifier_badge:
+  /pea/verif_badge/{badgeid}:
     get:
       tags:
       - PEA

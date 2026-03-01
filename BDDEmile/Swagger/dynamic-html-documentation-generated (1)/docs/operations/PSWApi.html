@@ -1,0 +1,138 @@
+<div class="main-content">
+  <h2><a name=""></a></h2>
+  <p>This is the  API</p>
+
+  <h2><a name="pswEtatSalleGet"></a>pswEtatSalleGet</h2>
+  <hr>
+  <p></p>
+  <p>Permet d&#x27;obtenir quelle élève est présent dans une salle (prend le numéro d&#x27;une salle en entrée) ! uniquement pour le personnl enseignant !</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/psw/etat_salle</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="utilisateur"><a href="">List</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      <span class="param-in">Query: </span>
+      
+      
+      
+      <span class="param-name">salle</span>
+      <span class="param-type">Integer</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pswHistoriqueEleveGet"></a>pswHistoriqueEleveGet</h2>
+  <hr>
+  <p></p>
+  <p>Obtenir les informations d&#x27;absence et présence de l&#x27;élève déjà identifier à partir de son token JWT.</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/psw/historique_eleve</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="absence"><a href="">List</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+  </ul>
+  <h2><a name="pswLoginPost"></a>pswLoginPost</h2>
+  <hr>
+  <p></p>
+  <p>S&#x27;authentifier grâce à un username et un mot de passe. Il renvoie un token JWT. Cela permet l&#x27;accès de tout les modules à tous les utilisateurs.</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/psw/login</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>POST</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="token_jwt"><a href="">token_jwt</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      
+      
+      
+      <span class="param-in">Body: </span>
+      <span class="param-name">body</span>
+      <span class="param-type">UserLogin(UserLogin)</span>
+      
+      <p class="param-description">Mot de passe et identifiant à verifié sous forme d&#x27;une structure.</p>
+	  </li>
+  </ul>
+  <h2><a name="pswPlanningGet"></a>pswPlanningGet</h2>
+  <hr>
+  <p></p>
+  <p>Permet d&#x27;obtenir les horaires de reservation d&#x27;une salle</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/psw/planning</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="reservation"><a href="">List</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      <span class="param-in">Query: </span>
+      
+      
+      
+      <span class="param-name">salle</span>
+      <span class="param-type">Integer</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+  <h2><a name="pswReserverSallePost"></a>pswReserverSallePost</h2>
+  <hr>
+  <p></p>
+  <p>Permet de reserver une salle à partir de son numéro et d&#x27;un utilisateur authentifier (l&#x27;utilisateur ne peut pas avoir plus de 3 réservations).</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/psw/reserver_salle</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>POST</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model=""><a href=""></a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      
+      
+      
+      <span class="param-in">Body: </span>
+      <span class="param-name">body</span>
+      <span class="param-type">Psw_reserver_salle_body(Psw_reserver_salle_body)</span>
+      
+      <p class="param-description">Numéro de la salle à reserver et horaire de la reservation.</p>
+	  </li>
+  </ul>
+  <h2><a name="pswSalleCrenauxGet"></a>pswSalleCrenauxGet</h2>
+  <hr>
+  <p></p>
+  <p>Permet de lister les salles disponible pour un crénaux et renvoie une liste de salles.</p>
+  <h3 class="section">URL</h3>
+  <code>https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0/psw/salle_crenaux</code>
+  <h3 class="section">HTTP Method</h3>
+  <code>GET</code>
+  <h3 class="section">Response Type</h3>
+  <div class="model" data-model="salle"><a href="">List</a></div>
+  <h3 class="section">Parameters</h3>
+  <ul>
+	  <li class="parameter">
+      
+      <span class="param-in">Query: </span>
+      
+      
+      
+      <span class="param-name">horaire</span>
+      <span class="param-type">Date</span>
+      
+      <p class="param-description"></p>
+	  </li>
+  </ul>
+</div>
