@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acces Campus</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-dark bg-dark px-3">
+    <span class="navbar-brand">Acces Campus</span>
+    <button v-show="currentPage !== 'login'" class="btn btn-outline-light btn-sm" @click="logout">Deconnexion</button>
+  </nav>
+
+  <!-- LOGIN -->
+  <div v-show="currentPage === 'login'" style="position:fixed; top:56px; left:0; right:0; bottom:0; background:#343a40; display:flex; align-items:center; justify-content:center; z-index:100">
+    <div class="card" style="width:380px">
+      <div class="card-header bg-primary text-white text-center">
+        <h5 class="mb-0">Connexion</h5>
+      </div>
+      <div class="card-body">
+        <div v-show="loginError" class="alert alert-danger py-2" style="font-size:13px">{{ loginError }}</div>
+        <div class="mb-3">
+          <label class="form-label">Identifiant</label>
+          <input type="text" v-model="loginId" class="form-control" placeholder="Votre identifiant">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Mot de passe</label>
+          <input type="password" v-model="loginPass" class="form-control" placeholder="Votre mot de passe">
+        </div>
+        <button class="btn btn-primary w-100" @click="handleLogin">Se connecter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div v-show="currentPage === 'dashboard'" class="p-4">
+    <div class="bg-primary text-white rounded p-3 mb-4">
+      <h4>Bienvenue sur Acces Campus</h4>
+      <p class="mb-0" style="opacity:0.8">Selectionnez un module.</p>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('dispo')"><h6>Disponibilite des Salles</h6><small class="text-muted">Verifiez quelles salles sont libres.</small></div></div>
+      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('agenda')"><h6>Mon Agenda</h6><small class="text-muted">Gerez vos reservations.</small></div></div>
+      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('annuaire')"><h6>Annuaire</h6><small class="text-muted">Trouvez un etudiant.</small></div></div>
+      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('planning')"><h6>Planning Salles</h6><small class="text-muted">Emploi du temps des salles.</small></div></div>
+    </div>
+  </div>
+
+  <!-- DISPONIBILITE -->
+  <div v-show="currentPage === 'dispo'" class="p-4">
+    <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
+    <h4>Disponibilite des Salles</h4>
+    <div class="card p-3 mt-3">
+      <label class="form-label">Choisir une salle :</label>
+      <select v-model="selectedDispo" class="form-select" style="max-width:300px">
+        <option value="">-- Selectionnez --</option>
+        <option v-for="salle in salles" :key="salle" :value="salle">{{ salle }}</option>
+      </select>
+      <div class="mt-3" v-if="dispoInfo">
+        <div v-if="dispoInfo.libre" class="alert alert-success">La salle est <strong>libre</strong> aujourd'hui.</div>
+        <div v-else>
+          <div class="alert alert-danger">La salle est <strong>occupee</strong> aujourd'hui.</div>
+          <h6>Cours du jour ({{ dispoInfo.jour }}) :</h6>
+          <ul class="list-group">
+            <li v-for="ev in dispoInfo.events" :key="ev.heure" class="list-group-item">
+              <strong>{{ ev.heure }}</strong> - {{ ev.titre }} ({{ ev.duree }}h)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div v-show="currentPage === 'agenda'" class="p-4">
+    <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
+    <h4>Mon Agenda &amp; Reservations</h4>
+    <div class="card p-3 mt-3">
+      <div class="row g-2 mb-3">
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:13px">Creneau debut</label>
+          <select v-model="agendaCreneauDeb" class="form-select form-select-sm">
+            <option value="">--</option>
+            <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:13px">Date debut</label>
+          <input type="date" v-model="agendaDateDeb" class="form-control form-control-sm">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:13px">Creneau fin</label>
+          <select v-model="agendaCreneauFin" class="form-select form-select-sm">
+            <option value="">--</option>
+            <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:13px">Date fin</label>
+          <input type="date" v-model="agendaDateFin" class="form-control form-control-sm">
+        </div>
+      </div>
+      <div>
+        <button class="btn btn-primary btn-sm me-2" @click="searchAgenda">Rechercher</button>
+        <button class="btn btn-outline-danger btn-sm" @click="simulerErreur">Simuler erreur</button>
+      </div>
+    </div>
+    <div class="mt-3" v-if="agendaResultats !== null">
+      <p v-if="agendaResultats.length === 0" class="text-muted text-center mt-3">Aucune reservation trouvee.</p>
+      <div v-else>
+        <p class="text-muted" style="font-size:13px">{{ agendaResultats.length }} reservation(s)</p>
+        <table class="table table-striped">
+          <thead><tr><th>Titre</th><th>Date</th><th>Creneau</th><th>Salle</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr v-for="res in agendaResultats" :key="res.date + res.creneau">
+              <td>{{ res.titre }}</td>
+              <td>{{ formatDate(res.date) }}</td>
+              <td>{{ res.creneau }}</td>
+              <td>{{ res.salle }}</td>
+              <td><span class="badge" :class="badgeClass(res.statut)">{{ res.statut }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANNUAIRE -->
+  <div v-show="currentPage === 'annuaire'" class="p-4">
+    <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
+    <h4>Annuaire du Campus</h4>
+    <input type="text" v-model="searchAnnuaire" class="form-control my-3" placeholder="Rechercher par nom ou classe...">
+    <table class="table table-hover">
+      <thead><tr><th>Nom</th><th>Classe</th><th>Email</th></tr></thead>
+      <tbody>
+        <tr v-if="filteredStudents.length === 0">
+          <td colspan="3" class="text-center text-muted">Aucun resultat.</td>
+        </tr>
+        <tr v-for="s in filteredStudents" :key="s.email">
+          <td>{{ s.nom }}</td><td>{{ s.classe }}</td><td>{{ s.email }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PLANNING -->
+  <div v-show="currentPage === 'planning'" class="p-4">
+    <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
+    <h4>Planning Salles</h4>
+    <div class="mb-3">
+      <label class="form-label">Salle :</label>
+      <select v-model="selectedPlanning" class="form-select" style="max-width:250px">
+        <option v-for="salle in salles" :key="salle" :value="salle">{{ salle }}</option>
+      </select>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead class="table-light"><tr><th>Heure</th><th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th></tr></thead>
+        <tbody>
+          <tr v-for="row in planningRows" :key="row.heure">
+            <td class="text-muted" style="font-size:12px">{{ row.heure }}</td>
+            <td v-for="(ev, i) in row.jours" :key="i" style="font-size:11px; vertical-align:top">
+              <div v-if="ev" class="planning-event" :class="'event-' + ev.type">{{ ev.titre }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Toast erreur -->
+  <div v-show="toastVisible" class="alert alert-danger position-fixed top-0 end-0 m-3" style="z-index:9999; max-width:400px">{{ toastMessage }}</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
