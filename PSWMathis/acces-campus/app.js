@@ -53,8 +53,9 @@ createApp({
       // Annuaire
       searchAnnuaire: '',
 
-      // Disponibilite
+      // Disponibilite : salle selectionnee et creneau optionnel
       selectedDispo: '',
+      selectedCreneauDispo: '',
 
       // Agenda
       agendaCreneauDeb: '',
@@ -85,11 +86,25 @@ createApp({
     },
 
     dispoInfo() {
+      // Aucune salle selectionnee : on ne retourne rien
       if (!this.selectedDispo) return null;
+
+      // Recupere les evenements de la salle choisie
       const events = this.planning[this.selectedDispo] || [];
+
+      // Determine le jour actuel en francais (1=Lundi ... 5=Vendredi)
       const today = new Date().getDay();
       const jourAuj = this.joursFR[today] || null;
-      const eventsDuJour = jourAuj ? events.filter(e => e.jour === jourAuj) : [];
+
+      // Filtre les cours qui ont lieu aujourd'hui
+      let eventsDuJour = jourAuj ? events.filter(e => e.jour === jourAuj) : [];
+
+      // Si un creneau est selectionne, on filtre en plus par l'heure de debut
+      if (this.selectedCreneauDispo) {
+        const heureDebut = this.selectedCreneauDispo.split(' - ')[0];
+        eventsDuJour = eventsDuJour.filter(e => e.heure === heureDebut);
+      }
+
       return { libre: eventsDuJour.length === 0, events: eventsDuJour, jour: jourAuj };
     },
 

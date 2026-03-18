@@ -51,27 +51,70 @@
     </div>
   </div>
 
-  <!-- DISPONIBILITE -->
+  <!-- DISPONIBILITE : page de verification de disponibilite d'une salle -->
   <div v-show="currentPage === 'dispo'" class="p-4">
     <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
     <h4>Disponibilite des Salles</h4>
     <div class="card p-3 mt-3">
+
+      <!-- Selecteur de salle -->
       <label class="form-label">Choisir une salle :</label>
       <select v-model="selectedDispo" class="form-select" style="max-width:300px">
         <option value="">-- Selectionnez --</option>
         <option v-for="salle in salles" :key="salle" :value="salle">{{ salle }}</option>
       </select>
+
+      <!-- Selecteur de creneau horaire -->
+      <label class="form-label mt-3">Choisir un creneau
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        :</label>
+      <select v-model="selectedCreneauDispo" class="form-select" style="max-width:300px">
+        <option value="">-- Tous les creneaux --</option>
+        <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
+      </select>
+
+      <!-- Affichage du resultat une fois une salle selectionnee -->
       <div class="mt-3" v-if="dispoInfo">
-        <div v-if="dispoInfo.libre" class="alert alert-success">La salle est <strong>libre</strong> aujourd'hui.</div>
+
+        <!-- Cas ou la salle est libre sur le creneau choisi -->
+        <div v-if="dispoInfo.libre" class="alert alert-success">
+          La salle est <strong>libre</strong>
+          <span v-if="selectedCreneauDispo"> sur le creneau {{ selectedCreneauDispo }}</span>
+          <span v-else> aujourd'hui</span>.
+        </div>
+
+        <!-- Cas ou la salle est occupee : liste des cours correspondants -->
         <div v-else>
-          <div class="alert alert-danger">La salle est <strong>occupee</strong> aujourd'hui.</div>
-          <h6>Cours du jour ({{ dispoInfo.jour }}) :</h6>
+          <div class="alert alert-danger">
+            La salle est <strong>occupee</strong>
+            <span v-if="selectedCreneauDispo"> sur le creneau {{ selectedCreneauDispo }}</span>
+            <span v-else> aujourd'hui</span>.
+          </div>
+          <h6>Cours ({{ dispoInfo.jour }}) :</h6>
           <ul class="list-group">
+            <!-- Affiche chaque cours avec son heure et sa duree -->
             <li v-for="ev in dispoInfo.events" :key="ev.heure" class="list-group-item">
               <strong>{{ ev.heure }}</strong> - {{ ev.titre }} ({{ ev.duree }}h)
             </li>
           </ul>
         </div>
+
       </div>
     </div>
   </div>
