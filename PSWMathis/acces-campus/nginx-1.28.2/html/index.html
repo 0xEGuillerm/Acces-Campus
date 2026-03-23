@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <!-- Rend la page responsive sur mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acces Campus</title>
+  <!-- Bootstrap 5 pour les composants visuels (boutons, tableaux, badges...) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Nos styles personnalisés (couleurs du planning, cartes cliquables...) -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Point d'entrée Vue.js : tout ce qui est ici est contrôlé par app.js -->
+<div id="app">
+
+  <!-- ===================================================
+       BARRE DE NAVIGATION (visible sur toutes les pages)
+       =================================================== -->
+  <nav class="navbar navbar-dark bg-dark px-3">
+    <span class="navbar-brand">Acces Campus</span>
+    <!-- Le bouton Déconnexion est caché sur la page de login (inutile à ce stade) -->
+    <button v-show="pageCourante !== 'login'" class="btn btn-outline-light btn-sm" @click="deconnecter">
+      Deconnexion
+    </button>
+  </nav>
+
+
+  <!-- ===================================================
+       PAGE : LOGIN
+       Affichée uniquement si pageCourante === 'login'
+       Positionnée en plein écran par-dessus le reste
+       =================================================== -->
+  <div v-show="pageCourante === 'login'"
+       style="position:fixed; top:56px; left:0; right:0; bottom:0;
+              background:#343a40; display:flex; align-items:center;
+              justify-content:center; z-index:100">
+
+    <div class="card" style="width:380px">
+      <div class="card-header bg-primary text-white text-center">
+        <h5 class="mb-0">Connexion</h5>
+      </div>
+      <div class="card-body">
+
+        <!-- Message d'erreur (masqué si loginErreur est vide) -->
+        <div v-show="loginErreur" class="alert alert-danger py-2" style="font-size:13px">
+          {{ loginErreur }}
+        </div>
+
+        <!-- Champ identifiant lié à la variable loginId dans app.js -->
+        <div class="mb-3">
+          <label class="form-label">Identifiant</label>
+          <input type="text" v-model="loginId" class="form-control" placeholder="Votre identifiant">
+        </div>
+
+        <!-- Champ mot de passe lié à loginMdp dans app.js -->
+        <div class="mb-3">
+          <label class="form-label">Mot de passe</label>
+          <input type="password" v-model="loginMdp" class="form-control" placeholder="Votre mot de passe">
+        </div>
+
+        <!-- Bouton désactivé pendant le chargement pour éviter les doubles clics -->
+        <button class="btn btn-primary w-100" @click="gererLogin" :disabled="loginCharge">
+          <!-- Spinner visible uniquement pendant l'appel API -->
+          <span v-if="loginCharge" class="spinner-border spinner-border-sm me-2" role="status"></span>
+          {{ loginCharge ? 'Connexion...' : 'Se connecter' }}
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================================================
+       PAGE : DASHBOARD
+       4 cartes cliquables pour accéder aux modules
+       =================================================== -->
+  <div v-show="pageCourante === 'dashboard'" class="p-4">
+
+    <!-- Bandeau de bienvenue -->
+    <div class="bg-primary text-white rounded p-3 mb-4">
+      <h4>Bienvenue sur Acces Campus</h4>
+      <p class="mb-0" style="opacity:0.8">Selectionnez un module.</p>
+    </div>
+
+    <!-- Grille 2x2 des modules -->
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card p-3 module-card" @click="allerA('dispo')">
+          <h6>Disponibilite des Salles</h6>
+          <small class="text-muted">Verifiez quelles salles sont libres.</small>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3 module-card" @click="allerA('agenda')">
+          <h6>Mon Agenda</h6>
+          <small class="text-muted">Gerez vos reservations.</small>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3 module-card" @click="allerA('annuaire')">
+          <h6>Annuaire</h6>
+          <small class="text-muted">Trouvez un etudiant.</small>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3 module-card" @click="allerA('planning')">
+          <h6>Planning Salles</h6>
+          <small class="text-muted">Emploi du temps des salles.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================================================
+       PAGE : DISPONIBILITE DES SALLES
+       Vérifie si une salle est libre aujourd'hui
+       =================================================== -->
+  <div v-show="pageCourante === 'dispo'" class="p-4">
+    <button class="btn btn-secondary btn-sm mb-3" @click="allerA('dashboard')">← Retour</button>
+    <h4>Disponibilite des Salles</h4>
+
+    <div class="card p-3 mt-3">
+
+      <!-- Sélection de la salle -->
+      <label class="form-label">Choisir une salle :</label>
+      <select v-model="salleChoisie" class="form-select" style="max-width:300px">
+        <option value="">-- Selectionnez --</option>
+        <!-- v-for génère une option pour chaque salle chargée depuis json-server -->
+        <option v-for="salle in salles" :key="salle" :value="salle">{{ salle }}</option>
+      </select>
+
+      <!-- Sélection du créneau (optionnel) -->
+      <label class="form-label mt-3">Choisir un creneau :</label>
+      <select v-model="creneauChoisi" class="form-select" style="max-width:300px">
+        <option value="">-- Tous les creneaux --</option>
+        <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
+      </select>
+
+      <!-- Résultat affiché uniquement quand une salle est sélectionnée -->
+      <div class="mt-3" v-if="infoDispo">
+
+        <!-- Salle libre -->
+        <div v-if="infoDispo.libre" class="alert alert-success">
+          La salle est <strong>libre</strong>
+          <span v-if="creneauChoisi"> sur le creneau {{ creneauChoisi }}</span>
+          <span v-else> aujourd'hui</span>.
+        </div>
+
+        <!-- Salle occupée : liste des cours en cours -->
+        <div v-else>
+          <div class="alert alert-danger">
+            La salle est <strong>occupee</strong>
+            <span v-if="creneauChoisi"> sur le creneau {{ creneauChoisi }}</span>
+            <span v-else> aujourd'hui</span>.
+          </div>
+          <h6>Cours ({{ infoDispo.jour }}) :</h6>
+          <ul class="list-group">
+            <li v-for="ev in infoDispo.events" :key="ev.heure" class="list-group-item">
+              <strong>{{ ev.heure }}</strong> - {{ ev.titre }} ({{ ev.duree }}h)
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================================================
+       PAGE : AGENDA / RESERVATIONS
+       =================================================== -->
+  <div v-show="pageCourante === 'agenda'" class="p-4">
+    <button class="btn btn-secondary btn-sm mb-3" @click="allerA('dashboard')">← Retour</button>
+    <h4>Mon Agenda &amp; Reservations</h4>
+
+    <!-- Filtres de recherche -->
+    <div class="card p-3 mt-3">
+      <div class="row g-2 mb-3">
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:13px">Creneau debut</label>
+          <select v-model="agendaCreneauDeb" class="form-select form-select-sm">
+            <option value="">--</option>
+            <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:13px">Date debut</label>
+          <input type="date" v-model="agendaDateDeb" class="form-control form-control-sm">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:13px">Creneau fin</label>
+          <select v-model="agendaCreneauFin" class="form-select form-select-sm">
+            <option value="">--</option>
+            <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:13px">Date fin</label>
+          <input type="date" v-model="agendaDateFin" class="form-control form-control-sm">
+        </div>
+      </div>
+      <div>
+        <button class="btn btn-primary btn-sm me-2" @click="rechercherAgenda">Rechercher</button>
+        <!-- Bouton de test pour vérifier que les toasts fonctionnent -->
+        <button class="btn btn-outline-danger btn-sm" @click="simulerErreur">Simuler erreur</button>
+      </div>
+    </div>
+
+    <!-- Résultats de la recherche (null = pas encore lancée) -->
+    <div class="mt-3" v-if="agendaResultats !== null">
+      <p v-if="agendaResultats.length === 0" class="text-muted text-center mt-3">
+        Aucune reservation trouvee.
+      </p>
+      <div v-else>
+        <p class="text-muted" style="font-size:13px">{{ agendaResultats.length }} reservation(s)</p>
+        <table class="table table-striped">
+          <thead>
+            <tr><th>Titre</th><th>Date</th><th>Creneau</th><th>Salle</th><th>Statut</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="res in agendaResultats" :key="res.date + res.creneau">
+              <td>{{ res.titre }}</td>
+              <td>{{ formaterDate(res.date) }}</td>
+              <td>{{ res.creneau }}</td>
+              <td>{{ res.salle }}</td>
+              <!-- Badge vert si confirmé, jaune si en attente -->
+              <td><span class="badge" :class="classeBadge(res.statut)">{{ res.statut }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================================================
+       PAGE : ANNUAIRE
+       Recherche en temps réel dans la liste des étudiants
+       =================================================== -->
+  <div v-show="pageCourante === 'annuaire'" class="p-4">
+    <button class="btn btn-secondary btn-sm mb-3" @click="allerA('dashboard')">← Retour</button>
+    <h4>Annuaire du Campus</h4>
+    <!-- La propriété calculée etudiantsFiltres se met à jour à chaque frappe -->
+    <input type="text" v-model="rechercheAnnuaire" class="form-control my-3"
+           placeholder="Rechercher par nom ou classe...">
+    <table class="table table-hover">
+      <thead><tr><th>Nom</th><th>Classe</th><th>Email</th></tr></thead>
+      <tbody>
+        <tr v-if="etudiantsFiltres.length === 0">
+          <td colspan="3" class="text-center text-muted">Aucun resultat.</td>
+        </tr>
+        <tr v-for="e in etudiantsFiltres" :key="e.email">
+          <td>{{ e.nom }}</td><td>{{ e.classe }}</td><td>{{ e.email }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ===================================================
+       PAGE : PLANNING DES SALLES
+       Grille horaire lundi→vendredi pour la salle choisie
+       =================================================== -->
+  <div v-show="pageCourante === 'planning'" class="p-4">
+    <button class="btn btn-secondary btn-sm mb-3" @click="allerA('dashboard')">← Retour</button>
+    <h4>Planning Salles</h4>
+
+    <div class="mb-3">
+      <label class="form-label">Salle :</label>
+      <select v-model="sallesPlanningChoisie" class="form-select" style="max-width:250px">
+        <option v-for="salle in salles" :key="salle" :value="salle">{{ salle }}</option>
+      </select>
+    </div>
+
+    <!-- Tableau de la semaine : une ligne par heure, une colonne par jour -->
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr><th>Heure</th><th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th></tr>
+        </thead>
+        <tbody>
+          <tr v-for="ligne in lignesPlanning" :key="ligne.heure">
+            <td class="text-muted" style="font-size:12px">{{ ligne.heure }}</td>
+            <!-- Pour chaque jour, affiche l'événement s'il existe (sinon cellule vide) -->
+            <td v-for="(ev, i) in ligne.jours" :key="i" style="font-size:11px; vertical-align:top">
+              <div v-if="ev" class="planning-event" :class="'event-' + ev.type">
+                {{ ev.titre }}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ===================================================
+       TOAST - Notification temporaire (erreurs, alertes)
+       Positionnée en haut à droite, disparaît après 4s
+       =================================================== -->
+  <div v-show="toastVisible"
+       class="alert alert-danger position-fixed top-0 end-0 m-3"
+       style="z-index:9999; max-width:400px">
+    {{ toastMessage }}
+  </div>
+
+</div><!-- fin #app -->
+
+<!-- Vue 3 doit être chargé AVANT app.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
