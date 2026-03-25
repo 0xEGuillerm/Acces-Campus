@@ -1,0 +1,59 @@
+{
+  "utilisateurs": [
+    {
+      "id": 1,
+      "login_user": "mblanchard",
+      "motdepasse": "helloworld1234!",
+      "nom_user": "Blanchard",
+      "prenom_user": "Mathis",
+      "classe": "BTS CIEL 2",
+      "statut": "eleve"
+    },
+    {
+      "id": 2,
+      "login_user": "eguillerm",
+      "motdepasse": "helloworld1234!",
+      "nom_user": "Guillerm",
+      "prenom_user": "Emile",
+      "classe": "BTS CIEL 2",
+      "statut": "eleve"
+    },
+    {
+      "id": 3,
+      "login_user": "mguillon",
+      "motdepasse": "helloworld1234!",
+      "nom_user": "Guillon",
+      "prenom_user": "Mael",
+      "classe": "BTS CIEL 2",
+      "statut": "eleve"
+    }
+  ],
+
+  "etat_salle": [
+    { "id": 1, "salle": 101, "nom_user": "Guillerm",  "prenom_user": "Emile",  "classe": "CIEL2", "present": true,  "statut": "eleve" },
+    { "id": 2, "salle": 101, "nom_user": "Blanchard", "prenom_user": "Mathis", "classe": "CIEL2", "present": false, "statut": "eleve" },
+    { "id": 3, "salle": 101, "nom_user": "Guillon",   "prenom_user": "Mael",   "classe": "CIEL2", "present": false, "statut": "eleve" }
+  ],
+
+  "historique_eleve": [
+    { "id": 1, "absenceBool": true,  "horaire_du_cours": "2026-03-15T09:30:00.000Z" },
+    { "id": 2, "absenceBool": false, "horaire_du_cours": "2026-04-11T10:12:00.000Z", "temps_retard": 10 },
+    { "id": 3, "absenceBool": false, "horaire_du_cours": "2026-06-10T10:30:00.000Z", "temps_retard": 22 }
+  ],
+
+  "planning": [
+    { "id": 1, "salle": 101, "horaire": "2026-03-25T08:00:00.000Z" },
+    { "id": 2, "salle": 101, "horaire": "2026-03-25T10:00:00.000Z" },
+    { "id": 3, "salle": 202, "horaire": "2026-03-25T14:00:00.000Z" }
+  ],
+
+  "reserver_salle": [
+    { "id": 1, "horaire": "2026-03-25T14:00:00.000Z", "numero": 101 }
+  ],
+
+  "salle_crenaux": [
+    { "id": 1, "horaire": "2026-03-25T08:00:00.000Z", "numero": 101 },
+    { "id": 2, "horaire": "2026-03-25T08:00:00.000Z", "numero": 202 },
+    { "id": 3, "horaire": "2026-03-25T08:00:00.000Z", "numero": 315 }
+  ]
+}
