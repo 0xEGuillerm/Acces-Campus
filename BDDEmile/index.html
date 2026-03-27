@@ -1,0 +1,1455 @@
+<!doctype html>
+<html>
+  <head>
+    <title>API BDD Accès Campus</title>
+    <style type="text/css">
+      body {
+      	font-family: Trebuchet MS, sans-serif;
+      	font-size: 15px;
+      	color: #444;
+      	margin-right: 24px;
+      }
+      
+      h1	{
+      	font-size: 25px;
+      }
+      h2	{
+      	font-size: 20px;
+      }
+      h3	{
+      	font-size: 16px;
+      	font-weight: bold;
+      }
+      hr	{
+      	height: 1px;
+      	border: 0;
+      	color: #ddd;
+      	background-color: #ddd;
+      }
+      
+      .app-desc {
+        clear: both;
+        margin-left: 20px;
+      }
+      .param-name {
+        width: 100%;
+      }
+      .license-info {
+        margin-left: 20px;
+      }
+      
+      .license-url {
+        margin-left: 20px;
+      }
+      
+      .model {
+        margin: 0 0 0px 20px;
+      }
+      
+      .method {
+        margin-left: 20px;
+      }
+      
+      .method-notes	{
+      	margin: 10px 0 20px 0;
+      	font-size: 90%;
+      	color: #555;
+      }
+      
+      pre {
+        padding: 10px;
+        margin-bottom: 2px;
+      }
+      
+      .http-method {
+       text-transform: uppercase;
+      }
+      
+      pre.get {
+        background-color: #0f6ab4;
+      }
+      
+      pre.post {
+        background-color: #10a54a;
+      }
+      
+      pre.put {
+        background-color: #c5862b;
+      }
+      
+      pre.delete {
+        background-color: #a41e22;
+      }
+      
+      .huge	{
+      	color: #fff;
+      }
+      
+      pre.example {
+        background-color: #f3f3f3;
+        padding: 10px;
+        border: 1px solid #ddd;
+      }
+      
+      code {
+        white-space: pre;
+      }
+      
+      .nickname {
+        font-weight: bold;
+      }
+      
+      .method-path {
+        font-size: 1.5em;
+        background-color: #0f6ab4;
+      }
+      
+      .up {
+        float:right;
+      }
+      
+      .parameter {
+        width: 500px;
+      }
+      
+      .param {
+        width: 500px;
+        padding: 10px 0 0 20px;
+        font-weight: bold;
+      }
+      
+      .param-desc {
+        width: 700px;
+        padding: 0 0 0 20px;
+        color: #777;
+      }
+      
+      .param-type {
+        font-style: italic;
+      }
+      
+      .param-enum-header {
+      width: 700px;
+      padding: 0 0 0 60px;
+      color: #777;
+      font-weight: bold;
+      }
+      
+      .param-enum {
+      width: 700px;
+      padding: 0 0 0 80px;
+      color: #777;
+      font-style: italic;
+      }
+      
+      .field-label {
+        padding: 0;
+        margin: 0;
+        clear: both;
+      }
+      
+      .field-items	{
+      	padding: 0 0 15px 0;
+      	margin-bottom: 15px;
+      }
+      
+      .return-type {
+        clear: both;
+        padding-bottom: 10px;
+      }
+      
+      .param-header {
+        font-weight: bold;
+      }
+      
+      .method-tags {
+        text-align: right;
+      }
+      
+      .method-tag {
+        background: none repeat scroll 0% 0% #24A600;
+        border-radius: 3px;
+        padding: 2px 10px;
+        margin: 2px;
+        color: #FFF;
+        display: inline-block;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>API BDD Accès Campus</h1>
+    <div class="app-desc">Prototype de l'API du projet Accès Campus. Fournit la documentation de l'API de la base de donnée pour le PGS, PSW, BAE et PEA</div>
+    <div class="app-desc">More information: <a href="https://helloreverb.com">https://helloreverb.com</a></div>
+    <div class="app-desc">Contact Info: <a href="emile.guillerm@saintaubinlasalle.fr">emile.guillerm@saintaubinlasalle.fr</a></div>
+    <div class="app-desc">Version: 1.0.0</div>
+    <div class="app-desc">BasePath:/student-fbe/BDD/1.0.0</div>
+    <div class="license-info">Apache 2.0</div>
+    <div class="license-url">http://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+    <ol>
+      <li></li>
+    </ol>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#BAE">BAE</a></h4>
+  <ul>
+  <li><a href="#baeScannerBadgePost"><code><span class="http-method">post</span> /bae/scanner_badge</code></a></li>
+  </ul>
+  <h4><a href="#PEA">PEA</a></h4>
+  <ul>
+  <li><a href="#peaVerifBadgeBadgeidGet"><code><span class="http-method">get</span> /pea/verif_badge/{badgeid}</code></a></li>
+  </ul>
+  <h4><a href="#PGS">PGS</a></h4>
+  <ul>
+  <li><a href="#pgsBadgesBadgeidDelete"><code><span class="http-method">delete</span> /pgs/badges/{badgeid}</code></a></li>
+  <li><a href="#pgsBadgesBadgeidGet"><code><span class="http-method">get</span> /pgs/badges/{badgeid}</code></a></li>
+  <li><a href="#pgsBadgesBadgeidPost"><code><span class="http-method">post</span> /pgs/badges/{badgeid}</code></a></li>
+  <li><a href="#pgsBadgesBadgeidPut"><code><span class="http-method">put</span> /pgs/badges/{badgeid}</code></a></li>
+  <li><a href="#pgsEtatSalleGet"><code><span class="http-method">get</span> /pgs/etat_salle</code></a></li>
+  <li><a href="#pgsHistoriqueBadgeGet"><code><span class="http-method">get</span> /pgs/historique_badge</code></a></li>
+  <li><a href="#pgsPlanningGet"><code><span class="http-method">get</span> /pgs/planning</code></a></li>
+  <li><a href="#pgsRechercheUtilisateurGet"><code><span class="http-method">get</span> /pgs/recherche_utilisateur</code></a></li>
+  <li><a href="#pgsReserverSallePost"><code><span class="http-method">post</span> /pgs/reserver_salle</code></a></li>
+  </ul>
+  <h4><a href="#PSW">PSW</a></h4>
+  <ul>
+  <li><a href="#pswEtatSalleGet"><code><span class="http-method">get</span> /psw/etat_salle</code></a></li>
+  <li><a href="#pswHistoriqueEleveGet"><code><span class="http-method">get</span> /psw/historique_eleve</code></a></li>
+  <li><a href="#pswLoginPost"><code><span class="http-method">post</span> /psw/login</code></a></li>
+  <li><a href="#pswPlanningGet"><code><span class="http-method">get</span> /psw/planning</code></a></li>
+  <li><a href="#pswReserverSallePost"><code><span class="http-method">post</span> /psw/reserver_salle</code></a></li>
+  <li><a href="#pswSalleCrenauxGet"><code><span class="http-method">get</span> /psw/salle_crenaux</code></a></li>
+  </ul>
+
+  <h1><a name="BAE">BAE</a></h1>
+  <div class="method"><a name="baeScannerBadgePost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /bae/scanner_badge</code></pre></div>
+    <div class="method-summary">Pointer une présence (<span class="nickname">baeScannerBadgePost</span>)</div>
+    <div class="method-notes">Permet de pointer une présence à partir de l'UUID d'un badge.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#bae_scanner_badge_body">bae_scanner_badge_body</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; UUID du badge scanné et salle. </div>
+                </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#utilisateur">utilisateur</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Confimration de l&#x27;enregistrement de l&#x27;utilisateur avec ses infos.
+        <a href="#utilisateur">utilisateur</a>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Equipement introuvable&quot;:{&quot;summary&quot;:&quot;Adresse MAC inconnue&quot;},&quot;Badge Inconnue&quot;:{&quot;summary&quot;:&quot;UUID du badge inconnu ou liée à aucun utilisateur&quot;},&quot;Salle inconnue&quot;:{&quot;summary&quot;:&quot;Numéro de salle inconnu&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="PEA">PEA</a></h1>
+  <div class="method"><a name="peaVerifBadgeBadgeidGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /pea/verif_badge/{badgeid}</code></pre></div>
+    <div class="method-summary">Verifier l'accès (<span class="nickname">peaVerifBadgeBadgeidGet</span>)</div>
+    <div class="method-notes">Vérifier que le badge à un droit d'accès à la salle.</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">badgeid (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">salle (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#utilisateur">utilisateur</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Renvoie les informations de l&#x27;utilisateur liée au badge.
+        <a href="#utilisateur">utilisateur</a>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Equipement introuvable&quot;:{&quot;summary&quot;:&quot;Adresse MAC inconnue&quot;},&quot;Badge Inconnue&quot;:{&quot;summary&quot;:&quot;UUID du badge inconnu ou liée à aucun utilisateur&quot;},&quot;Salle inconnue&quot;:{&quot;summary&quot;:&quot;Numéro de salle inconnu&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="PGS">PGS</a></h1>
+  <div class="method"><a name="pgsBadgesBadgeidDelete"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /pgs/badges/{badgeid}</code></pre></div>
+    <div class="method-summary">Supprimer un badge (<span class="nickname">pgsBadgesBadgeidDelete</span>)</div>
+    <div class="method-notes">Permet de supprimer un badge de la base de donnée et donc supprimer son association avec l'individu</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">badgeid (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">204</h4>
+    Opération réussie. Badge supprimé.
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Badge Inconnue&quot;:{&quot;summary&quot;:&quot;UUID du badge inconnu&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pgsBadgesBadgeidGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /pgs/badges/{badgeid}</code></pre></div>
+    <div class="method-summary">Information badge (<span class="nickname">pgsBadgesBadgeidGet</span>)</div>
+    <div class="method-notes">Permet d'obtenir les informations d'un badge (nom, prénom, classe, statut) à partir de son UUID</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">badgeid (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#utilisateur">utilisateur</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Renvoie les informations du badge
+        <a href="#utilisateur">utilisateur</a>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Badge Inconnue&quot;:{&quot;summary&quot;:&quot;UUID du badge inconnu&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pgsBadgesBadgeidPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /pgs/badges/{badgeid}</code></pre></div>
+    <div class="method-summary">Ajout d'un badge (<span class="nickname">pgsBadgesBadgeidPost</span>)</div>
+    <div class="method-notes">Permet d'ajouter un badge à la base de donnée. Il doit être lié à un UUID</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">badgeid (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#badges_badgeid_body">badges_badgeid_body</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; UUID utilisateur à associé </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">204</h4>
+    Opération réussie. Badge liée.
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Badge Inconnue&quot;:{&quot;summary&quot;:&quot;UUID du badge inconnu ou liée à aucun utilisateur&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pgsBadgesBadgeidPut"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="put"><code class="huge"><span class="http-method">put</span> /pgs/badges/{badgeid}</code></pre></div>
+    <div class="method-summary">Modifier un badge (<span class="nickname">pgsBadgesBadgeidPut</span>)</div>
+    <div class="method-notes">Modifie les informations d'un utilisateur</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">badgeid (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">204</h4>
+    Opération réussie. Modification des champs de l&#x27;utilisateur
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Badge Inconnue&quot;:{&quot;summary&quot;:&quot;UUID du badge inconnu ou liée à aucun utilisateur&quot;},&quot;Utilisateur inconnue&quot;:{&quot;summary&quot;:&quot;L&#x27;UUID de l&#x27;utilisateur est inconnue&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pgsEtatSalleGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /pgs/etat_salle</code></pre></div>
+    <div class="method-summary">Voire état salle (<span class="nickname">pgsEtatSalleGet</span>)</div>
+    <div class="method-notes">Permet d'obtenir la liste des élèves présent(et absent) dans une salle</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">salle (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#utilisateur">utilisateur</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+}, {
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Liste d&#x27;élève présent
+        
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[{&quot;utilisateur&quot;:1,&quot;nom_user&quot;:&quot;Emile&quot;,&quot;prenom_user&quot;:&quot;Guillerm&quot;,&quot;present&quot;:true},{&quot;utilisateur&quot;:2,&quot;nom_user&quot;:&quot;Mathis&quot;,&quot;prenom_user&quot;:&quot;Blanchard&quot;,&quot;present&quot;:false},{&quot;utilisateur&quot;:3,&quot;nom_user&quot;:&quot;Mael&quot;,&quot;prenom_user&quot;:&quot;Guillon&quot;,&quot;present&quot;:false}]</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Salle inconnue&quot;:{&quot;summary&quot;:&quot;La salle est inconnue&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pgsHistoriqueBadgeGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /pgs/historique_badge</code></pre></div>
+    <div class="method-summary">Historique badge (<span class="nickname">pgsHistoriqueBadgeGet</span>)</div>
+    <div class="method-notes">Obtenir les informations sur les modifications d'un utilisateur (badge, classe, etc...)</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">uuid_user (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  format: UUID</div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#historique_utilisateur">historique_utilisateur</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "type_action" : "modification_badge",
+  "date_action" : 0
+}, {
+  "type_action" : "modification_badge",
+  "date_action" : 0
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussi. Retour d&#x27;une liste avec les derniere modification horodaté.
+        
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[{&quot;absence&quot;:1,&quot;absenceBool&quot;:true,&quot;horaire_du_cours&quot;:&quot;2026-03-15T09:30:00.000Z&quot;},{&quot;absence&quot;:2,&quot;absenceBool&quot;:false,&quot;horaire_du_cours&quot;:&quot;2021-04-11T10:12:00.000Z&quot;,&quot;temps_retard&quot;:10},{&quot;absence&quot;:3,&quot;absenceBool&quot;:false,&quot;horaire_du_cours&quot;:&quot;2026-06-10T10:30:00.000Z&quot;,&quot;temps_retard&quot;:22}]</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Professeur&quot;:{&quot;summary&quot;:&quot;La personne d&#x27;obtenir l&#x27;historique est professeur.&quot;},&quot;Pas d&#x27;historique&quot;:{&quot;summary&quot;:&quot;Pas d&#x27;historique disponible&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pgsPlanningGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /pgs/planning</code></pre></div>
+    <div class="method-summary">Voire le planning d'une salle (<span class="nickname">pgsPlanningGet</span>)</div>
+    <div class="method-notes">Permet d'obtenir les horaires de reservation d'une salle</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">salle (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#reservation">reservation</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "horaire" : "2000-01-23T04:56:07.000+00:00"
+}, {
+  "horaire" : "2000-01-23T04:56:07.000+00:00"
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Horaire à laquelle une reservation est présente
+        
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[{&quot;reservation&quot;:1,&quot;horaire&quot;:&quot;2026-03-15T09:30:00.000Z&quot;},{&quot;reservation&quot;:2,&quot;horaire&quot;:&quot;2026-04-11T10:12:00.000Z&quot;},{&quot;reservation&quot;:3,&quot;horaire&quot;:&quot;2026-06-10T10:30:00.000Z&quot;}]</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Salle inconnue&quot;:{&quot;summary&quot;:&quot;La salle est inconnue&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pgsRechercheUtilisateurGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /pgs/recherche_utilisateur</code></pre></div>
+    <div class="method-summary">Recherche un utilisateur (<span class="nickname">pgsRechercheUtilisateurGet</span>)</div>
+    <div class="method-notes">Permet d'obtenir la liste des élèves portant le nom ou prénom entrée.</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">prenom (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  </div>      <div class="param">nom (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#utilisateur">utilisateur</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+}, {
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Liste d&#x27;élève portant le nom et ou prénom entrée
+        
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[{&quot;utilisateur&quot;:1,&quot;nom_user&quot;:&quot;Emile&quot;,&quot;prenom_user&quot;:&quot;Guillerm&quot;},{&quot;utilisateur&quot;:2,&quot;nom_user&quot;:&quot;Emile&quot;,&quot;prenom_user&quot;:&quot;Zola&quot;}]</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Aucun nom&quot;:{&quot;summary&quot;:&quot;Aucun nom ne correspond à celui entrée&quot;},&quot;Aucun prénom&quot;:{&quot;summary&quot;:&quot;Aucun prénom ne correspond à celui entrée&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pgsReserverSallePost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /pgs/reserver_salle</code></pre></div>
+    <div class="method-summary">Reservation salle (<span class="nickname">pgsReserverSallePost</span>)</div>
+    <div class="method-notes">Permet de de reserver une salle (pas besoin d'ID) à partir du numéro de salle et de l'horaire.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#salle">salle</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; Numéro salle </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">204</h4>
+    Opération réussie. La salle à bien été reserver
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Badge Inconnue&quot;:{&quot;summary&quot;:&quot;UUID du badge inconnu&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="PSW">PSW</a></h1>
+  <div class="method"><a name="pswEtatSalleGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /psw/etat_salle</code></pre></div>
+    <div class="method-summary">Voire état salle (<span class="nickname">pswEtatSalleGet</span>)</div>
+    <div class="method-notes">Permet d'obtenir quelle élève est présent dans une salle (prend le numéro d'une salle en entrée) ! uniquement pour le personnl enseignant !</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">salle (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#utilisateur">utilisateur</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+}, {
+  "classe" : "CIEL2",
+  "nom_user" : "Guillerm",
+  "prenom_user" : "Emile",
+  "present" : true,
+  "statut" : "eleve"
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Liste d&#x27;élève présent
+        
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[{&quot;utilisateur&quot;:1,&quot;nom_user&quot;:&quot;Emile&quot;,&quot;prenom_user&quot;:&quot;Guillerm&quot;,&quot;present&quot;:true},{&quot;utilisateur&quot;:2,&quot;nom_user&quot;:&quot;Mathis&quot;,&quot;prenom_user&quot;:&quot;Blanchard&quot;,&quot;present&quot;:false},{&quot;utilisateur&quot;:3,&quot;nom_user&quot;:&quot;Mael&quot;,&quot;prenom_user&quot;:&quot;Guillon&quot;,&quot;present&quot;:false}]</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">401</h4>
+    Opération échouée. Le token n&#x27;es plus valide
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Salle vide&quot;:{&quot;summary&quot;:&quot;La salle est vide.&quot;},&quot;Salle inconnue&quot;:{&quot;summary&quot;:&quot;La salle est inconnue&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pswHistoriqueEleveGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /psw/historique_eleve</code></pre></div>
+    <div class="method-summary">Absence/retard élève (<span class="nickname">pswHistoriqueEleveGet</span>)</div>
+    <div class="method-notes">Obtenir les informations d'absence et présence de l'élève déjà identifier à partir de son token JWT.</div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#absence">absence</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "horaire_du_cours" : "2026-03-15T09:30:00Z",
+  "absenceBool" : true,
+  "temps_retard" : 59
+}, {
+  "horaire_du_cours" : "2026-03-15T09:30:00Z",
+  "absenceBool" : true,
+  "temps_retard" : 59
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussi. Retour d&#x27;une liste avec: absence ou retard, l&#x27;horaire du cours et le temps de retard pour une retard en minutes
+        
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[{&quot;absence&quot;:1,&quot;absenceBool&quot;:true,&quot;horaire_du_cours&quot;:&quot;2026-03-15T09:30:00.000Z&quot;},{&quot;absence&quot;:2,&quot;absenceBool&quot;:false,&quot;horaire_du_cours&quot;:&quot;2021-04-11T10:12:00.000Z&quot;,&quot;temps_retard&quot;:10},{&quot;absence&quot;:3,&quot;absenceBool&quot;:false,&quot;horaire_du_cours&quot;:&quot;2026-06-10T10:30:00.000Z&quot;,&quot;temps_retard&quot;:22}]</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">401</h4>
+    Opération échouée. Le token n&#x27;es plus valide
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Pas d&#x27;historique&quot;:{&quot;summary&quot;:&quot;L&#x27;élève n&#x27;a pas d&#x27;historique&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pswLoginPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /psw/login</code></pre></div>
+    <div class="method-summary">Authentification (<span class="nickname">pswLoginPost</span>)</div>
+    <div class="method-notes">S'authentifier grâce à un username et un mot de passe. Il renvoie un token JWT. Cela permet l'accès de tout les modules à tous les utilisateurs.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#userLogin">userLogin</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; Mot de passe et identifiant à verifié sous forme d&#x27;une structure. </div>
+                </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#token_jwt">token_jwt</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30",
+  "expire_dans" : 1200
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Authentification réussi. Renvoie un token JWT lié à un utilisateur permettant d&#x27;accèder aux modules.
+        <a href="#token_jwt">token_jwt</a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;token&quot;:&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30&quot;,&quot;expire_dans&quot;:1200}</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">401</h4>
+    Opération échouée. Identifiant ou mot de passe invalide
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pswPlanningGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /psw/planning</code></pre></div>
+    <div class="method-summary">Voire le planning d'une salle (<span class="nickname">pswPlanningGet</span>)</div>
+    <div class="method-notes">Permet d'obtenir les horaires de reservation d'une salle</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">salle (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  </div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#reservation">reservation</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "horaire" : "2000-01-23T04:56:07.000+00:00"
+}, {
+  "horaire" : "2000-01-23T04:56:07.000+00:00"
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Horaire à laquelle une reservation est présente
+        
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[{&quot;reservation&quot;:1,&quot;horaire&quot;:&quot;2026-03-15T09:30:00.000Z&quot;},{&quot;reservation&quot;:2,&quot;horaire&quot;:&quot;2026-04-11T10:12:00.000Z&quot;},{&quot;reservation&quot;:3,&quot;horaire&quot;:&quot;2026-06-10T10:30:00.000Z&quot;}]</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">401</h4>
+    Opération échouée. Le token n&#x27;es plus valide
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Pas de réservation&quot;:{&quot;summary&quot;:&quot;Pas de réservation pour ses horaire/dates&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pswReserverSallePost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /psw/reserver_salle</code></pre></div>
+    <div class="method-summary">Reserver une salle (<span class="nickname">pswReserverSallePost</span>)</div>
+    <div class="method-notes">Permet de reserver une salle à partir de son numéro et d'un utilisateur authentifier (l'utilisateur ne peut pas avoir plus de 3 réservations).</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#psw_reserver_salle_body">psw_reserver_salle_body</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; Numéro de la salle à reserver et horaire de la reservation. </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">204</h4>
+    Opération réussie. La salle à bien été reserver
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">401</h4>
+    Opération échouée. Le token n&#x27;es plus valide
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Salle inconnue&quot;:{&quot;summary&quot;:&quot;La salle est inconnue&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pswSalleCrenauxGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /psw/salle_crenaux</code></pre></div>
+    <div class="method-summary">Planning des salles (<span class="nickname">pswSalleCrenauxGet</span>)</div>
+    <div class="method-notes">Permet de lister les salles disponible pour un crénaux et renvoie une liste de salles.</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">horaire (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash;  format: date-time</div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#salle">salle</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "numero" : 218
+}, {
+  "numero" : 218
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Opération réussie. Retour d&#x27;une liste de salle disponible pour le créneau choisit
+        
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[{&quot;salle&quot;:1,&quot;numero&quot;:101},{&quot;salle&quot;:2,&quot;numero&quot;:202},{&quot;salle&quot;:3,&quot;numero&quot;:315}]</code></pre>
+    <h4 class="field-label">400</h4>
+    Requête mal formulé
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>La requête n&#x27;a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)</code></pre>
+    <h4 class="field-label">401</h4>
+    Opération échouée. Le token n&#x27;es plus valide
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Opération refusée/déclinée.
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Ressource introuvable.
+        <a href="#"></a>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{&quot;Salle inconnue&quot;:{&quot;summary&quot;:&quot;La salle est inconnue&quot;}}</code></pre>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#absence"><code>absence</code></a></li>
+    <li><a href="#badges"><code>badges</code></a></li>
+    <li><a href="#badges_badgeid_body"><code>badges_badgeid_body</code></a></li>
+    <li><a href="#bae_scanner_badge_body"><code>bae_scanner_badge_body</code></a></li>
+    <li><a href="#erreur_code"><code>erreur_code</code></a></li>
+    <li><a href="#historique_utilisateur"><code>historique_utilisateur</code></a></li>
+    <li><a href="#psw_reserver_salle_body"><code>psw_reserver_salle_body</code></a></li>
+    <li><a href="#reservation"><code>reservation</code></a></li>
+    <li><a href="#salle"><code>salle</code></a></li>
+    <li><a href="#token_jwt"><code>token_jwt</code></a></li>
+    <li><a href="#userLogin"><code>userLogin</code></a></li>
+    <li><a href="#utilisateur"><code>utilisateur</code></a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="absence"><code>absence</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">absenceBool </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> True &#x3D; absence False &#x3D; retard </div>
+          <div class="param-desc"><span class="param-type">example: true</span></div>
+<div class="param">horaire_du_cours </div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> Horaire du retard format: date-time</div>
+          <div class="param-desc"><span class="param-type">example: 2026-03-15T09:30Z</span></div>
+<div class="param">temps_retard (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> Temps de retard en minute </div>
+          <div class="param-desc"><span class="param-type">example: 59</span></div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="badges"><code>badges</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">uuid (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> UUID d&#x27;un badge format: UUID</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="badges_badgeid_body"><code>badges_badgeid_body</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">uuid_user </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> UUID de l&#x27;utilisateur à qui le badge vas être associé </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="bae_scanner_badge_body"><code>bae_scanner_badge_body</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">salle </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+          <div class="param-desc"><span class="param-type">example: 112</span></div>
+<div class="param">uuid (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> UUID d&#x27;un badge format: UUID</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="erreur_code"><code>erreur_code</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">code (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">message (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="historique_utilisateur"><code>historique_utilisateur</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">type_action (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Type d&#x27;action effectuée </div>
+          <div class="param-desc"><span class="param-type">example: modification_badge</span></div>
+<div class="param">date_action (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> Date de l&#x27;action effectué format: timestamp</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="psw_reserver_salle_body"><code>psw_reserver_salle_body</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">horaire (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  format: date-time</div>
+<div class="param">numero </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> numero de la salle </div>
+          <div class="param-desc"><span class="param-type">example: 218</span></div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="reservation"><code>reservation</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">horaire (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> Horaire du début de la reservation format: date-time</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="salle"><code>salle</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">numero </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> numero de la salle </div>
+          <div class="param-desc"><span class="param-type">example: 218</span></div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="token_jwt"><code>token_jwt</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">token </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Token JWT </div>
+          <div class="param-desc"><span class="param-type">example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30</span></div>
+<div class="param">expire_dans </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> Durée en seconde de la durée de vie </div>
+          <div class="param-desc"><span class="param-type">example: 1200</span></div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="userLogin"><code>userLogin</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">login_user </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+          <div class="param-desc"><span class="param-type">example: eguillerm</span></div>
+<div class="param">motdepasse </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+          <div class="param-desc"><span class="param-type">example: helloworld1234!</span></div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="utilisateur"><code>utilisateur</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">nom_user </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+          <div class="param-desc"><span class="param-type">example: Guillerm</span></div>
+<div class="param">prenom_user </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+          <div class="param-desc"><span class="param-type">example: Emile</span></div>
+<div class="param">present (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+          <div class="param-desc"><span class="param-type">example: true</span></div>
+<div class="param">classe (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+          <div class="param-desc"><span class="param-type">example: CIEL2</span></div>
+<div class="param">statut (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">eleve</div><div class="param-enum">professeur</div>
+          <div class="param-desc"><span class="param-type">example: eleve</span></div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

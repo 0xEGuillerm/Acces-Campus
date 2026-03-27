@@ -1,0 +1,20 @@
+using system;
+using System.Net.http;
+
+namespace AccesCampus.Services
+{
+public class 
+ {
+    public string LireUUID();
+    {
+    
+    
+    }
+
+}
+
+
+
+
+
+}
