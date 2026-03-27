@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\maelg\\Acces-Campus\\PGSMael\\AccesCampusPGS\\AccesCampusPGS.csproj",
+      "projectUniqueName": "C:\\Users\\maelg\\ApplicationProjet\\Acces-Campus\\PGSMael\\AccesCampusPGS\\AccesCampusPGS.csproj",
       "projectName": "AccesCampusPGS",
-      "projectPath": "C:\\Users\\maelg\\Acces-Campus\\PGSMael\\AccesCampusPGS\\AccesCampusPGS.csproj",
+      "projectPath": "C:\\Users\\maelg\\ApplicationProjet\\Acces-Campus\\PGSMael\\AccesCampusPGS\\AccesCampusPGS.csproj",
       "packagesPath": "C:\\Users\\maelg\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\maelg\\Acces-Campus\\PGSMael\\AccesCampusPGS\\obj\\",
+      "outputPath": "C:\\Users\\maelg\\ApplicationProjet\\Acces-Campus\\PGSMael\\AccesCampusPGS\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
