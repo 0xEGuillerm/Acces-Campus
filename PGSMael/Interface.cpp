@@ -1,3 +1,15 @@
 #include "Interface.h"
 
 vdsvdvffvdvf
+falsesdf
+falsefs
+transaction_safe_dynamicfsd
+sf
+f
+dynamic_castfsd
+transaction_safe_dynamicsfd
+sdf
+transaction_safe_dynamicsdf
+__STDCPP_DEFAULT_NEW_ALIGNMENT__fd
+sizeofsfd
+fd
