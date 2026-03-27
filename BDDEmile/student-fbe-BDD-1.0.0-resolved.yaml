@@ -699,12 +699,12 @@ paths:
         required: true
         schema:
           type: string
-      - name: salle
+      - name: MAC
         in: query
         required: true
         schema:
-          type: integer
-        example: 112
+          type: string
+        example: "FF:FF:FF:FF:FF:FF"
       responses:
         "200":
           description: Opération réussie. Renvoie les informations de l'utilisateur liée au badge.
@@ -740,6 +740,76 @@ paths:
 
 
 
+  /bae/etat_salle:
+    get:
+      tags:
+      - BAE
+      summary: Etat salle
+      description: Permet d'obtenir l'état salle (présence, absences, capacité, type de cours)
+      responses:
+        "200":
+          description: Opération réussie. Envoie des informations des élèves absents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nb_eleve_present:
+                    type: integer
+                    example: 15
+                  nb_eleve_attendu:
+                    type: integer
+                    example: 12
+                  liste_eleve:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/utilisateur"
+                  professeur:
+                    type: string
+                    example: "M.Jumel"
+              example:
+                nb_eleve_present: 15
+                nb_eleve_attendu: 12
+                liste_eleve:
+                  - utilisateur: 1
+                    nom_user: Emile
+                    prenom_user: Guillerm
+                  - utilisateur: 2
+                    nom_user: Mathis
+                    prenom_user: Blanchard
+                  - utilisateur: 3
+                    nom_user: Mael
+                    prenom_user: Guillon
+                professeur: "M.Jumel"                   
+        "403":
+          description: Opération refusée/déclinée.
+          content:
+            application/json:
+              schema:
+                example:
+                  Pointage refusée:
+                    summary: L'utilisateur à déjà scanné sont badge
+                  Pas de cours:
+                    summary: Pas de cours auquelle pointée
+        "404":
+          description: Ressource introuvable.
+          content:
+            application/json:
+              example:
+                Equipement introuvable:
+                  summary: Adresse MAC inconnue
+                Badge Inconnue:
+                  summary: UUID du badge inconnu ou liée à aucun utilisateur
+                Salle inconnue:
+                  summary: Numéro de salle inconnu
+        "400":
+          description: Requête mal formulé
+          content:
+            application/json:
+              example: "La requête n'a pas abouti car elle est mal formulé. Veuillez vérifier les champs et leur format (documentation API)"
+      security: []
+
+
   /bae/scanner_badge:
     post:
       tags:
@@ -755,11 +825,14 @@ paths:
               - $ref: "#/components/schemas/badges"
               - type: object
                 required:
-                  - salle
+                  - MAC
                 properties:
-                  salle:
+                  MAC:
+                    type: string
+                    example: "FF:FF:FF:FF:FF:FF"
+                  heure_badge:
                     type: integer
-                    example: 112
+                    format: timestamp
       responses:
         "200":
           description: Opération réussie. Confimration de l'enregistrement de l'utilisateur avec ses infos.
@@ -821,6 +894,9 @@ components:
           enum:
           - eleve
           - professeur
+        autorisee:
+          type: boolean
+          example: true
     userLogin:
       required:
       - login_user
