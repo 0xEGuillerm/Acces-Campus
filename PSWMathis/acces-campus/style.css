@@ -1,14 +1,21 @@
+/* style.css*/
+
+/* Fond gris */
 body {
   background-color: #f5f5f5;
 }
 
+/* dashboard*/
 .module-card {
   cursor: pointer;
 }
+
+/* Ombre*/
 .module-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Style commun*/
 .planning-event {
   padding: 2px 5px;
   border-radius: 3px;
@@ -17,8 +24,9 @@ body {
   color: white;
 }
 
-.event-tp     { background: #17a2b8; }
-.event-cours  { background: #6f42c1; }
-.event-td     { background: #e83e8c; }
-.event-exam   { background: #dc3545; }
-.event-projet { background: #28a745; }
+/* Couleur par type de cours*/
+.event-tp     { background: #17a2b8; } /* cyan  */
+.event-cours  { background: #6f42c1; } /* violet */
+.event-td     { background: #e83e8c; } /* rose  */
+.event-exam   { background: #dc3545; } /* rouge  */
+.event-projet { background: #28a745; } /* vert  */

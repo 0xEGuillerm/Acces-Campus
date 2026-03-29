@@ -10,13 +10,11 @@
 <body>
 <div id="app">
 
-  <!-- Navbar -->
   <nav class="navbar navbar-dark bg-dark px-3">
     <span class="navbar-brand">Acces Campus</span>
     <button v-show="currentPage !== 'login'" class="btn btn-outline-light btn-sm" @click="logout">Deconnexion</button>
   </nav>
 
-  <!-- LOGIN -->
   <div v-show="currentPage === 'login'" style="position:fixed; top:56px; left:0; right:0; bottom:0; background:#343a40; display:flex; align-items:center; justify-content:center; z-index:100">
     <div class="card" style="width:380px">
       <div class="card-header bg-primary text-white text-center">
@@ -32,12 +30,14 @@
           <label class="form-label">Mot de passe</label>
           <input type="password" v-model="loginPass" class="form-control" placeholder="Votre mot de passe">
         </div>
-        <button class="btn btn-primary w-100" @click="handleLogin">Se connecter</button>
+        <button class="btn btn-primary w-100" @click="handleLogin" :disabled="loginLoading">
+          <span v-if="loginLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+          {{ loginLoading ? 'Connexion...' : 'Se connecter' }}
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- DASHBOARD -->
   <div v-show="currentPage === 'dashboard'" class="p-4">
     <div class="bg-primary text-white rounded p-3 mb-4">
       <h4>Bienvenue sur Acces Campus</h4>
@@ -45,61 +45,32 @@
     </div>
     <div class="row g-3">
       <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('dispo')"><h6>Disponibilite des Salles</h6><small class="text-muted">Verifiez quelles salles sont libres.</small></div></div>
-      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('agenda')"><h6>Mon Agenda</h6><small class="text-muted">Gerez vos reservations.</small></div></div>
-      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('annuaire')"><h6>Annuaire</h6><small class="text-muted">Trouvez un etudiant.</small></div></div>
+      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('reservation')"><h6>Reserver une Salle</h6><small class="text-muted">Gerez vos reservations.</small></div></div>
+      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('annuaire')"><h6>Annuaire Campus</h6><small class="text-muted">Trouvez un etudiant.</small></div></div>
       <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('planning')"><h6>Planning Salles</h6><small class="text-muted">Emploi du temps des salles.</small></div></div>
     </div>
   </div>
 
-  <!-- DISPONIBILITE : page de verification de disponibilite d'une salle -->
   <div v-show="currentPage === 'dispo'" class="p-4">
     <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
     <h4>Disponibilite des Salles</h4>
     <div class="card p-3 mt-3">
-
-      <!-- Selecteur de salle -->
       <label class="form-label">Choisir une salle :</label>
       <select v-model="selectedDispo" class="form-select" style="max-width:300px">
         <option value="">-- Selectionnez --</option>
         <option v-for="salle in salles" :key="salle" :value="salle">{{ salle }}</option>
       </select>
-
-      <!-- Selecteur de creneau horaire -->
-      <label class="form-label mt-3">Choisir un creneau
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        :</label>
+      <label class="form-label mt-3">Choisir un creneau :</label>
       <select v-model="selectedCreneauDispo" class="form-select" style="max-width:300px">
         <option value="">-- Tous les creneaux --</option>
         <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
       </select>
-
-      <!-- Affichage du resultat une fois une salle selectionnee -->
       <div class="mt-3" v-if="dispoInfo">
-
-        <!-- Cas ou la salle est libre sur le creneau choisi -->
         <div v-if="dispoInfo.libre" class="alert alert-success">
           La salle est <strong>libre</strong>
           <span v-if="selectedCreneauDispo"> sur le creneau {{ selectedCreneauDispo }}</span>
           <span v-else> aujourd'hui</span>.
         </div>
-
-        <!-- Cas ou la salle est occupee : liste des cours correspondants -->
         <div v-else>
           <div class="alert alert-danger">
             La salle est <strong>occupee</strong>
@@ -108,72 +79,88 @@
           </div>
           <h6>Cours ({{ dispoInfo.jour }}) :</h6>
           <ul class="list-group">
-            <!-- Affiche chaque cours avec son heure et sa duree -->
             <li v-for="ev in dispoInfo.events" :key="ev.heure" class="list-group-item">
               <strong>{{ ev.heure }}</strong> - {{ ev.titre }} ({{ ev.duree }}h)
             </li>
           </ul>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- AGENDA -->
-  <div v-show="currentPage === 'agenda'" class="p-4">
+  <div v-show="currentPage === 'reservation'" class="p-4">
     <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
-    <h4>Mon Agenda &amp; Reservations</h4>
-    <div class="card p-3 mt-3">
-      <div class="row g-2 mb-3">
-        <div class="col-md-3">
-          <label class="form-label" style="font-size:13px">Creneau debut</label>
-          <select v-model="agendaCreneauDeb" class="form-select form-select-sm">
-            <option value="">--</option>
-            <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
-          </select>
+    <h4>Reserver une Salle</h4>
+
+    <! formulaire de recherche >
+    <div class="card mt-3 mb-4">
+      <div class="card-header bg-white"><strong>Etape 1</strong> — Choisissez un creneau</div>
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label">Date</label>
+            <input type="date" v-model="reservationDate" class="form-control">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Heure de debut</label>
+            <select v-model="reservationHeureDeb" class="form-select">
+              <option value="">-- Choisir --</option>
+              <option v-for="h in heuresDispos" :key="h" :value="h">{{ h }}</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Heure de fin</label>
+            <select v-model="reservationHeureFin" class="form-select">
+              <option value="">-- Choisir --</option>
+              <option v-for="h in heuresDispos" :key="h" :value="h">{{ h }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100" @click="rechercherCreneaux" :disabled="creneauxCharge">
+              <span v-if="creneauxCharge" class="spinner-border spinner-border-sm me-1"></span>
+              Rechercher
+            </button>
+          </div>
         </div>
-        <div class="col-md-3">
-          <label class="form-label" style="font-size:13px">Date debut</label>
-          <input type="date" v-model="agendaDateDeb" class="form-control form-control-sm">
+        <div v-show="erreurRecherche" class="alert alert-danger mt-3 mb-0 py-2" style="font-size:13px">
+          {{ erreurRecherche }}
         </div>
-        <div class="col-md-3">
-          <label class="form-label" style="font-size:13px">Creneau fin</label>
-          <select v-model="agendaCreneauFin" class="form-select form-select-sm">
-            <option value="">--</option>
-            <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label" style="font-size:13px">Date fin</label>
-          <input type="date" v-model="agendaDateFin" class="form-control form-control-sm">
-        </div>
-      </div>
-      <div>
-        <button class="btn btn-primary btn-sm me-2" @click="searchAgenda">Rechercher</button>
-        <button class="btn btn-outline-danger btn-sm" @click="simulerErreur">Simuler erreur</button>
       </div>
     </div>
-    <div class="mt-3" v-if="agendaResultats !== null">
-      <p v-if="agendaResultats.length === 0" class="text-muted text-center mt-3">Aucune reservation trouvee.</p>
-      <div v-else>
-        <p class="text-muted" style="font-size:13px">{{ agendaResultats.length }} reservation(s)</p>
-        <table class="table table-striped">
-          <thead><tr><th>Titre</th><th>Date</th><th>Creneau</th><th>Salle</th><th>Statut</th></tr></thead>
-          <tbody>
-            <tr v-for="res in agendaResultats" :key="res.date + res.creneau">
-              <td>{{ res.titre }}</td>
-              <td>{{ formatDate(res.date) }}</td>
-              <td>{{ res.creneau }}</td>
-              <td>{{ res.salle }}</td>
-              <td><span class="badge" :class="badgeClass(res.statut)">{{ res.statut }}</span></td>
-            </tr>
-          </tbody>
-        </table>
+
+    <!résultats>
+    <div v-show="rechercheEffectuee">
+      <div class="card">
+        <div class="card-header bg-white"><strong>Etape 2</strong> — Salles disponibles</div>
+        <div class="card-body">
+          <div v-if="creneauxFiltres.length === 0" class="alert alert-warning mb-0">
+            Aucune salle disponible pour ce creneau.
+          </div>
+          <table v-else class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr><th>Salle</th><th>Date</th><th>Heure</th><th class="text-end">Action</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="creneau in creneauxFiltres" :key="creneau.id">
+                <td><span class="badge bg-primary fs-6">Salle {{ creneau.numero }}</span></td>
+                <td class="align-middle">{{ formaterDate(creneau.horaire) }}</td>
+                <td class="align-middle">{{ formaterHeure(creneau.horaire) }}</td>
+                <td class="text-end">
+                  <button class="btn btn-success btn-sm"
+                    @click="demanderConfirmation(creneau)"
+                    :disabled="reservationEnCours === creneau.id">
+                    <span v-if="reservationEnCours === creneau.id" class="spinner-border spinner-border-sm me-1"></span>
+                    {{ reservationEnCours === creneau.id ? 'En cours...' : 'Reserver' }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ANNUAIRE -->
   <div v-show="currentPage === 'annuaire'" class="p-4">
     <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
     <h4>Annuaire du Campus</h4>
@@ -191,7 +178,6 @@
     </table>
   </div>
 
-  <!-- PLANNING -->
   <div v-show="currentPage === 'planning'" class="p-4">
     <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
     <h4>Planning Salles</h4>
@@ -216,8 +202,29 @@
     </div>
   </div>
 
-  <!-- Toast erreur -->
-  <div v-show="toastVisible" class="alert alert-danger position-fixed top-0 end-0 m-3" style="z-index:9999; max-width:400px">{{ toastMessage }}</div>
+  <div v-show="confirmationVisible"
+       style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5);
+              display:flex; align-items:center; justify-content:center; z-index:200">
+    <div class="card" style="width:400px">
+      <div class="card-header bg-warning">
+        <h5 class="mb-0">Confirmer la reservation</h5>
+      </div>
+      <div class="card-body">
+        <div v-if="creneauSelectionne">
+          <p class="mb-1"><strong>Salle :</strong> {{ creneauSelectionne.numero }}</p>
+          <p class="mb-3"><strong>Horaire :</strong> {{ formaterHoraire(creneauSelectionne.horaire) }}</p>
+        </div>
+        <div class="d-flex gap-2 justify-content-end">
+          <button class="btn btn-outline-secondary" @click="annulerConfirmation">Annuler</button>
+          <button class="btn btn-success" @click="confirmerReservation">Confirmer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div v-show="toastVisible"
+       :class="`alert alert-${toastType} position-fixed top-0 end-0 m-3`"
+       style="z-index:9999; max-width:400px">{{ toastMessage }}</div>
 
 </div>
 

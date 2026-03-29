@@ -1,3 +1,15 @@
+// app.js - Acces Campus
+// Framework : Vue 3
+// API       : json-server
+
+const API = 'http://localhost:3001';
+
+const ROUTES = {
+  utilisateurs:  `${API}/utilisateurs`,     // GET  - login
+  reserverSalle: `${API}/reserver_salle`,   // POST - créer une réservation
+  salleCrenaux:  `${API}/salle_crenaux`,    // GET  - créneaux disponibles
+};
+
 const { createApp } = Vue;
 
 createApp({
@@ -6,11 +18,12 @@ createApp({
       currentPage: 'login',
 
       // Login
-      loginId: '',
-      loginPass: '',
-      loginError: '',
+      loginId:      '',
+      loginPass:    '',
+      loginError:   '',
+      loginLoading: false,
 
-      // Donnees
+      // Données statiques
       etudiants: [
         { nom: 'Mathis Blanchard', classe: 'BTS CIEL 2', email: 'mathis.blanchard@campus.fr' },
         { nom: 'Emile Guillerm',   classe: 'BTS CIEL 2', email: 'emile.guillerm@campus.fr' },
@@ -20,7 +33,7 @@ createApp({
       salles: ['Salle B201'],
 
       heures: ['08:15','09:10','10:20','11:15','13:30','14:25','15:35','16:30'],
-      jours: ['Lundi','Mardi','Mercredi','Jeudi','Vendredi'],
+      jours:  ['Lundi','Mardi','Mercredi','Jeudi','Vendredi'],
 
       creneaux: [
         '08:15 - 09:10',
@@ -35,46 +48,59 @@ createApp({
 
       planning: {
         'Salle B201': [
-          { jour: 'Lundi',    heure: '08:15', titre: 'Cours Reseaux - Mr Jumel',    type: 'cours',  duree: 1 },
-          { jour: 'Mardi',    heure: '10:20', titre: 'TP Reseaux - Mr Jumel',       type: 'tp',     duree: 1 },
-          { jour: 'Jeudi',    heure: '13:30', titre: 'Cours Reseaux - Mr Jumel',    type: 'cours',  duree: 1 },
-          { jour: 'Vendredi', heure: '14:25', titre: 'TP Reseaux - Mr Jumel',       type: 'tp',     duree: 1 },
+          { jour: 'Lundi',    heure: '08:15', titre: 'Cours Reseaux - Mr Jumel', type: 'cours', duree: 1 },
+          { jour: 'Mardi',    heure: '10:20', titre: 'TP Reseaux - Mr Jumel',    type: 'tp',    duree: 1 },
+          { jour: 'Jeudi',    heure: '13:30', titre: 'Cours Reseaux - Mr Jumel', type: 'cours', duree: 1 },
+          { jour: 'Vendredi', heure: '14:25', titre: 'TP Reseaux - Mr Jumel',    type: 'tp',    duree: 1 },
         ],
       },
 
-      reservations: [
-        { date: '2026-03-12', creneau: '10:20 - 11:15', salle: 'Salle B201', titre: 'TP Reseaux - Mr Jumel',    statut: 'confirme' },
-        { date: '2026-03-13', creneau: '13:30 - 14:25', salle: 'Salle B201', titre: 'Cours Reseaux - Mr Jumel', statut: 'confirme' },
-        { date: '2026-03-14', creneau: '08:15 - 09:10', salle: 'Salle B201', titre: 'Cours Reseaux - Mr Jumel', statut: 'en attente' },
-      ],
-
-      joursFR: { 1: 'Lundi', 2: 'Mardi', 3: 'Mercredi', 4: 'Jeudi', 5: 'Vendredi' },
+      joursFR: { 1:'Lundi', 2:'Mardi', 3:'Mercredi', 4:'Jeudi', 5:'Vendredi' },
 
       // Annuaire
       searchAnnuaire: '',
 
-      // Disponibilite : salle selectionnee et creneau optionnel
-      selectedDispo: '',
+      // Disponibilité
+      selectedDispo:       '',
       selectedCreneauDispo: '',
 
-      // Agenda
-      agendaCreneauDeb: '',
-      agendaCreneauFin: '',
-      agendaDateDeb: '',
-      agendaDateFin: '',
-      agendaResultats: null,
-
-      // Planning
+      // Planning 
       selectedPlanning: 'Salle B201',
 
-      // Toast
+      // Réservation
+      creneaux_api:        [],    // tous les créneaux chargés depuis json-server
+      creneauxFiltres:     [],    // créneaux filtrés après la recherche
+      creneauxCharge:      false,
+      rechercheEffectuee:  false, // true après le premier clic sur Rechercher
+      reservationEnCours:  null,
+      confirmationVisible: false,
+      creneauSelectionne:  null,
+
+      // Champs du formulaire de recherche
+      reservationDate:     '',
+      reservationHeureDeb: '',
+      reservationHeureFin: '',
+      erreurRecherche:     '',
+
+      // Créneaux horaires proposés dans les menus déroulants
+      heuresDispos: [
+        '08:00', '08:15', '09:00', '09:10', '10:00', '10:20',
+        '11:00', '11:15', '12:00', '13:00', '13:30', '14:00',
+        '14:25', '15:00', '15:35', '16:00', '16:30', '17:00',
+      ],
+
+      // --- Toast ---
       toastMessage: '',
       toastVisible: false,
-      toastTimer: null,
+      toastType:    'success',
+      toastTimer:   null,
     };
   },
 
+
   computed: {
+
+    // Filtre l'annuaire selon la saisie de l'utilisateur
     filteredStudents() {
       const q = this.searchAnnuaire.trim().toLowerCase();
       if (!q) return this.etudiants;
@@ -85,29 +111,21 @@ createApp({
       );
     },
 
+    // Calcule si la salle sélectionnée est libre ou occupée aujourd'hui
     dispoInfo() {
-      // Aucune salle selectionnee : on ne retourne rien
       if (!this.selectedDispo) return null;
-
-      // Recupere les evenements de la salle choisie
-      const events = this.planning[this.selectedDispo] || [];
-
-      // Determine le jour actuel en francais (1=Lundi ... 5=Vendredi)
-      const today = new Date().getDay();
+      const events  = this.planning[this.selectedDispo] || [];
+      const today   = new Date().getDay();
       const jourAuj = this.joursFR[today] || null;
-
-      // Filtre les cours qui ont lieu aujourd'hui
       let eventsDuJour = jourAuj ? events.filter(e => e.jour === jourAuj) : [];
-
-      // Si un creneau est selectionne, on filtre en plus par l'heure de debut
       if (this.selectedCreneauDispo) {
         const heureDebut = this.selectedCreneauDispo.split(' - ')[0];
         eventsDuJour = eventsDuJour.filter(e => e.heure === heureDebut);
       }
-
       return { libre: eventsDuJour.length === 0, events: eventsDuJour, jour: jourAuj };
     },
 
+    // Construit les lignes du tableau planning (une ligne par heure)
     planningRows() {
       const events = this.planning[this.selectedPlanning] || [];
       return this.heures.map(heure => ({
@@ -117,65 +135,201 @@ createApp({
     },
   },
 
+
   methods: {
+
+    // Change la page affichée
     goTo(page) {
       this.currentPage = page;
       window.scrollTo(0, 0);
+      // Charge les créneaux depuis json-server quand on ouvre la réservation
+      if (page === 'reservation') this.chargerCreneaux();
     },
 
-    handleLogin() {
+   
+    // login cherche l'utilisateur par son login
+    // puis compare le mot de passe côté client
+
+    async handleLogin() {
       if (!this.loginId.trim() || !this.loginPass.trim()) {
         this.loginError = 'Veuillez remplir tous les champs.';
         return;
       }
-      this.loginError = '';
-      this.goTo('dashboard');
+      this.loginError   = '';
+      this.loginLoading = true;
+
+      try {
+        // Filtre directement par login_user dans json-server
+        const url         = `${ROUTES.utilisateurs}?login_user=${encodeURIComponent(this.loginId.trim())}`;
+        const reponse     = await fetch(url);
+        const utilisateurs = await reponse.json();
+
+        if (utilisateurs.length === 0) {
+          this.loginError = 'Identifiant ou mot de passe incorrect.';
+          return;
+        }
+
+        const user = utilisateurs[0];
+
+        // Vérifie le mot de passe (json-server ne chiffre pas)
+        if (user.motdepasse !== this.loginPass) {
+          this.loginError = 'Identifiant ou mot de passe incorrect.';
+          return;
+        }
+
+        // Connexion réussie : sauvegarde en localStorage et redirige
+        localStorage.setItem('user_connecte', JSON.stringify(user));
+        this.goTo('dashboard');
+
+      } catch (err) {
+        this.loginError = 'Impossible de joindre le serveur. Veuillez reessayer.';
+        console.error('Erreur login :', err);
+      } finally {
+        this.loginLoading = false;
+      }
     },
 
+    // deconnexion : efface la session et retourne au login
     logout() {
-      this.loginId = '';
+      localStorage.removeItem('user_connecte');
+      this.loginId   = '';
       this.loginPass = '';
       this.loginError = '';
       this.goTo('login');
     },
 
-    showToast(message) {
+
+ 
+    // reservation recherch des créneaux disponibles
+    // charge tous les créneaux puis filtre
+    // selon la date et les heures choisies par l'utilisateur
+
+    async rechercherCreneaux() {
+      // Vérifie que tous les champs sont remplis
+      if (!this.reservationDate || !this.reservationHeureDeb || !this.reservationHeureFin) {
+        this.erreurRecherche = 'Veuillez remplir la date et les deux heures.';
+        return;
+      }
+      if (this.reservationHeureDeb >= this.reservationHeureFin) {
+        this.erreurRecherche = "L'heure de fin doit etre apres l'heure de debut.";
+        return;
+      }
+
+      this.erreurRecherche    = '';
+      this.creneauxCharge     = true;
+      this.rechercheEffectuee = false;
+
+      try {
+        // Charge tous les créneaux depuis json-server
+        const reponse        = await fetch(ROUTES.salleCrenaux);
+        this.creneaux_api    = await reponse.json();
+
+        // Filtre côté client selon la date et l'heure choisies
+        this.creneauxFiltres = this.creneaux_api.filter(c => {
+          const d      = new Date(c.horaire);
+          const dateC  = d.toISOString().split('T')[0];         // "2026-03-25"
+          const heureC = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0'); // "08:00"
+          return dateC === this.reservationDate && heureC >= this.reservationHeureDeb && heureC < this.reservationHeureFin;
+        });
+
+        this.rechercheEffectuee = true;
+
+      } catch (err) {
+        this.erreurRecherche = 'Impossible de contacter le serveur.';
+        console.error('Erreur créneaux :', err);
+      } finally {
+        this.creneauxCharge = false;
+      }
+    },
+
+    // Alias pour le bouton Actualiser (recharge sans réinitialiser le formulaire)
+    async chargerCreneaux() {
+      await this.rechercherCreneaux();
+    },
+
+    // Ouvre la modale de confirmation avec le créneau cliqué
+    demanderConfirmation(creneau) {
+      this.creneauSelectionne  = creneau;
+      this.confirmationVisible = true;
+    },
+
+    // Ferme la modale sans rien faire
+    annulerConfirmation() {
+      this.confirmationVisible = false;
+      this.creneauSelectionne  = null;
+    },
+
+    // Envoie la réservation (POST)
+    async confirmerReservation() {
+      if (!this.creneauSelectionne) return;
+      const creneau = this.creneauSelectionne;
+      this.confirmationVisible = false;
+      this.reservationEnCours  = creneau.id;
+
+      try {
+        const user = JSON.parse(localStorage.getItem('user_connecte') || '{}');
+        const reponse = await fetch(ROUTES.reserverSalle, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            horaire:    creneau.horaire,
+            numero:     creneau.numero,
+            login_user: user.login_user,
+          }),
+        });
+
+        if (!reponse.ok) throw new Error(`Erreur ${reponse.status}`);
+
+        this.showToast(`Salle ${creneau.numero} reservee pour le ${this.formaterHoraire(creneau.horaire)} !`, 'success');
+        // Retire le créneau de la liste
+        this.creneaux_api = this.creneaux_api.filter(c => c.id !== creneau.id);
+
+      } catch (err) {
+        this.showToast('La reservation a echoue. Reessaie.', 'danger');
+        console.error('Erreur reservation :', err);
+      } finally {
+        this.reservationEnCours = null;
+        this.creneauSelectionne = null;
+      }
+    },
+
+    // Formate une date ISO → "25/03/2026"
+    formaterDate(dateISO) {
+      const d = new Date(dateISO);
+      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    },
+
+    // Formate une date → "08h00"
+    formaterHeure(dateISO) {
+      const d = new Date(dateISO);
+      return `${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`;
+    },
+
+    // Formate une date → "25/03/2026 a 08h00" 
+    formaterHoraire(dateISO) {
+      return `${this.formaterDate(dateISO)} a ${this.formaterHeure(dateISO)}`;
+    },
+
+    // Affiche une notification temporaire (4 secondes)
+    showToast(message, type = 'success') {
       this.toastMessage = message;
+      this.toastType    = type;
       this.toastVisible = true;
       if (this.toastTimer) clearTimeout(this.toastTimer);
       this.toastTimer = setTimeout(() => { this.toastVisible = false; }, 4000);
     },
-
-    simulerErreur() {
-      this.showToast('Erreur 503 - Le service de reservation est temporairement indisponible.');
-    },
-
-    searchAgenda() {
-      const { agendaCreneauDeb, agendaCreneauFin, agendaDateDeb, agendaDateFin } = this;
-      this.agendaResultats = this.reservations.filter(r => {
-        if (agendaDateDeb && r.date < agendaDateDeb) return false;
-        if (agendaDateFin && r.date > agendaDateFin) return false;
-        if (agendaCreneauDeb && r.creneau < agendaCreneauDeb) return false;
-        if (agendaCreneauFin && r.creneau > agendaCreneauFin) return false;
-        return true;
-      });
-    },
-
-    formatDate(dateStr) {
-      const [y, m, d] = dateStr.split('-');
-      return `${d}/${m}/${y}`;
-    },
-
-    badgeClass(statut) {
-      return statut === 'confirme' ? 'bg-success' : 'bg-warning text-dark';
-    },
   },
+
 
   mounted() {
+    // Si une session existe déjà, on va directement au dashboard
+    const session = localStorage.getItem('user_connecte');
+    if (session) this.goTo('dashboard');
+
+    // Touche Entrée pour valider le login
     window.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter' && this.currentPage === 'login') {
-        this.handleLogin();
-      }
+      if (e.key === 'Enter' && this.currentPage === 'login') this.handleLogin();
     });
   },
+
 }).mount('#app');
