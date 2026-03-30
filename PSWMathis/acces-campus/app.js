@@ -2,12 +2,13 @@
 // Framework : Vue 3
 // API       : json-server
 
-const API = 'http://localhost:3001';
-
 const ROUTES = {
-  utilisateurs:  `${API}/utilisateurs`,     // GET  - login
-  reserverSalle: `${API}/reserver_salle`,   // POST - créer une réservation
-  salleCrenaux:  `${API}/salle_crenaux`,    // GET  - créneaux disponibles
+  login:        '/psw/login',          // GET  (mock) / POST (prod) - authentification
+  reserverSalle:'/psw/reserver_salle', // POST - créer une réservation
+  salleCrenaux: '/psw/salle_crenaux',  // GET  - créneaux disponibles
+  planning:     '/psw/planning',       // GET  - planning des salles
+  etatSalle:    '/psw/etat_salle',     // GET  - état des salles en temps réel
+  historique:   '/psw/historique_eleve', // GET - historique de présence
 };
 
 const { createApp } = Vue;
@@ -159,8 +160,7 @@ createApp({
       this.loginLoading = true;
 
       try {
-        // Filtre directement par login_user dans json-server
-        const url         = `${ROUTES.utilisateurs}?login_user=${encodeURIComponent(this.loginId.trim())}`;
+        const url         = `${ROUTES.login}?login_user=${encodeURIComponent(this.loginId.trim())}`;
         const reponse     = await fetch(url);
         const utilisateurs = await reponse.json();
 
