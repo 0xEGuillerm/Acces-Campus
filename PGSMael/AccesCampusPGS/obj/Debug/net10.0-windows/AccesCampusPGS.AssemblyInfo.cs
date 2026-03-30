@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AccesCampusPGS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fdd00a18af18931581fd559ecef14a636c6d5415")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e04732ffb22031224e7fdf8523c2b78c92f91b70")]
 [assembly: System.Reflection.AssemblyProductAttribute("AccesCampusPGS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AccesCampusPGS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
