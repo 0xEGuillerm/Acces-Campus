@@ -20,8 +20,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(${PROJECT_NAME} main.cc
-        controllers/ControlleurPSW.cpp
-        controllers/ControlleurPSW.h)
+        models/Badge.cc
+        controllers/SalleController.cpp
+        controllers/SalleController.h
+        dao/BadgeDAO.cpp
+        dao/BadgeDAO.h)
 
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method
