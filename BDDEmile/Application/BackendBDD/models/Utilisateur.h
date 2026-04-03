@@ -49,7 +49,7 @@ class Utilisateur
         static const std::string _prenom_user;
         static const std::string _login_user;
         static const std::string _hash_mdp;
-        static const std::string _classe_user;
+        static const std::string _id_classe;
         static const std::string _role_user;
         static const std::string _uuid_badge;
     };
@@ -148,15 +148,14 @@ class Utilisateur
     void setHashMdp(const std::string &pHashMdp) noexcept;
     void setHashMdp(std::string &&pHashMdp) noexcept;
 
-    /**  For column classe_user  */
-    ///Get the value of the column classe_user, returns the default value if the column is null
-    const std::string &getValueOfClasseUser() const noexcept;
+    /**  For column id_classe  */
+    ///Get the value of the column id_classe, returns the default value if the column is null
+    const int32_t &getValueOfIdClasse() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getClasseUser() const noexcept;
-    ///Set the value of the column classe_user
-    void setClasseUser(const std::string &pClasseUser) noexcept;
-    void setClasseUser(std::string &&pClasseUser) noexcept;
-    void setClasseUserToNull() noexcept;
+    const std::shared_ptr<int32_t> &getIdClasse() const noexcept;
+    ///Set the value of the column id_classe
+    void setIdClasse(const int32_t &pIdClasse) noexcept;
+    void setIdClasseToNull() noexcept;
 
     /**  For column role_user  */
     ///Get the value of the column role_user, returns the default value if the column is null
@@ -204,7 +203,7 @@ class Utilisateur
     std::shared_ptr<std::string> prenomUser_;
     std::shared_ptr<std::string> loginUser_;
     std::shared_ptr<std::string> hashMdp_;
-    std::shared_ptr<std::string> classeUser_;
+    std::shared_ptr<int32_t> idClasse_;
     std::shared_ptr<std::string> roleUser_;
     std::shared_ptr<int32_t> uuidBadge_;
     struct MetaData
@@ -263,7 +262,7 @@ class Utilisateur
         }
         if(dirtyFlag_[5])
         {
-            sql += "classe_user,";
+            sql += "id_classe,";
             ++parametersCount;
         }
         if(dirtyFlag_[6])

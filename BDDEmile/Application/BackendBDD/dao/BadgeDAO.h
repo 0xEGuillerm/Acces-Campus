@@ -54,7 +54,8 @@ public:
     void VerifierBadge(
         const DbClientPtr &db,
         const std::int32_t &uid,
-        std::function<void(const drogon_model::ProjetV1::Badge &)> &&BadgeVerifier,
+        const std::string &MAC,
+        std::function<void(const drogon_model::ProjetV1::Badge &)> &&BadgeVerifierResultat,
         std::function<void(const DrogonDbException &)> &&Erreur);
 };
 

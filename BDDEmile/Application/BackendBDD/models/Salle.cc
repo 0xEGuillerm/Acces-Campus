@@ -15,13 +15,17 @@ using namespace drogon_model::ProjetV1;
 
 const std::string Salle::Cols::_num_salle = "\"num_salle\"";
 const std::string Salle::Cols::_place_maximum = "\"place_maximum\"";
+const std::string Salle::Cols::_mac_bae = "\"mac_bae\"";
+const std::string Salle::Cols::_mac_pea = "\"mac_pea\"";
 const std::string Salle::primaryKeyName = "num_salle";
 const bool Salle::hasPrimaryKey = true;
 const std::string Salle::tableName = "\"salle\"";
 
 const std::vector<typename Salle::MetaData> Salle::metaData_={
 {"num_salle","int32_t","integer",4,0,1,1},
-{"place_maximum","int32_t","integer",4,0,0,1}
+{"place_maximum","int32_t","integer",4,0,0,1},
+{"mac_bae","std::string","character varying",17,0,0,0},
+{"mac_pea","std::string","character varying",17,0,0,0}
 };
 const std::string &Salle::getColumnName(size_t index) noexcept(false)
 {
@@ -40,11 +44,19 @@ Salle::Salle(const Row &r, const ssize_t indexOffset) noexcept
         {
             placeMaximum_=std::make_shared<int32_t>(r["place_maximum"].as<int32_t>());
         }
+        if(!r["mac_bae"].isNull())
+        {
+            macBae_=std::make_shared<std::string>(r["mac_bae"].as<std::string>());
+        }
+        if(!r["mac_pea"].isNull())
+        {
+            macPea_=std::make_shared<std::string>(r["mac_pea"].as<std::string>());
+        }
     }
     else
     {
         size_t offset = (size_t)indexOffset;
-        if(offset + 2 > r.size())
+        if(offset + 4 > r.size())
         {
             LOG_FATAL << "Invalid SQL result for this model";
             return;
@@ -60,13 +72,23 @@ Salle::Salle(const Row &r, const ssize_t indexOffset) noexcept
         {
             placeMaximum_=std::make_shared<int32_t>(r[index].as<int32_t>());
         }
+        index = offset + 2;
+        if(!r[index].isNull())
+        {
+            macBae_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
+        index = offset + 3;
+        if(!r[index].isNull())
+        {
+            macPea_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
     }
 
 }
 
 Salle::Salle(const Json::Value &pJson, const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 2)
+    if(pMasqueradingVector.size() != 4)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -85,6 +107,22 @@ Salle::Salle(const Json::Value &pJson, const std::vector<std::string> &pMasquera
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
             placeMaximum_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
+        }
+    }
+    if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
+    {
+        dirtyFlag_[2] = true;
+        if(!pJson[pMasqueradingVector[2]].isNull())
+        {
+            macBae_=std::make_shared<std::string>(pJson[pMasqueradingVector[2]].asString());
+        }
+    }
+    if(!pMasqueradingVector[3].empty() && pJson.isMember(pMasqueradingVector[3]))
+    {
+        dirtyFlag_[3] = true;
+        if(!pJson[pMasqueradingVector[3]].isNull())
+        {
+            macPea_=std::make_shared<std::string>(pJson[pMasqueradingVector[3]].asString());
         }
     }
 }
@@ -107,12 +145,28 @@ Salle::Salle(const Json::Value &pJson) noexcept(false)
             placeMaximum_=std::make_shared<int32_t>((int32_t)pJson["place_maximum"].asInt64());
         }
     }
+    if(pJson.isMember("mac_bae"))
+    {
+        dirtyFlag_[2]=true;
+        if(!pJson["mac_bae"].isNull())
+        {
+            macBae_=std::make_shared<std::string>(pJson["mac_bae"].asString());
+        }
+    }
+    if(pJson.isMember("mac_pea"))
+    {
+        dirtyFlag_[3]=true;
+        if(!pJson["mac_pea"].isNull())
+        {
+            macPea_=std::make_shared<std::string>(pJson["mac_pea"].asString());
+        }
+    }
 }
 
 void Salle::updateByMasqueradedJson(const Json::Value &pJson,
                                             const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 2)
+    if(pMasqueradingVector.size() != 4)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -132,6 +186,22 @@ void Salle::updateByMasqueradedJson(const Json::Value &pJson,
             placeMaximum_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
         }
     }
+    if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
+    {
+        dirtyFlag_[2] = true;
+        if(!pJson[pMasqueradingVector[2]].isNull())
+        {
+            macBae_=std::make_shared<std::string>(pJson[pMasqueradingVector[2]].asString());
+        }
+    }
+    if(!pMasqueradingVector[3].empty() && pJson.isMember(pMasqueradingVector[3]))
+    {
+        dirtyFlag_[3] = true;
+        if(!pJson[pMasqueradingVector[3]].isNull())
+        {
+            macPea_=std::make_shared<std::string>(pJson[pMasqueradingVector[3]].asString());
+        }
+    }
 }
 
 void Salle::updateByJson(const Json::Value &pJson) noexcept(false)
@@ -149,6 +219,22 @@ void Salle::updateByJson(const Json::Value &pJson) noexcept(false)
         if(!pJson["place_maximum"].isNull())
         {
             placeMaximum_=std::make_shared<int32_t>((int32_t)pJson["place_maximum"].asInt64());
+        }
+    }
+    if(pJson.isMember("mac_bae"))
+    {
+        dirtyFlag_[2] = true;
+        if(!pJson["mac_bae"].isNull())
+        {
+            macBae_=std::make_shared<std::string>(pJson["mac_bae"].asString());
+        }
+    }
+    if(pJson.isMember("mac_pea"))
+    {
+        dirtyFlag_[3] = true;
+        if(!pJson["mac_pea"].isNull())
+        {
+            macPea_=std::make_shared<std::string>(pJson["mac_pea"].asString());
         }
     }
 }
@@ -192,6 +278,60 @@ void Salle::setPlaceMaximum(const int32_t &pPlaceMaximum) noexcept
     dirtyFlag_[1] = true;
 }
 
+const std::string &Salle::getValueOfMacBae() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(macBae_)
+        return *macBae_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &Salle::getMacBae() const noexcept
+{
+    return macBae_;
+}
+void Salle::setMacBae(const std::string &pMacBae) noexcept
+{
+    macBae_ = std::make_shared<std::string>(pMacBae);
+    dirtyFlag_[2] = true;
+}
+void Salle::setMacBae(std::string &&pMacBae) noexcept
+{
+    macBae_ = std::make_shared<std::string>(std::move(pMacBae));
+    dirtyFlag_[2] = true;
+}
+void Salle::setMacBaeToNull() noexcept
+{
+    macBae_.reset();
+    dirtyFlag_[2] = true;
+}
+
+const std::string &Salle::getValueOfMacPea() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(macPea_)
+        return *macPea_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &Salle::getMacPea() const noexcept
+{
+    return macPea_;
+}
+void Salle::setMacPea(const std::string &pMacPea) noexcept
+{
+    macPea_ = std::make_shared<std::string>(pMacPea);
+    dirtyFlag_[3] = true;
+}
+void Salle::setMacPea(std::string &&pMacPea) noexcept
+{
+    macPea_ = std::make_shared<std::string>(std::move(pMacPea));
+    dirtyFlag_[3] = true;
+}
+void Salle::setMacPeaToNull() noexcept
+{
+    macPea_.reset();
+    dirtyFlag_[3] = true;
+}
+
 void Salle::updateId(const uint64_t id)
 {
 }
@@ -200,7 +340,9 @@ const std::vector<std::string> &Salle::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
         "num_salle",
-        "place_maximum"
+        "place_maximum",
+        "mac_bae",
+        "mac_pea"
     };
     return inCols;
 }
@@ -229,6 +371,28 @@ void Salle::outputArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
+    if(dirtyFlag_[2])
+    {
+        if(getMacBae())
+        {
+            binder << getValueOfMacBae();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[3])
+    {
+        if(getMacPea())
+        {
+            binder << getValueOfMacPea();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
 }
 
 const std::vector<std::string> Salle::updateColumns() const
@@ -241,6 +405,14 @@ const std::vector<std::string> Salle::updateColumns() const
     if(dirtyFlag_[1])
     {
         ret.push_back(getColumnName(1));
+    }
+    if(dirtyFlag_[2])
+    {
+        ret.push_back(getColumnName(2));
+    }
+    if(dirtyFlag_[3])
+    {
+        ret.push_back(getColumnName(3));
     }
     return ret;
 }
@@ -269,6 +441,28 @@ void Salle::updateArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
+    if(dirtyFlag_[2])
+    {
+        if(getMacBae())
+        {
+            binder << getValueOfMacBae();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[3])
+    {
+        if(getMacPea())
+        {
+            binder << getValueOfMacPea();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
 }
 Json::Value Salle::toJson() const
 {
@@ -289,6 +483,22 @@ Json::Value Salle::toJson() const
     {
         ret["place_maximum"]=Json::Value();
     }
+    if(getMacBae())
+    {
+        ret["mac_bae"]=getValueOfMacBae();
+    }
+    else
+    {
+        ret["mac_bae"]=Json::Value();
+    }
+    if(getMacPea())
+    {
+        ret["mac_pea"]=getValueOfMacPea();
+    }
+    else
+    {
+        ret["mac_pea"]=Json::Value();
+    }
     return ret;
 }
 
@@ -301,7 +511,7 @@ Json::Value Salle::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {
     Json::Value ret;
-    if(pMasqueradingVector.size() == 2)
+    if(pMasqueradingVector.size() == 4)
     {
         if(!pMasqueradingVector[0].empty())
         {
@@ -325,6 +535,28 @@ Json::Value Salle::toMasqueradedJson(
                 ret[pMasqueradingVector[1]]=Json::Value();
             }
         }
+        if(!pMasqueradingVector[2].empty())
+        {
+            if(getMacBae())
+            {
+                ret[pMasqueradingVector[2]]=getValueOfMacBae();
+            }
+            else
+            {
+                ret[pMasqueradingVector[2]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[3].empty())
+        {
+            if(getMacPea())
+            {
+                ret[pMasqueradingVector[3]]=getValueOfMacPea();
+            }
+            else
+            {
+                ret[pMasqueradingVector[3]]=Json::Value();
+            }
+        }
         return ret;
     }
     LOG_ERROR << "Masquerade failed";
@@ -343,6 +575,22 @@ Json::Value Salle::toMasqueradedJson(
     else
     {
         ret["place_maximum"]=Json::Value();
+    }
+    if(getMacBae())
+    {
+        ret["mac_bae"]=getValueOfMacBae();
+    }
+    else
+    {
+        ret["mac_bae"]=Json::Value();
+    }
+    if(getMacPea())
+    {
+        ret["mac_pea"]=getValueOfMacPea();
+    }
+    else
+    {
+        ret["mac_pea"]=Json::Value();
     }
     return ret;
 }
@@ -369,13 +617,23 @@ bool Salle::validateJsonForCreation(const Json::Value &pJson, std::string &err)
         err="The place_maximum column cannot be null";
         return false;
     }
+    if(pJson.isMember("mac_bae"))
+    {
+        if(!validJsonOfField(2, "mac_bae", pJson["mac_bae"], err, true))
+            return false;
+    }
+    if(pJson.isMember("mac_pea"))
+    {
+        if(!validJsonOfField(3, "mac_pea", pJson["mac_pea"], err, true))
+            return false;
+    }
     return true;
 }
 bool Salle::validateMasqueradedJsonForCreation(const Json::Value &pJson,
                                                const std::vector<std::string> &pMasqueradingVector,
                                                std::string &err)
 {
-    if(pMasqueradingVector.size() != 2)
+    if(pMasqueradingVector.size() != 4)
     {
         err = "Bad masquerading vector";
         return false;
@@ -407,6 +665,22 @@ bool Salle::validateMasqueradedJsonForCreation(const Json::Value &pJson,
             return false;
         }
       }
+      if(!pMasqueradingVector[2].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[2]))
+          {
+              if(!validJsonOfField(2, pMasqueradingVector[2], pJson[pMasqueradingVector[2]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[3].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[3]))
+          {
+              if(!validJsonOfField(3, pMasqueradingVector[3], pJson[pMasqueradingVector[3]], err, true))
+                  return false;
+          }
+      }
     }
     catch(const Json::LogicError &e)
     {
@@ -432,13 +706,23 @@ bool Salle::validateJsonForUpdate(const Json::Value &pJson, std::string &err)
         if(!validJsonOfField(1, "place_maximum", pJson["place_maximum"], err, false))
             return false;
     }
+    if(pJson.isMember("mac_bae"))
+    {
+        if(!validJsonOfField(2, "mac_bae", pJson["mac_bae"], err, false))
+            return false;
+    }
+    if(pJson.isMember("mac_pea"))
+    {
+        if(!validJsonOfField(3, "mac_pea", pJson["mac_pea"], err, false))
+            return false;
+    }
     return true;
 }
 bool Salle::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
                                              const std::vector<std::string> &pMasqueradingVector,
                                              std::string &err)
 {
-    if(pMasqueradingVector.size() != 2)
+    if(pMasqueradingVector.size() != 4)
     {
         err = "Bad masquerading vector";
         return false;
@@ -457,6 +741,16 @@ bool Salle::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
       if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
       {
           if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
+      {
+          if(!validJsonOfField(2, pMasqueradingVector[2], pJson[pMasqueradingVector[2]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[3].empty() && pJson.isMember(pMasqueradingVector[3]))
+      {
+          if(!validJsonOfField(3, pMasqueradingVector[3], pJson[pMasqueradingVector[3]], err, false))
               return false;
       }
     }
@@ -496,6 +790,44 @@ bool Salle::validJsonOfField(size_t index,
             if(!pJson.isInt())
             {
                 err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 2:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            if(pJson.isString() && std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}
+                .from_bytes(pJson.asCString()).size() > 17)
+            {
+                err="String length exceeds limit for the " +
+                    fieldName +
+                    " field (the maximum value is 17)";
+                return false;
+            }
+            break;
+        case 3:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            if(pJson.isString() && std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}
+                .from_bytes(pJson.asCString()).size() > 17)
+            {
+                err="String length exceeds limit for the " +
+                    fieldName +
+                    " field (the maximum value is 17)";
                 return false;
             }
             break;

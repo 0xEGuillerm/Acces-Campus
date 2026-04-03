@@ -15,9 +15,9 @@ using namespace drogon_model::ProjetV1;
 
 const std::string Cours::Cols::_id_cours = "\"id_cours\"";
 const std::string Cours::Cols::_num_salle = "\"num_salle\"";
-const std::string Cours::Cols::_date_cours = "\"date_cours\"";
 const std::string Cours::Cols::_heure_debut = "\"heure_debut\"";
 const std::string Cours::Cols::_heure_fin = "\"heure_fin\"";
+const std::string Cours::Cols::_id_classe = "\"id_classe\"";
 const std::string Cours::primaryKeyName = "id_cours";
 const bool Cours::hasPrimaryKey = true;
 const std::string Cours::tableName = "\"cours\"";
@@ -25,9 +25,9 @@ const std::string Cours::tableName = "\"cours\"";
 const std::vector<typename Cours::MetaData> Cours::metaData_={
 {"id_cours","int32_t","integer",4,1,1,1},
 {"num_salle","int32_t","integer",4,0,0,1},
-{"date_cours","::trantor::Date","date",0,0,0,1},
 {"heure_debut","std::string","time without time zone",0,0,0,1},
-{"heure_fin","std::string","time without time zone",0,0,0,1}
+{"heure_fin","std::string","time without time zone",0,0,0,1},
+{"id_classe","int32_t","integer",4,0,0,0}
 };
 const std::string &Cours::getColumnName(size_t index) noexcept(false)
 {
@@ -46,15 +46,6 @@ Cours::Cours(const Row &r, const ssize_t indexOffset) noexcept
         {
             numSalle_=std::make_shared<int32_t>(r["num_salle"].as<int32_t>());
         }
-        if(!r["date_cours"].isNull())
-        {
-            auto daysStr = r["date_cours"].as<std::string>();
-            struct tm stm;
-            memset(&stm,0,sizeof(stm));
-            strptime(daysStr.c_str(),"%Y-%m-%d",&stm);
-            time_t t = mktime(&stm);
-            dateCours_=std::make_shared<::trantor::Date>(t*1000000);
-        }
         if(!r["heure_debut"].isNull())
         {
             heureDebut_=std::make_shared<std::string>(r["heure_debut"].as<std::string>());
@@ -62,6 +53,10 @@ Cours::Cours(const Row &r, const ssize_t indexOffset) noexcept
         if(!r["heure_fin"].isNull())
         {
             heureFin_=std::make_shared<std::string>(r["heure_fin"].as<std::string>());
+        }
+        if(!r["id_classe"].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>(r["id_classe"].as<int32_t>());
         }
     }
     else
@@ -86,22 +81,17 @@ Cours::Cours(const Row &r, const ssize_t indexOffset) noexcept
         index = offset + 2;
         if(!r[index].isNull())
         {
-            auto daysStr = r[index].as<std::string>();
-            struct tm stm;
-            memset(&stm,0,sizeof(stm));
-            strptime(daysStr.c_str(),"%Y-%m-%d",&stm);
-            time_t t = mktime(&stm);
-            dateCours_=std::make_shared<::trantor::Date>(t*1000000);
+            heureDebut_=std::make_shared<std::string>(r[index].as<std::string>());
         }
         index = offset + 3;
         if(!r[index].isNull())
         {
-            heureDebut_=std::make_shared<std::string>(r[index].as<std::string>());
+            heureFin_=std::make_shared<std::string>(r[index].as<std::string>());
         }
         index = offset + 4;
         if(!r[index].isNull())
         {
-            heureFin_=std::make_shared<std::string>(r[index].as<std::string>());
+            idClasse_=std::make_shared<int32_t>(r[index].as<int32_t>());
         }
     }
 
@@ -135,12 +125,7 @@ Cours::Cours(const Json::Value &pJson, const std::vector<std::string> &pMasquera
         dirtyFlag_[2] = true;
         if(!pJson[pMasqueradingVector[2]].isNull())
         {
-            auto daysStr = pJson[pMasqueradingVector[2]].asString();
-            struct tm stm;
-            memset(&stm,0,sizeof(stm));
-            strptime(daysStr.c_str(),"%Y-%m-%d",&stm);
-            time_t t = mktime(&stm);
-            dateCours_=std::make_shared<::trantor::Date>(t*1000000);
+            heureDebut_=std::make_shared<std::string>(pJson[pMasqueradingVector[2]].asString());
         }
     }
     if(!pMasqueradingVector[3].empty() && pJson.isMember(pMasqueradingVector[3]))
@@ -148,7 +133,7 @@ Cours::Cours(const Json::Value &pJson, const std::vector<std::string> &pMasquera
         dirtyFlag_[3] = true;
         if(!pJson[pMasqueradingVector[3]].isNull())
         {
-            heureDebut_=std::make_shared<std::string>(pJson[pMasqueradingVector[3]].asString());
+            heureFin_=std::make_shared<std::string>(pJson[pMasqueradingVector[3]].asString());
         }
     }
     if(!pMasqueradingVector[4].empty() && pJson.isMember(pMasqueradingVector[4]))
@@ -156,7 +141,7 @@ Cours::Cours(const Json::Value &pJson, const std::vector<std::string> &pMasquera
         dirtyFlag_[4] = true;
         if(!pJson[pMasqueradingVector[4]].isNull())
         {
-            heureFin_=std::make_shared<std::string>(pJson[pMasqueradingVector[4]].asString());
+            idClasse_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[4]].asInt64());
         }
     }
 }
@@ -179,22 +164,9 @@ Cours::Cours(const Json::Value &pJson) noexcept(false)
             numSalle_=std::make_shared<int32_t>((int32_t)pJson["num_salle"].asInt64());
         }
     }
-    if(pJson.isMember("date_cours"))
-    {
-        dirtyFlag_[2]=true;
-        if(!pJson["date_cours"].isNull())
-        {
-            auto daysStr = pJson["date_cours"].asString();
-            struct tm stm;
-            memset(&stm,0,sizeof(stm));
-            strptime(daysStr.c_str(),"%Y-%m-%d",&stm);
-            time_t t = mktime(&stm);
-            dateCours_=std::make_shared<::trantor::Date>(t*1000000);
-        }
-    }
     if(pJson.isMember("heure_debut"))
     {
-        dirtyFlag_[3]=true;
+        dirtyFlag_[2]=true;
         if(!pJson["heure_debut"].isNull())
         {
             heureDebut_=std::make_shared<std::string>(pJson["heure_debut"].asString());
@@ -202,10 +174,18 @@ Cours::Cours(const Json::Value &pJson) noexcept(false)
     }
     if(pJson.isMember("heure_fin"))
     {
-        dirtyFlag_[4]=true;
+        dirtyFlag_[3]=true;
         if(!pJson["heure_fin"].isNull())
         {
             heureFin_=std::make_shared<std::string>(pJson["heure_fin"].asString());
+        }
+    }
+    if(pJson.isMember("id_classe"))
+    {
+        dirtyFlag_[4]=true;
+        if(!pJson["id_classe"].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>((int32_t)pJson["id_classe"].asInt64());
         }
     }
 }
@@ -238,12 +218,7 @@ void Cours::updateByMasqueradedJson(const Json::Value &pJson,
         dirtyFlag_[2] = true;
         if(!pJson[pMasqueradingVector[2]].isNull())
         {
-            auto daysStr = pJson[pMasqueradingVector[2]].asString();
-            struct tm stm;
-            memset(&stm,0,sizeof(stm));
-            strptime(daysStr.c_str(),"%Y-%m-%d",&stm);
-            time_t t = mktime(&stm);
-            dateCours_=std::make_shared<::trantor::Date>(t*1000000);
+            heureDebut_=std::make_shared<std::string>(pJson[pMasqueradingVector[2]].asString());
         }
     }
     if(!pMasqueradingVector[3].empty() && pJson.isMember(pMasqueradingVector[3]))
@@ -251,7 +226,7 @@ void Cours::updateByMasqueradedJson(const Json::Value &pJson,
         dirtyFlag_[3] = true;
         if(!pJson[pMasqueradingVector[3]].isNull())
         {
-            heureDebut_=std::make_shared<std::string>(pJson[pMasqueradingVector[3]].asString());
+            heureFin_=std::make_shared<std::string>(pJson[pMasqueradingVector[3]].asString());
         }
     }
     if(!pMasqueradingVector[4].empty() && pJson.isMember(pMasqueradingVector[4]))
@@ -259,7 +234,7 @@ void Cours::updateByMasqueradedJson(const Json::Value &pJson,
         dirtyFlag_[4] = true;
         if(!pJson[pMasqueradingVector[4]].isNull())
         {
-            heureFin_=std::make_shared<std::string>(pJson[pMasqueradingVector[4]].asString());
+            idClasse_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[4]].asInt64());
         }
     }
 }
@@ -281,22 +256,9 @@ void Cours::updateByJson(const Json::Value &pJson) noexcept(false)
             numSalle_=std::make_shared<int32_t>((int32_t)pJson["num_salle"].asInt64());
         }
     }
-    if(pJson.isMember("date_cours"))
-    {
-        dirtyFlag_[2] = true;
-        if(!pJson["date_cours"].isNull())
-        {
-            auto daysStr = pJson["date_cours"].asString();
-            struct tm stm;
-            memset(&stm,0,sizeof(stm));
-            strptime(daysStr.c_str(),"%Y-%m-%d",&stm);
-            time_t t = mktime(&stm);
-            dateCours_=std::make_shared<::trantor::Date>(t*1000000);
-        }
-    }
     if(pJson.isMember("heure_debut"))
     {
-        dirtyFlag_[3] = true;
+        dirtyFlag_[2] = true;
         if(!pJson["heure_debut"].isNull())
         {
             heureDebut_=std::make_shared<std::string>(pJson["heure_debut"].asString());
@@ -304,10 +266,18 @@ void Cours::updateByJson(const Json::Value &pJson) noexcept(false)
     }
     if(pJson.isMember("heure_fin"))
     {
-        dirtyFlag_[4] = true;
+        dirtyFlag_[3] = true;
         if(!pJson["heure_fin"].isNull())
         {
             heureFin_=std::make_shared<std::string>(pJson["heure_fin"].asString());
+        }
+    }
+    if(pJson.isMember("id_classe"))
+    {
+        dirtyFlag_[4] = true;
+        if(!pJson["id_classe"].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>((int32_t)pJson["id_classe"].asInt64());
         }
     }
 }
@@ -351,23 +321,6 @@ void Cours::setNumSalle(const int32_t &pNumSalle) noexcept
     dirtyFlag_[1] = true;
 }
 
-const ::trantor::Date &Cours::getValueOfDateCours() const noexcept
-{
-    static const ::trantor::Date defaultValue = ::trantor::Date();
-    if(dateCours_)
-        return *dateCours_;
-    return defaultValue;
-}
-const std::shared_ptr<::trantor::Date> &Cours::getDateCours() const noexcept
-{
-    return dateCours_;
-}
-void Cours::setDateCours(const ::trantor::Date &pDateCours) noexcept
-{
-    dateCours_ = std::make_shared<::trantor::Date>(pDateCours.roundDay());
-    dirtyFlag_[2] = true;
-}
-
 const std::string &Cours::getValueOfHeureDebut() const noexcept
 {
     static const std::string defaultValue = std::string();
@@ -382,12 +335,12 @@ const std::shared_ptr<std::string> &Cours::getHeureDebut() const noexcept
 void Cours::setHeureDebut(const std::string &pHeureDebut) noexcept
 {
     heureDebut_ = std::make_shared<std::string>(pHeureDebut);
-    dirtyFlag_[3] = true;
+    dirtyFlag_[2] = true;
 }
 void Cours::setHeureDebut(std::string &&pHeureDebut) noexcept
 {
     heureDebut_ = std::make_shared<std::string>(std::move(pHeureDebut));
-    dirtyFlag_[3] = true;
+    dirtyFlag_[2] = true;
 }
 
 const std::string &Cours::getValueOfHeureFin() const noexcept
@@ -404,11 +357,33 @@ const std::shared_ptr<std::string> &Cours::getHeureFin() const noexcept
 void Cours::setHeureFin(const std::string &pHeureFin) noexcept
 {
     heureFin_ = std::make_shared<std::string>(pHeureFin);
-    dirtyFlag_[4] = true;
+    dirtyFlag_[3] = true;
 }
 void Cours::setHeureFin(std::string &&pHeureFin) noexcept
 {
     heureFin_ = std::make_shared<std::string>(std::move(pHeureFin));
+    dirtyFlag_[3] = true;
+}
+
+const int32_t &Cours::getValueOfIdClasse() const noexcept
+{
+    static const int32_t defaultValue = int32_t();
+    if(idClasse_)
+        return *idClasse_;
+    return defaultValue;
+}
+const std::shared_ptr<int32_t> &Cours::getIdClasse() const noexcept
+{
+    return idClasse_;
+}
+void Cours::setIdClasse(const int32_t &pIdClasse) noexcept
+{
+    idClasse_ = std::make_shared<int32_t>(pIdClasse);
+    dirtyFlag_[4] = true;
+}
+void Cours::setIdClasseToNull() noexcept
+{
+    idClasse_.reset();
     dirtyFlag_[4] = true;
 }
 
@@ -420,9 +395,9 @@ const std::vector<std::string> &Cours::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
         "num_salle",
-        "date_cours",
         "heure_debut",
-        "heure_fin"
+        "heure_fin",
+        "id_classe"
     };
     return inCols;
 }
@@ -442,17 +417,6 @@ void Cours::outputArgs(drogon::orm::internal::SqlBinder &binder) const
     }
     if(dirtyFlag_[2])
     {
-        if(getDateCours())
-        {
-            binder << getValueOfDateCours();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
-    if(dirtyFlag_[3])
-    {
         if(getHeureDebut())
         {
             binder << getValueOfHeureDebut();
@@ -462,11 +426,22 @@ void Cours::outputArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
-    if(dirtyFlag_[4])
+    if(dirtyFlag_[3])
     {
         if(getHeureFin())
         {
             binder << getValueOfHeureFin();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[4])
+    {
+        if(getIdClasse())
+        {
+            binder << getValueOfIdClasse();
         }
         else
         {
@@ -512,17 +487,6 @@ void Cours::updateArgs(drogon::orm::internal::SqlBinder &binder) const
     }
     if(dirtyFlag_[2])
     {
-        if(getDateCours())
-        {
-            binder << getValueOfDateCours();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
-    if(dirtyFlag_[3])
-    {
         if(getHeureDebut())
         {
             binder << getValueOfHeureDebut();
@@ -532,11 +496,22 @@ void Cours::updateArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
-    if(dirtyFlag_[4])
+    if(dirtyFlag_[3])
     {
         if(getHeureFin())
         {
             binder << getValueOfHeureFin();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[4])
+    {
+        if(getIdClasse())
+        {
+            binder << getValueOfIdClasse();
         }
         else
         {
@@ -563,14 +538,6 @@ Json::Value Cours::toJson() const
     {
         ret["num_salle"]=Json::Value();
     }
-    if(getDateCours())
-    {
-        ret["date_cours"]=getDateCours()->toDbStringLocal();
-    }
-    else
-    {
-        ret["date_cours"]=Json::Value();
-    }
     if(getHeureDebut())
     {
         ret["heure_debut"]=getValueOfHeureDebut();
@@ -586,6 +553,14 @@ Json::Value Cours::toJson() const
     else
     {
         ret["heure_fin"]=Json::Value();
+    }
+    if(getIdClasse())
+    {
+        ret["id_classe"]=getValueOfIdClasse();
+    }
+    else
+    {
+        ret["id_classe"]=Json::Value();
     }
     return ret;
 }
@@ -625,9 +600,9 @@ Json::Value Cours::toMasqueradedJson(
         }
         if(!pMasqueradingVector[2].empty())
         {
-            if(getDateCours())
+            if(getHeureDebut())
             {
-                ret[pMasqueradingVector[2]]=getDateCours()->toDbStringLocal();
+                ret[pMasqueradingVector[2]]=getValueOfHeureDebut();
             }
             else
             {
@@ -636,9 +611,9 @@ Json::Value Cours::toMasqueradedJson(
         }
         if(!pMasqueradingVector[3].empty())
         {
-            if(getHeureDebut())
+            if(getHeureFin())
             {
-                ret[pMasqueradingVector[3]]=getValueOfHeureDebut();
+                ret[pMasqueradingVector[3]]=getValueOfHeureFin();
             }
             else
             {
@@ -647,9 +622,9 @@ Json::Value Cours::toMasqueradedJson(
         }
         if(!pMasqueradingVector[4].empty())
         {
-            if(getHeureFin())
+            if(getIdClasse())
             {
-                ret[pMasqueradingVector[4]]=getValueOfHeureFin();
+                ret[pMasqueradingVector[4]]=getValueOfIdClasse();
             }
             else
             {
@@ -675,14 +650,6 @@ Json::Value Cours::toMasqueradedJson(
     {
         ret["num_salle"]=Json::Value();
     }
-    if(getDateCours())
-    {
-        ret["date_cours"]=getDateCours()->toDbStringLocal();
-    }
-    else
-    {
-        ret["date_cours"]=Json::Value();
-    }
     if(getHeureDebut())
     {
         ret["heure_debut"]=getValueOfHeureDebut();
@@ -698,6 +665,14 @@ Json::Value Cours::toMasqueradedJson(
     else
     {
         ret["heure_fin"]=Json::Value();
+    }
+    if(getIdClasse())
+    {
+        ret["id_classe"]=getValueOfIdClasse();
+    }
+    else
+    {
+        ret["id_classe"]=Json::Value();
     }
     return ret;
 }
@@ -719,19 +694,9 @@ bool Cours::validateJsonForCreation(const Json::Value &pJson, std::string &err)
         err="The num_salle column cannot be null";
         return false;
     }
-    if(pJson.isMember("date_cours"))
-    {
-        if(!validJsonOfField(2, "date_cours", pJson["date_cours"], err, true))
-            return false;
-    }
-    else
-    {
-        err="The date_cours column cannot be null";
-        return false;
-    }
     if(pJson.isMember("heure_debut"))
     {
-        if(!validJsonOfField(3, "heure_debut", pJson["heure_debut"], err, true))
+        if(!validJsonOfField(2, "heure_debut", pJson["heure_debut"], err, true))
             return false;
     }
     else
@@ -741,13 +706,18 @@ bool Cours::validateJsonForCreation(const Json::Value &pJson, std::string &err)
     }
     if(pJson.isMember("heure_fin"))
     {
-        if(!validJsonOfField(4, "heure_fin", pJson["heure_fin"], err, true))
+        if(!validJsonOfField(3, "heure_fin", pJson["heure_fin"], err, true))
             return false;
     }
     else
     {
         err="The heure_fin column cannot be null";
         return false;
+    }
+    if(pJson.isMember("id_classe"))
+    {
+        if(!validJsonOfField(4, "id_classe", pJson["id_classe"], err, true))
+            return false;
     }
     return true;
 }
@@ -815,11 +785,6 @@ bool Cours::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(4, pMasqueradingVector[4], pJson[pMasqueradingVector[4]], err, true))
                   return false;
           }
-        else
-        {
-            err="The " + pMasqueradingVector[4] + " column cannot be null";
-            return false;
-        }
       }
     }
     catch(const Json::LogicError &e)
@@ -846,19 +811,19 @@ bool Cours::validateJsonForUpdate(const Json::Value &pJson, std::string &err)
         if(!validJsonOfField(1, "num_salle", pJson["num_salle"], err, false))
             return false;
     }
-    if(pJson.isMember("date_cours"))
-    {
-        if(!validJsonOfField(2, "date_cours", pJson["date_cours"], err, false))
-            return false;
-    }
     if(pJson.isMember("heure_debut"))
     {
-        if(!validJsonOfField(3, "heure_debut", pJson["heure_debut"], err, false))
+        if(!validJsonOfField(2, "heure_debut", pJson["heure_debut"], err, false))
             return false;
     }
     if(pJson.isMember("heure_fin"))
     {
-        if(!validJsonOfField(4, "heure_fin", pJson["heure_fin"], err, false))
+        if(!validJsonOfField(3, "heure_fin", pJson["heure_fin"], err, false))
+            return false;
+    }
+    if(pJson.isMember("id_classe"))
+    {
+        if(!validJsonOfField(4, "id_classe", pJson["id_classe"], err, false))
             return false;
     }
     return true;
@@ -975,10 +940,9 @@ bool Cours::validJsonOfField(size_t index,
         case 4:
             if(pJson.isNull())
             {
-                err="The " + fieldName + " column cannot be null";
-                return false;
+                return true;
             }
-            if(!pJson.isString())
+            if(!pJson.isInt())
             {
                 err="Type error in the "+fieldName+" field";
                 return false;

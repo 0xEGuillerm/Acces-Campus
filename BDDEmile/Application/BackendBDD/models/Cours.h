@@ -46,9 +46,9 @@ class Cours
     {
         static const std::string _id_cours;
         static const std::string _num_salle;
-        static const std::string _date_cours;
         static const std::string _heure_debut;
         static const std::string _heure_fin;
+        static const std::string _id_classe;
     };
 
     static const int primaryKeyNumber;
@@ -116,14 +116,6 @@ class Cours
     ///Set the value of the column num_salle
     void setNumSalle(const int32_t &pNumSalle) noexcept;
 
-    /**  For column date_cours  */
-    ///Get the value of the column date_cours, returns the default value if the column is null
-    const ::trantor::Date &getValueOfDateCours() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<::trantor::Date> &getDateCours() const noexcept;
-    ///Set the value of the column date_cours
-    void setDateCours(const ::trantor::Date &pDateCours) noexcept;
-
     /**  For column heure_debut  */
     ///Get the value of the column heure_debut, returns the default value if the column is null
     const std::string &getValueOfHeureDebut() const noexcept;
@@ -141,6 +133,15 @@ class Cours
     ///Set the value of the column heure_fin
     void setHeureFin(const std::string &pHeureFin) noexcept;
     void setHeureFin(std::string &&pHeureFin) noexcept;
+
+    /**  For column id_classe  */
+    ///Get the value of the column id_classe, returns the default value if the column is null
+    const int32_t &getValueOfIdClasse() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<int32_t> &getIdClasse() const noexcept;
+    ///Set the value of the column id_classe
+    void setIdClasse(const int32_t &pIdClasse) noexcept;
+    void setIdClasseToNull() noexcept;
 
 
     static size_t getColumnNumber() noexcept {  return 5;  }
@@ -167,9 +168,9 @@ class Cours
     void updateId(const uint64_t id);
     std::shared_ptr<int32_t> idCours_;
     std::shared_ptr<int32_t> numSalle_;
-    std::shared_ptr<::trantor::Date> dateCours_;
     std::shared_ptr<std::string> heureDebut_;
     std::shared_ptr<std::string> heureFin_;
+    std::shared_ptr<int32_t> idClasse_;
     struct MetaData
     {
         const std::string colName_;
@@ -208,17 +209,17 @@ class Cours
         }
         if(dirtyFlag_[2])
         {
-            sql += "date_cours,";
+            sql += "heure_debut,";
             ++parametersCount;
         }
         if(dirtyFlag_[3])
         {
-            sql += "heure_debut,";
+            sql += "heure_fin,";
             ++parametersCount;
         }
         if(dirtyFlag_[4])
         {
-            sql += "heure_fin,";
+            sql += "id_classe,";
             ++parametersCount;
         }
         needSelection=true;
