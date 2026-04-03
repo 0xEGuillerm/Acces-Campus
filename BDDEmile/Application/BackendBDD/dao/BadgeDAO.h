@@ -21,7 +21,7 @@ public:
     // Obtenir les infos d'un badge
     void InformationBadge(
         const DbClientPtr &db,
-        const std::int32_t &uid,
+        const std::string &uid,
         //Appel la fonction BadgeObtenu(callback)
         std::function<void(const Json::Value &body)> &&InformationObtenu,
         std::function<void(const DrogonDbException &)> &&Erreur);
@@ -30,13 +30,13 @@ public:
     void CreeBadge(
         const DbClientPtr &db,
         const std::int32_t &uiduser,
-        const std::int32_t &uidbadge,
+        const std::string &uidbadge,
         std::function<void(bool, const std::string&)> &&BadgeCree,
         std::function<void(const DrogonDbException &)> &&Erreur);
 
     void SupprimerBadge(
         const DbClientPtr &db,
-        const std::int32_t &uid,
+        const std::string &uid,
         std::function<void(const drogon_model::ProjetV1::Badge &)> &&BadgeSupprimer,
         std::function<void(const DrogonDbException &)> &&Erreur);
 
@@ -44,7 +44,7 @@ public:
         //La connexion
         const DbClientPtr &db,
         //Uid Badge
-        const std::int32_t &uid,
+        const std::string &uid,
         //Body des champs à modifier peut etre vide donc tester les champs
         const Json::Value &body,
         //callback reussite / Erreur
@@ -53,9 +53,16 @@ public:
 
     void VerifierBadge(
         const DbClientPtr &db,
-        const std::int32_t &uid,
+        const std::string &uid,
         const std::string &MAC,
-        std::function<void(const drogon_model::ProjetV1::Badge &)> &&BadgeVerifierResultat,
+        std::function<void(bool, const std::string&)> &&BadgeVerifierResultat,
+        std::function<void(const DrogonDbException &)> &&Erreur);
+
+    void ScannerBadge(
+        const DbClientPtr &db,
+        const std::string &uid,
+        const std::string &MAC,
+        std::function<void(bool, const std::string&)> &&BadgeScannerResultat,
         std::function<void(const DrogonDbException &)> &&Erreur);
 };
 

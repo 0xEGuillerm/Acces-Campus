@@ -14,7 +14,7 @@ using namespace drogon::orm;
 using namespace drogon_model::ProjetV1;
 
 const std::string Historique::Cols::_id_historique = "\"id_historique\"";
-const std::string Historique::Cols::_uuid_user = "\"uuid_user\"";
+const std::string Historique::Cols::_id_user = "\"id_user\"";
 const std::string Historique::Cols::_date_action = "\"date_action\"";
 const std::string Historique::Cols::_type_action = "\"type_action\"";
 const std::string Historique::primaryKeyName = "id_historique";
@@ -23,7 +23,7 @@ const std::string Historique::tableName = "\"historique\"";
 
 const std::vector<typename Historique::MetaData> Historique::metaData_={
 {"id_historique","int32_t","integer",4,1,1,1},
-{"uuid_user","std::string","uuid",0,0,0,1},
+{"id_user","int32_t","integer",4,1,0,1},
 {"date_action","::trantor::Date","timestamp without time zone",0,0,0,1},
 {"type_action","std::string","character varying",50,0,0,1}
 };
@@ -40,9 +40,9 @@ Historique::Historique(const Row &r, const ssize_t indexOffset) noexcept
         {
             idHistorique_=std::make_shared<int32_t>(r["id_historique"].as<int32_t>());
         }
-        if(!r["uuid_user"].isNull())
+        if(!r["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(r["uuid_user"].as<std::string>());
+            idUser_=std::make_shared<int32_t>(r["id_user"].as<int32_t>());
         }
         if(!r["date_action"].isNull())
         {
@@ -88,7 +88,7 @@ Historique::Historique(const Row &r, const ssize_t indexOffset) noexcept
         index = offset + 1;
         if(!r[index].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(r[index].as<std::string>());
+            idUser_=std::make_shared<int32_t>(r[index].as<int32_t>());
         }
         index = offset + 2;
         if(!r[index].isNull())
@@ -142,7 +142,7 @@ Historique::Historique(const Json::Value &pJson, const std::vector<std::string> 
         dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson[pMasqueradingVector[1]].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
         }
     }
     if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
@@ -191,12 +191,12 @@ Historique::Historique(const Json::Value &pJson) noexcept(false)
             idHistorique_=std::make_shared<int32_t>((int32_t)pJson["id_historique"].asInt64());
         }
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
         dirtyFlag_[1]=true;
-        if(!pJson["uuid_user"].isNull())
+        if(!pJson["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson["uuid_user"].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
         }
     }
     if(pJson.isMember("date_action"))
@@ -252,10 +252,9 @@ void Historique::updateByMasqueradedJson(const Json::Value &pJson,
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
     {
-        dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson[pMasqueradingVector[1]].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
         }
     }
     if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
@@ -303,12 +302,11 @@ void Historique::updateByJson(const Json::Value &pJson) noexcept(false)
             idHistorique_=std::make_shared<int32_t>((int32_t)pJson["id_historique"].asInt64());
         }
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        dirtyFlag_[1] = true;
-        if(!pJson["uuid_user"].isNull())
+        if(!pJson["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson["uuid_user"].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
         }
     }
     if(pJson.isMember("date_action"))
@@ -369,25 +367,20 @@ const typename Historique::PrimaryKeyType & Historique::getPrimaryKey() const
     return *idHistorique_;
 }
 
-const std::string &Historique::getValueOfUuidUser() const noexcept
+const int32_t &Historique::getValueOfIdUser() const noexcept
 {
-    static const std::string defaultValue = std::string();
-    if(uuidUser_)
-        return *uuidUser_;
+    static const int32_t defaultValue = int32_t();
+    if(idUser_)
+        return *idUser_;
     return defaultValue;
 }
-const std::shared_ptr<std::string> &Historique::getUuidUser() const noexcept
+const std::shared_ptr<int32_t> &Historique::getIdUser() const noexcept
 {
-    return uuidUser_;
+    return idUser_;
 }
-void Historique::setUuidUser(const std::string &pUuidUser) noexcept
+void Historique::setIdUser(const int32_t &pIdUser) noexcept
 {
-    uuidUser_ = std::make_shared<std::string>(pUuidUser);
-    dirtyFlag_[1] = true;
-}
-void Historique::setUuidUser(std::string &&pUuidUser) noexcept
-{
-    uuidUser_ = std::make_shared<std::string>(std::move(pUuidUser));
+    idUser_ = std::make_shared<int32_t>(pIdUser);
     dirtyFlag_[1] = true;
 }
 
@@ -437,7 +430,6 @@ void Historique::updateId(const uint64_t id)
 const std::vector<std::string> &Historique::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
-        "uuid_user",
         "date_action",
         "type_action"
     };
@@ -446,17 +438,6 @@ const std::vector<std::string> &Historique::insertColumns() noexcept
 
 void Historique::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 {
-    if(dirtyFlag_[1])
-    {
-        if(getUuidUser())
-        {
-            binder << getValueOfUuidUser();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
     if(dirtyFlag_[2])
     {
         if(getDateAction())
@@ -484,10 +465,6 @@ void Historique::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 const std::vector<std::string> Historique::updateColumns() const
 {
     std::vector<std::string> ret;
-    if(dirtyFlag_[1])
-    {
-        ret.push_back(getColumnName(1));
-    }
     if(dirtyFlag_[2])
     {
         ret.push_back(getColumnName(2));
@@ -501,17 +478,6 @@ const std::vector<std::string> Historique::updateColumns() const
 
 void Historique::updateArgs(drogon::orm::internal::SqlBinder &binder) const
 {
-    if(dirtyFlag_[1])
-    {
-        if(getUuidUser())
-        {
-            binder << getValueOfUuidUser();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
     if(dirtyFlag_[2])
     {
         if(getDateAction())
@@ -546,13 +512,13 @@ Json::Value Historique::toJson() const
     {
         ret["id_historique"]=Json::Value();
     }
-    if(getUuidUser())
+    if(getIdUser())
     {
-        ret["uuid_user"]=getValueOfUuidUser();
+        ret["id_user"]=getValueOfIdUser();
     }
     else
     {
-        ret["uuid_user"]=Json::Value();
+        ret["id_user"]=Json::Value();
     }
     if(getDateAction())
     {
@@ -597,9 +563,9 @@ Json::Value Historique::toMasqueradedJson(
         }
         if(!pMasqueradingVector[1].empty())
         {
-            if(getUuidUser())
+            if(getIdUser())
             {
-                ret[pMasqueradingVector[1]]=getValueOfUuidUser();
+                ret[pMasqueradingVector[1]]=getValueOfIdUser();
             }
             else
             {
@@ -639,13 +605,13 @@ Json::Value Historique::toMasqueradedJson(
     {
         ret["id_historique"]=Json::Value();
     }
-    if(getUuidUser())
+    if(getIdUser())
     {
-        ret["uuid_user"]=getValueOfUuidUser();
+        ret["id_user"]=getValueOfIdUser();
     }
     else
     {
-        ret["uuid_user"]=Json::Value();
+        ret["id_user"]=Json::Value();
     }
     if(getDateAction())
     {
@@ -673,15 +639,10 @@ bool Historique::validateJsonForCreation(const Json::Value &pJson, std::string &
         if(!validJsonOfField(0, "id_historique", pJson["id_historique"], err, true))
             return false;
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!validJsonOfField(1, "uuid_user", pJson["uuid_user"], err, true))
+        if(!validJsonOfField(1, "id_user", pJson["id_user"], err, true))
             return false;
-    }
-    else
-    {
-        err="The uuid_user column cannot be null";
-        return false;
     }
     if(pJson.isMember("date_action"))
     {
@@ -725,11 +686,6 @@ bool Historique::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, true))
                   return false;
           }
-        else
-        {
-            err="The " + pMasqueradingVector[1] + " column cannot be null";
-            return false;
-        }
       }
       if(!pMasqueradingVector[2].empty())
       {
@@ -772,9 +728,9 @@ bool Historique::validateJsonForUpdate(const Json::Value &pJson, std::string &er
         err = "The value of primary key must be set in the json object for update";
         return false;
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!validJsonOfField(1, "uuid_user", pJson["uuid_user"], err, false))
+        if(!validJsonOfField(1, "id_user", pJson["id_user"], err, false))
             return false;
     }
     if(pJson.isMember("date_action"))
@@ -863,7 +819,17 @@ bool Historique::validJsonOfField(size_t index,
                 err="The " + fieldName + " column cannot be null";
                 return false;
             }
-            if(!pJson.isString())
+            if(isForCreation)
+            {
+                err="The automatic primary key cannot be set";
+                return false;
+            }
+            else
+            {
+                err="The automatic primary key cannot be update";
+                return false;
+            }
+            if(!pJson.isInt())
             {
                 err="Type error in the "+fieldName+" field";
                 return false;

@@ -14,7 +14,7 @@ using namespace drogon::orm;
 using namespace drogon_model::ProjetV1;
 
 const std::string Retardabsence::Cols::_id_retardabsence = "\"id_retardabsence\"";
-const std::string Retardabsence::Cols::_uuid_user = "\"uuid_user\"";
+const std::string Retardabsence::Cols::_id_user = "\"id_user\"";
 const std::string Retardabsence::Cols::_id_cours = "\"id_cours\"";
 const std::string Retardabsence::Cols::_temps_retard_min = "\"temps_retard_min\"";
 const std::string Retardabsence::Cols::_absence = "\"absence\"";
@@ -24,7 +24,7 @@ const std::string Retardabsence::tableName = "\"retardabsence\"";
 
 const std::vector<typename Retardabsence::MetaData> Retardabsence::metaData_={
 {"id_retardabsence","int32_t","integer",4,1,1,1},
-{"uuid_user","std::string","uuid",0,0,0,1},
+{"id_user","int32_t","integer",4,1,0,1},
 {"id_cours","int32_t","integer",4,0,0,1},
 {"temps_retard_min","int32_t","integer",4,0,0,0},
 {"absence","bool","boolean",1,0,0,1}
@@ -42,9 +42,9 @@ Retardabsence::Retardabsence(const Row &r, const ssize_t indexOffset) noexcept
         {
             idRetardabsence_=std::make_shared<int32_t>(r["id_retardabsence"].as<int32_t>());
         }
-        if(!r["uuid_user"].isNull())
+        if(!r["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(r["uuid_user"].as<std::string>());
+            idUser_=std::make_shared<int32_t>(r["id_user"].as<int32_t>());
         }
         if(!r["id_cours"].isNull())
         {
@@ -76,7 +76,7 @@ Retardabsence::Retardabsence(const Row &r, const ssize_t indexOffset) noexcept
         index = offset + 1;
         if(!r[index].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(r[index].as<std::string>());
+            idUser_=std::make_shared<int32_t>(r[index].as<int32_t>());
         }
         index = offset + 2;
         if(!r[index].isNull())
@@ -117,7 +117,7 @@ Retardabsence::Retardabsence(const Json::Value &pJson, const std::vector<std::st
         dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson[pMasqueradingVector[1]].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
         }
     }
     if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
@@ -156,12 +156,12 @@ Retardabsence::Retardabsence(const Json::Value &pJson) noexcept(false)
             idRetardabsence_=std::make_shared<int32_t>((int32_t)pJson["id_retardabsence"].asInt64());
         }
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
         dirtyFlag_[1]=true;
-        if(!pJson["uuid_user"].isNull())
+        if(!pJson["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson["uuid_user"].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
         }
     }
     if(pJson.isMember("id_cours"))
@@ -207,10 +207,9 @@ void Retardabsence::updateByMasqueradedJson(const Json::Value &pJson,
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
     {
-        dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson[pMasqueradingVector[1]].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
         }
     }
     if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
@@ -248,12 +247,11 @@ void Retardabsence::updateByJson(const Json::Value &pJson) noexcept(false)
             idRetardabsence_=std::make_shared<int32_t>((int32_t)pJson["id_retardabsence"].asInt64());
         }
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        dirtyFlag_[1] = true;
-        if(!pJson["uuid_user"].isNull())
+        if(!pJson["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson["uuid_user"].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
         }
     }
     if(pJson.isMember("id_cours"))
@@ -304,25 +302,20 @@ const typename Retardabsence::PrimaryKeyType & Retardabsence::getPrimaryKey() co
     return *idRetardabsence_;
 }
 
-const std::string &Retardabsence::getValueOfUuidUser() const noexcept
+const int32_t &Retardabsence::getValueOfIdUser() const noexcept
 {
-    static const std::string defaultValue = std::string();
-    if(uuidUser_)
-        return *uuidUser_;
+    static const int32_t defaultValue = int32_t();
+    if(idUser_)
+        return *idUser_;
     return defaultValue;
 }
-const std::shared_ptr<std::string> &Retardabsence::getUuidUser() const noexcept
+const std::shared_ptr<int32_t> &Retardabsence::getIdUser() const noexcept
 {
-    return uuidUser_;
+    return idUser_;
 }
-void Retardabsence::setUuidUser(const std::string &pUuidUser) noexcept
+void Retardabsence::setIdUser(const int32_t &pIdUser) noexcept
 {
-    uuidUser_ = std::make_shared<std::string>(pUuidUser);
-    dirtyFlag_[1] = true;
-}
-void Retardabsence::setUuidUser(std::string &&pUuidUser) noexcept
-{
-    uuidUser_ = std::make_shared<std::string>(std::move(pUuidUser));
+    idUser_ = std::make_shared<int32_t>(pIdUser);
     dirtyFlag_[1] = true;
 }
 
@@ -389,7 +382,6 @@ void Retardabsence::updateId(const uint64_t id)
 const std::vector<std::string> &Retardabsence::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
-        "uuid_user",
         "id_cours",
         "temps_retard_min",
         "absence"
@@ -399,17 +391,6 @@ const std::vector<std::string> &Retardabsence::insertColumns() noexcept
 
 void Retardabsence::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 {
-    if(dirtyFlag_[1])
-    {
-        if(getUuidUser())
-        {
-            binder << getValueOfUuidUser();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
     if(dirtyFlag_[2])
     {
         if(getIdCours())
@@ -448,10 +429,6 @@ void Retardabsence::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 const std::vector<std::string> Retardabsence::updateColumns() const
 {
     std::vector<std::string> ret;
-    if(dirtyFlag_[1])
-    {
-        ret.push_back(getColumnName(1));
-    }
     if(dirtyFlag_[2])
     {
         ret.push_back(getColumnName(2));
@@ -469,17 +446,6 @@ const std::vector<std::string> Retardabsence::updateColumns() const
 
 void Retardabsence::updateArgs(drogon::orm::internal::SqlBinder &binder) const
 {
-    if(dirtyFlag_[1])
-    {
-        if(getUuidUser())
-        {
-            binder << getValueOfUuidUser();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
     if(dirtyFlag_[2])
     {
         if(getIdCours())
@@ -525,13 +491,13 @@ Json::Value Retardabsence::toJson() const
     {
         ret["id_retardabsence"]=Json::Value();
     }
-    if(getUuidUser())
+    if(getIdUser())
     {
-        ret["uuid_user"]=getValueOfUuidUser();
+        ret["id_user"]=getValueOfIdUser();
     }
     else
     {
-        ret["uuid_user"]=Json::Value();
+        ret["id_user"]=Json::Value();
     }
     if(getIdCours())
     {
@@ -584,9 +550,9 @@ Json::Value Retardabsence::toMasqueradedJson(
         }
         if(!pMasqueradingVector[1].empty())
         {
-            if(getUuidUser())
+            if(getIdUser())
             {
-                ret[pMasqueradingVector[1]]=getValueOfUuidUser();
+                ret[pMasqueradingVector[1]]=getValueOfIdUser();
             }
             else
             {
@@ -637,13 +603,13 @@ Json::Value Retardabsence::toMasqueradedJson(
     {
         ret["id_retardabsence"]=Json::Value();
     }
-    if(getUuidUser())
+    if(getIdUser())
     {
-        ret["uuid_user"]=getValueOfUuidUser();
+        ret["id_user"]=getValueOfIdUser();
     }
     else
     {
-        ret["uuid_user"]=Json::Value();
+        ret["id_user"]=Json::Value();
     }
     if(getIdCours())
     {
@@ -679,15 +645,10 @@ bool Retardabsence::validateJsonForCreation(const Json::Value &pJson, std::strin
         if(!validJsonOfField(0, "id_retardabsence", pJson["id_retardabsence"], err, true))
             return false;
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!validJsonOfField(1, "uuid_user", pJson["uuid_user"], err, true))
+        if(!validJsonOfField(1, "id_user", pJson["id_user"], err, true))
             return false;
-    }
-    else
-    {
-        err="The uuid_user column cannot be null";
-        return false;
     }
     if(pJson.isMember("id_cours"))
     {
@@ -741,11 +702,6 @@ bool Retardabsence::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, true))
                   return false;
           }
-        else
-        {
-            err="The " + pMasqueradingVector[1] + " column cannot be null";
-            return false;
-        }
       }
       if(!pMasqueradingVector[2].empty())
       {
@@ -801,9 +757,9 @@ bool Retardabsence::validateJsonForUpdate(const Json::Value &pJson, std::string 
         err = "The value of primary key must be set in the json object for update";
         return false;
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!validJsonOfField(1, "uuid_user", pJson["uuid_user"], err, false))
+        if(!validJsonOfField(1, "id_user", pJson["id_user"], err, false))
             return false;
     }
     if(pJson.isMember("id_cours"))
@@ -902,7 +858,17 @@ bool Retardabsence::validJsonOfField(size_t index,
                 err="The " + fieldName + " column cannot be null";
                 return false;
             }
-            if(!pJson.isString())
+            if(isForCreation)
+            {
+                err="The automatic primary key cannot be set";
+                return false;
+            }
+            else
+            {
+                err="The automatic primary key cannot be update";
+                return false;
+            }
+            if(!pJson.isInt())
             {
                 err="Type error in the "+fieldName+" field";
                 return false;

@@ -44,7 +44,7 @@ class Utilisateur
   public:
     struct Cols
     {
-        static const std::string _uuid_user;
+        static const std::string _id_user;
         static const std::string _nom_user;
         static const std::string _prenom_user;
         static const std::string _login_user;
@@ -58,7 +58,7 @@ class Utilisateur
     static const std::string tableName;
     static const bool hasPrimaryKey;
     static const std::string primaryKeyName;
-    using PrimaryKeyType = std::string;
+    using PrimaryKeyType = int32_t;
     const PrimaryKeyType &getPrimaryKey() const;
 
     /**
@@ -103,14 +103,13 @@ class Utilisateur
                           std::string &err,
                           bool isForCreation);
 
-    /**  For column uuid_user  */
-    ///Get the value of the column uuid_user, returns the default value if the column is null
-    const std::string &getValueOfUuidUser() const noexcept;
+    /**  For column id_user  */
+    ///Get the value of the column id_user, returns the default value if the column is null
+    const int32_t &getValueOfIdUser() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getUuidUser() const noexcept;
-    ///Set the value of the column uuid_user
-    void setUuidUser(const std::string &pUuidUser) noexcept;
-    void setUuidUser(std::string &&pUuidUser) noexcept;
+    const std::shared_ptr<int32_t> &getIdUser() const noexcept;
+    ///Set the value of the column id_user
+    void setIdUser(const int32_t &pIdUser) noexcept;
 
     /**  For column nom_user  */
     ///Get the value of the column nom_user, returns the default value if the column is null
@@ -168,11 +167,12 @@ class Utilisateur
 
     /**  For column uuid_badge  */
     ///Get the value of the column uuid_badge, returns the default value if the column is null
-    const int32_t &getValueOfUuidBadge() const noexcept;
+    const std::string &getValueOfUuidBadge() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<int32_t> &getUuidBadge() const noexcept;
+    const std::shared_ptr<std::string> &getUuidBadge() const noexcept;
     ///Set the value of the column uuid_badge
-    void setUuidBadge(const int32_t &pUuidBadge) noexcept;
+    void setUuidBadge(const std::string &pUuidBadge) noexcept;
+    void setUuidBadge(std::string &&pUuidBadge) noexcept;
     void setUuidBadgeToNull() noexcept;
 
 
@@ -198,14 +198,14 @@ class Utilisateur
     void updateArgs(drogon::orm::internal::SqlBinder &binder) const;
     ///For mysql or sqlite3
     void updateId(const uint64_t id);
-    std::shared_ptr<std::string> uuidUser_;
+    std::shared_ptr<int32_t> idUser_;
     std::shared_ptr<std::string> nomUser_;
     std::shared_ptr<std::string> prenomUser_;
     std::shared_ptr<std::string> loginUser_;
     std::shared_ptr<std::string> hashMdp_;
     std::shared_ptr<int32_t> idClasse_;
     std::shared_ptr<std::string> roleUser_;
-    std::shared_ptr<int32_t> uuidBadge_;
+    std::shared_ptr<std::string> uuidBadge_;
     struct MetaData
     {
         const std::string colName_;
@@ -221,13 +221,13 @@ class Utilisateur
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
-        static const std::string sql="select * from " + tableName + " where uuid_user = $1";
+        static const std::string sql="select * from " + tableName + " where id_user = $1";
         return sql;
     }
 
     static const std::string &sqlForDeletingByPrimaryKey()
     {
-        static const std::string sql="delete from " + tableName + " where uuid_user = $1";
+        static const std::string sql="delete from " + tableName + " where id_user = $1";
         return sql;
     }
     std::string sqlForInserting(bool &needSelection) const
@@ -235,11 +235,8 @@ class Utilisateur
         std::string sql="insert into " + tableName + " (";
         size_t parametersCount = 0;
         needSelection = false;
-        if(dirtyFlag_[0])
-        {
-            sql += "uuid_user,";
+            sql += "id_user,";
             ++parametersCount;
-        }
         if(dirtyFlag_[1])
         {
             sql += "nom_user,";
@@ -275,6 +272,7 @@ class Utilisateur
             sql += "uuid_badge,";
             ++parametersCount;
         }
+        needSelection=true;
         if(parametersCount > 0)
         {
             sql[sql.length()-1]=')';
@@ -286,11 +284,7 @@ class Utilisateur
         int placeholder=1;
         char placeholderStr[64];
         size_t n=0;
-        if(dirtyFlag_[0])
-        {
-            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
-            sql.append(placeholderStr, n);
-        }
+        sql +="default,";
         if(dirtyFlag_[1])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);

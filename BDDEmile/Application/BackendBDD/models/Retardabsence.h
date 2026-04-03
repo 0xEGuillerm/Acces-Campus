@@ -45,7 +45,7 @@ class Retardabsence
     struct Cols
     {
         static const std::string _id_retardabsence;
-        static const std::string _uuid_user;
+        static const std::string _id_user;
         static const std::string _id_cours;
         static const std::string _temps_retard_min;
         static const std::string _absence;
@@ -108,14 +108,13 @@ class Retardabsence
     ///Set the value of the column id_retardabsence
     void setIdRetardabsence(const int32_t &pIdRetardabsence) noexcept;
 
-    /**  For column uuid_user  */
-    ///Get the value of the column uuid_user, returns the default value if the column is null
-    const std::string &getValueOfUuidUser() const noexcept;
+    /**  For column id_user  */
+    ///Get the value of the column id_user, returns the default value if the column is null
+    const int32_t &getValueOfIdUser() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getUuidUser() const noexcept;
-    ///Set the value of the column uuid_user
-    void setUuidUser(const std::string &pUuidUser) noexcept;
-    void setUuidUser(std::string &&pUuidUser) noexcept;
+    const std::shared_ptr<int32_t> &getIdUser() const noexcept;
+    ///Set the value of the column id_user
+    void setIdUser(const int32_t &pIdUser) noexcept;
 
     /**  For column id_cours  */
     ///Get the value of the column id_cours, returns the default value if the column is null
@@ -166,7 +165,7 @@ class Retardabsence
     ///For mysql or sqlite3
     void updateId(const uint64_t id);
     std::shared_ptr<int32_t> idRetardabsence_;
-    std::shared_ptr<std::string> uuidUser_;
+    std::shared_ptr<int32_t> idUser_;
     std::shared_ptr<int32_t> idCours_;
     std::shared_ptr<int32_t> tempsRetardMin_;
     std::shared_ptr<bool> absence_;
@@ -201,11 +200,8 @@ class Retardabsence
         needSelection = false;
             sql += "id_retardabsence,";
             ++parametersCount;
-        if(dirtyFlag_[1])
-        {
-            sql += "uuid_user,";
+            sql += "id_user,";
             ++parametersCount;
-        }
         if(dirtyFlag_[2])
         {
             sql += "id_cours,";
@@ -235,11 +231,7 @@ class Retardabsence
         char placeholderStr[64];
         size_t n=0;
         sql +="default,";
-        if(dirtyFlag_[1])
-        {
-            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
-            sql.append(placeholderStr, n);
-        }
+        sql +="default,";
         if(dirtyFlag_[2])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);

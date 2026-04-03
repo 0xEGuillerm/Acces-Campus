@@ -45,7 +45,7 @@ class Historique
     struct Cols
     {
         static const std::string _id_historique;
-        static const std::string _uuid_user;
+        static const std::string _id_user;
         static const std::string _date_action;
         static const std::string _type_action;
     };
@@ -107,14 +107,13 @@ class Historique
     ///Set the value of the column id_historique
     void setIdHistorique(const int32_t &pIdHistorique) noexcept;
 
-    /**  For column uuid_user  */
-    ///Get the value of the column uuid_user, returns the default value if the column is null
-    const std::string &getValueOfUuidUser() const noexcept;
+    /**  For column id_user  */
+    ///Get the value of the column id_user, returns the default value if the column is null
+    const int32_t &getValueOfIdUser() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getUuidUser() const noexcept;
-    ///Set the value of the column uuid_user
-    void setUuidUser(const std::string &pUuidUser) noexcept;
-    void setUuidUser(std::string &&pUuidUser) noexcept;
+    const std::shared_ptr<int32_t> &getIdUser() const noexcept;
+    ///Set the value of the column id_user
+    void setIdUser(const int32_t &pIdUser) noexcept;
 
     /**  For column date_action  */
     ///Get the value of the column date_action, returns the default value if the column is null
@@ -157,7 +156,7 @@ class Historique
     ///For mysql or sqlite3
     void updateId(const uint64_t id);
     std::shared_ptr<int32_t> idHistorique_;
-    std::shared_ptr<std::string> uuidUser_;
+    std::shared_ptr<int32_t> idUser_;
     std::shared_ptr<::trantor::Date> dateAction_;
     std::shared_ptr<std::string> typeAction_;
     struct MetaData
@@ -191,11 +190,8 @@ class Historique
         needSelection = false;
             sql += "id_historique,";
             ++parametersCount;
-        if(dirtyFlag_[1])
-        {
-            sql += "uuid_user,";
+            sql += "id_user,";
             ++parametersCount;
-        }
         sql += "date_action,";
         ++parametersCount;
         if(!dirtyFlag_[2])
@@ -220,11 +216,7 @@ class Historique
         char placeholderStr[64];
         size_t n=0;
         sql +="default,";
-        if(dirtyFlag_[1])
-        {
-            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
-            sql.append(placeholderStr, n);
-        }
+        sql +="default,";
         if(dirtyFlag_[2])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);

@@ -13,7 +13,7 @@ using namespace drogon;
 using namespace drogon::orm;
 using namespace drogon_model::ProjetV1;
 
-const std::string Utilisateur::Cols::_uuid_user = "\"uuid_user\"";
+const std::string Utilisateur::Cols::_id_user = "\"id_user\"";
 const std::string Utilisateur::Cols::_nom_user = "\"nom_user\"";
 const std::string Utilisateur::Cols::_prenom_user = "\"prenom_user\"";
 const std::string Utilisateur::Cols::_login_user = "\"login_user\"";
@@ -21,19 +21,19 @@ const std::string Utilisateur::Cols::_hash_mdp = "\"hash_mdp\"";
 const std::string Utilisateur::Cols::_id_classe = "\"id_classe\"";
 const std::string Utilisateur::Cols::_role_user = "\"role_user\"";
 const std::string Utilisateur::Cols::_uuid_badge = "\"uuid_badge\"";
-const std::string Utilisateur::primaryKeyName = "uuid_user";
+const std::string Utilisateur::primaryKeyName = "id_user";
 const bool Utilisateur::hasPrimaryKey = true;
 const std::string Utilisateur::tableName = "\"utilisateur\"";
 
 const std::vector<typename Utilisateur::MetaData> Utilisateur::metaData_={
-{"uuid_user","std::string","uuid",0,0,1,1},
+{"id_user","int32_t","integer",4,1,1,1},
 {"nom_user","std::string","character varying",50,0,0,1},
 {"prenom_user","std::string","character varying",50,0,0,1},
 {"login_user","std::string","character varying",60,0,0,1},
 {"hash_mdp","std::string","character varying",255,0,0,1},
 {"id_classe","int32_t","integer",4,0,0,0},
 {"role_user","std::string","character",0,0,0,1},
-{"uuid_badge","int32_t","integer",4,0,0,0}
+{"uuid_badge","std::string","character varying",8,0,0,0}
 };
 const std::string &Utilisateur::getColumnName(size_t index) noexcept(false)
 {
@@ -44,9 +44,9 @@ Utilisateur::Utilisateur(const Row &r, const ssize_t indexOffset) noexcept
 {
     if(indexOffset < 0)
     {
-        if(!r["uuid_user"].isNull())
+        if(!r["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(r["uuid_user"].as<std::string>());
+            idUser_=std::make_shared<int32_t>(r["id_user"].as<int32_t>());
         }
         if(!r["nom_user"].isNull())
         {
@@ -74,7 +74,7 @@ Utilisateur::Utilisateur(const Row &r, const ssize_t indexOffset) noexcept
         }
         if(!r["uuid_badge"].isNull())
         {
-            uuidBadge_=std::make_shared<int32_t>(r["uuid_badge"].as<int32_t>());
+            uuidBadge_=std::make_shared<std::string>(r["uuid_badge"].as<std::string>());
         }
     }
     else
@@ -89,7 +89,7 @@ Utilisateur::Utilisateur(const Row &r, const ssize_t indexOffset) noexcept
         index = offset + 0;
         if(!r[index].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(r[index].as<std::string>());
+            idUser_=std::make_shared<int32_t>(r[index].as<int32_t>());
         }
         index = offset + 1;
         if(!r[index].isNull())
@@ -124,7 +124,7 @@ Utilisateur::Utilisateur(const Row &r, const ssize_t indexOffset) noexcept
         index = offset + 7;
         if(!r[index].isNull())
         {
-            uuidBadge_=std::make_shared<int32_t>(r[index].as<int32_t>());
+            uuidBadge_=std::make_shared<std::string>(r[index].as<std::string>());
         }
     }
 
@@ -142,7 +142,7 @@ Utilisateur::Utilisateur(const Json::Value &pJson, const std::vector<std::string
         dirtyFlag_[0] = true;
         if(!pJson[pMasqueradingVector[0]].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson[pMasqueradingVector[0]].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[0]].asInt64());
         }
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
@@ -198,19 +198,19 @@ Utilisateur::Utilisateur(const Json::Value &pJson, const std::vector<std::string
         dirtyFlag_[7] = true;
         if(!pJson[pMasqueradingVector[7]].isNull())
         {
-            uuidBadge_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[7]].asInt64());
+            uuidBadge_=std::make_shared<std::string>(pJson[pMasqueradingVector[7]].asString());
         }
     }
 }
 
 Utilisateur::Utilisateur(const Json::Value &pJson) noexcept(false)
 {
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
         dirtyFlag_[0]=true;
-        if(!pJson["uuid_user"].isNull())
+        if(!pJson["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson["uuid_user"].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
         }
     }
     if(pJson.isMember("nom_user"))
@@ -266,7 +266,7 @@ Utilisateur::Utilisateur(const Json::Value &pJson) noexcept(false)
         dirtyFlag_[7]=true;
         if(!pJson["uuid_badge"].isNull())
         {
-            uuidBadge_=std::make_shared<int32_t>((int32_t)pJson["uuid_badge"].asInt64());
+            uuidBadge_=std::make_shared<std::string>(pJson["uuid_badge"].asString());
         }
     }
 }
@@ -283,7 +283,7 @@ void Utilisateur::updateByMasqueradedJson(const Json::Value &pJson,
     {
         if(!pJson[pMasqueradingVector[0]].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson[pMasqueradingVector[0]].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[0]].asInt64());
         }
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
@@ -339,18 +339,18 @@ void Utilisateur::updateByMasqueradedJson(const Json::Value &pJson,
         dirtyFlag_[7] = true;
         if(!pJson[pMasqueradingVector[7]].isNull())
         {
-            uuidBadge_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[7]].asInt64());
+            uuidBadge_=std::make_shared<std::string>(pJson[pMasqueradingVector[7]].asString());
         }
     }
 }
 
 void Utilisateur::updateByJson(const Json::Value &pJson) noexcept(false)
 {
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!pJson["uuid_user"].isNull())
+        if(!pJson["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson["uuid_user"].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
         }
     }
     if(pJson.isMember("nom_user"))
@@ -406,36 +406,31 @@ void Utilisateur::updateByJson(const Json::Value &pJson) noexcept(false)
         dirtyFlag_[7] = true;
         if(!pJson["uuid_badge"].isNull())
         {
-            uuidBadge_=std::make_shared<int32_t>((int32_t)pJson["uuid_badge"].asInt64());
+            uuidBadge_=std::make_shared<std::string>(pJson["uuid_badge"].asString());
         }
     }
 }
 
-const std::string &Utilisateur::getValueOfUuidUser() const noexcept
+const int32_t &Utilisateur::getValueOfIdUser() const noexcept
 {
-    static const std::string defaultValue = std::string();
-    if(uuidUser_)
-        return *uuidUser_;
+    static const int32_t defaultValue = int32_t();
+    if(idUser_)
+        return *idUser_;
     return defaultValue;
 }
-const std::shared_ptr<std::string> &Utilisateur::getUuidUser() const noexcept
+const std::shared_ptr<int32_t> &Utilisateur::getIdUser() const noexcept
 {
-    return uuidUser_;
+    return idUser_;
 }
-void Utilisateur::setUuidUser(const std::string &pUuidUser) noexcept
+void Utilisateur::setIdUser(const int32_t &pIdUser) noexcept
 {
-    uuidUser_ = std::make_shared<std::string>(pUuidUser);
-    dirtyFlag_[0] = true;
-}
-void Utilisateur::setUuidUser(std::string &&pUuidUser) noexcept
-{
-    uuidUser_ = std::make_shared<std::string>(std::move(pUuidUser));
+    idUser_ = std::make_shared<int32_t>(pIdUser);
     dirtyFlag_[0] = true;
 }
 const typename Utilisateur::PrimaryKeyType & Utilisateur::getPrimaryKey() const
 {
-    assert(uuidUser_);
-    return *uuidUser_;
+    assert(idUser_);
+    return *idUser_;
 }
 
 const std::string &Utilisateur::getValueOfNomUser() const noexcept
@@ -570,20 +565,25 @@ void Utilisateur::setRoleUser(std::string &&pRoleUser) noexcept
     dirtyFlag_[6] = true;
 }
 
-const int32_t &Utilisateur::getValueOfUuidBadge() const noexcept
+const std::string &Utilisateur::getValueOfUuidBadge() const noexcept
 {
-    static const int32_t defaultValue = int32_t();
+    static const std::string defaultValue = std::string();
     if(uuidBadge_)
         return *uuidBadge_;
     return defaultValue;
 }
-const std::shared_ptr<int32_t> &Utilisateur::getUuidBadge() const noexcept
+const std::shared_ptr<std::string> &Utilisateur::getUuidBadge() const noexcept
 {
     return uuidBadge_;
 }
-void Utilisateur::setUuidBadge(const int32_t &pUuidBadge) noexcept
+void Utilisateur::setUuidBadge(const std::string &pUuidBadge) noexcept
 {
-    uuidBadge_ = std::make_shared<int32_t>(pUuidBadge);
+    uuidBadge_ = std::make_shared<std::string>(pUuidBadge);
+    dirtyFlag_[7] = true;
+}
+void Utilisateur::setUuidBadge(std::string &&pUuidBadge) noexcept
+{
+    uuidBadge_ = std::make_shared<std::string>(std::move(pUuidBadge));
     dirtyFlag_[7] = true;
 }
 void Utilisateur::setUuidBadgeToNull() noexcept
@@ -599,7 +599,6 @@ void Utilisateur::updateId(const uint64_t id)
 const std::vector<std::string> &Utilisateur::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
-        "uuid_user",
         "nom_user",
         "prenom_user",
         "login_user",
@@ -613,17 +612,6 @@ const std::vector<std::string> &Utilisateur::insertColumns() noexcept
 
 void Utilisateur::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 {
-    if(dirtyFlag_[0])
-    {
-        if(getUuidUser())
-        {
-            binder << getValueOfUuidUser();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
     if(dirtyFlag_[1])
     {
         if(getNomUser())
@@ -706,10 +694,6 @@ void Utilisateur::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 const std::vector<std::string> Utilisateur::updateColumns() const
 {
     std::vector<std::string> ret;
-    if(dirtyFlag_[0])
-    {
-        ret.push_back(getColumnName(0));
-    }
     if(dirtyFlag_[1])
     {
         ret.push_back(getColumnName(1));
@@ -743,17 +727,6 @@ const std::vector<std::string> Utilisateur::updateColumns() const
 
 void Utilisateur::updateArgs(drogon::orm::internal::SqlBinder &binder) const
 {
-    if(dirtyFlag_[0])
-    {
-        if(getUuidUser())
-        {
-            binder << getValueOfUuidUser();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
     if(dirtyFlag_[1])
     {
         if(getNomUser())
@@ -835,13 +808,13 @@ void Utilisateur::updateArgs(drogon::orm::internal::SqlBinder &binder) const
 Json::Value Utilisateur::toJson() const
 {
     Json::Value ret;
-    if(getUuidUser())
+    if(getIdUser())
     {
-        ret["uuid_user"]=getValueOfUuidUser();
+        ret["id_user"]=getValueOfIdUser();
     }
     else
     {
-        ret["uuid_user"]=Json::Value();
+        ret["id_user"]=Json::Value();
     }
     if(getNomUser())
     {
@@ -915,9 +888,9 @@ Json::Value Utilisateur::toMasqueradedJson(
     {
         if(!pMasqueradingVector[0].empty())
         {
-            if(getUuidUser())
+            if(getIdUser())
             {
-                ret[pMasqueradingVector[0]]=getValueOfUuidUser();
+                ret[pMasqueradingVector[0]]=getValueOfIdUser();
             }
             else
             {
@@ -1004,13 +977,13 @@ Json::Value Utilisateur::toMasqueradedJson(
         return ret;
     }
     LOG_ERROR << "Masquerade failed";
-    if(getUuidUser())
+    if(getIdUser())
     {
-        ret["uuid_user"]=getValueOfUuidUser();
+        ret["id_user"]=getValueOfIdUser();
     }
     else
     {
-        ret["uuid_user"]=Json::Value();
+        ret["id_user"]=Json::Value();
     }
     if(getNomUser())
     {
@@ -1073,15 +1046,10 @@ Json::Value Utilisateur::toMasqueradedJson(
 
 bool Utilisateur::validateJsonForCreation(const Json::Value &pJson, std::string &err)
 {
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!validJsonOfField(0, "uuid_user", pJson["uuid_user"], err, true))
+        if(!validJsonOfField(0, "id_user", pJson["id_user"], err, true))
             return false;
-    }
-    else
-    {
-        err="The uuid_user column cannot be null";
-        return false;
     }
     if(pJson.isMember("nom_user"))
     {
@@ -1162,11 +1130,6 @@ bool Utilisateur::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(0, pMasqueradingVector[0], pJson[pMasqueradingVector[0]], err, true))
                   return false;
           }
-        else
-        {
-            err="The " + pMasqueradingVector[0] + " column cannot be null";
-            return false;
-        }
       }
       if(!pMasqueradingVector[1].empty())
       {
@@ -1259,9 +1222,9 @@ bool Utilisateur::validateMasqueradedJsonForCreation(const Json::Value &pJson,
 }
 bool Utilisateur::validateJsonForUpdate(const Json::Value &pJson, std::string &err)
 {
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!validJsonOfField(0, "uuid_user", pJson["uuid_user"], err, false))
+        if(!validJsonOfField(0, "id_user", pJson["id_user"], err, false))
             return false;
     }
     else
@@ -1383,7 +1346,12 @@ bool Utilisateur::validJsonOfField(size_t index,
                 err="The " + fieldName + " column cannot be null";
                 return false;
             }
-            if(!pJson.isString())
+            if(isForCreation)
+            {
+                err="The automatic primary key cannot be set";
+                return false;
+            }
+            if(!pJson.isInt())
             {
                 err="Type error in the "+fieldName+" field";
                 return false;
@@ -1497,9 +1465,17 @@ bool Utilisateur::validJsonOfField(size_t index,
             {
                 return true;
             }
-            if(!pJson.isInt())
+            if(!pJson.isString())
             {
                 err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            if(pJson.isString() && std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}
+                .from_bytes(pJson.asCString()).size() > 8)
+            {
+                err="String length exceeds limit for the " +
+                    fieldName +
+                    " field (the maximum value is 8)";
                 return false;
             }
             break;

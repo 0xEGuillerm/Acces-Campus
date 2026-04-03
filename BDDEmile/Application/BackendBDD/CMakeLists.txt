@@ -24,7 +24,8 @@ add_executable(${PROJECT_NAME} main.cc
         controllers/SalleController.cpp
         controllers/SalleController.h
         dao/BadgeDAO.cpp
-        dao/BadgeDAO.h)
+        dao/BadgeDAO.h
+        models/AbsenceCours.h)
 
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method

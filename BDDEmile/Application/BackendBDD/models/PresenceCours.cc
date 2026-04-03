@@ -14,14 +14,18 @@ using namespace drogon::orm;
 using namespace drogon_model::ProjetV1;
 
 const std::string PresenceCours::Cols::_id_presence = "\"id_presence\"";
-const std::string PresenceCours::Cols::_uuid_user = "\"uuid_user\"";
-const std::vector<std::string> PresenceCours::primaryKeyName = {"id_presence","uuid_user"};
+const std::string PresenceCours::Cols::_id_user = "\"id_user\"";
+const std::string PresenceCours::Cols::_id_cours = "\"id_cours\"";
+const std::string PresenceCours::Cols::_id_classe = "\"id_classe\"";
+const std::string PresenceCours::primaryKeyName = "id_presence";
 const bool PresenceCours::hasPrimaryKey = true;
 const std::string PresenceCours::tableName = "\"presence_cours\"";
 
 const std::vector<typename PresenceCours::MetaData> PresenceCours::metaData_={
-{"id_presence","int32_t","integer",4,0,1,1},
-{"uuid_user","std::string","uuid",0,0,1,1}
+{"id_presence","int32_t","integer",4,1,1,1},
+{"id_user","int32_t","integer",4,1,0,1},
+{"id_cours","int32_t","integer",4,1,0,1},
+{"id_classe","int32_t","integer",4,0,0,0}
 };
 const std::string &PresenceCours::getColumnName(size_t index) noexcept(false)
 {
@@ -36,15 +40,23 @@ PresenceCours::PresenceCours(const Row &r, const ssize_t indexOffset) noexcept
         {
             idPresence_=std::make_shared<int32_t>(r["id_presence"].as<int32_t>());
         }
-        if(!r["uuid_user"].isNull())
+        if(!r["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(r["uuid_user"].as<std::string>());
+            idUser_=std::make_shared<int32_t>(r["id_user"].as<int32_t>());
+        }
+        if(!r["id_cours"].isNull())
+        {
+            idCours_=std::make_shared<int32_t>(r["id_cours"].as<int32_t>());
+        }
+        if(!r["id_classe"].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>(r["id_classe"].as<int32_t>());
         }
     }
     else
     {
         size_t offset = (size_t)indexOffset;
-        if(offset + 2 > r.size())
+        if(offset + 4 > r.size())
         {
             LOG_FATAL << "Invalid SQL result for this model";
             return;
@@ -58,7 +70,17 @@ PresenceCours::PresenceCours(const Row &r, const ssize_t indexOffset) noexcept
         index = offset + 1;
         if(!r[index].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(r[index].as<std::string>());
+            idUser_=std::make_shared<int32_t>(r[index].as<int32_t>());
+        }
+        index = offset + 2;
+        if(!r[index].isNull())
+        {
+            idCours_=std::make_shared<int32_t>(r[index].as<int32_t>());
+        }
+        index = offset + 3;
+        if(!r[index].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>(r[index].as<int32_t>());
         }
     }
 
@@ -66,7 +88,7 @@ PresenceCours::PresenceCours(const Row &r, const ssize_t indexOffset) noexcept
 
 PresenceCours::PresenceCours(const Json::Value &pJson, const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 2)
+    if(pMasqueradingVector.size() != 4)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -84,7 +106,23 @@ PresenceCours::PresenceCours(const Json::Value &pJson, const std::vector<std::st
         dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson[pMasqueradingVector[1]].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
+        }
+    }
+    if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
+    {
+        dirtyFlag_[2] = true;
+        if(!pJson[pMasqueradingVector[2]].isNull())
+        {
+            idCours_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[2]].asInt64());
+        }
+    }
+    if(!pMasqueradingVector[3].empty() && pJson.isMember(pMasqueradingVector[3]))
+    {
+        dirtyFlag_[3] = true;
+        if(!pJson[pMasqueradingVector[3]].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[3]].asInt64());
         }
     }
 }
@@ -99,12 +137,28 @@ PresenceCours::PresenceCours(const Json::Value &pJson) noexcept(false)
             idPresence_=std::make_shared<int32_t>((int32_t)pJson["id_presence"].asInt64());
         }
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
         dirtyFlag_[1]=true;
-        if(!pJson["uuid_user"].isNull())
+        if(!pJson["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson["uuid_user"].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
+        }
+    }
+    if(pJson.isMember("id_cours"))
+    {
+        dirtyFlag_[2]=true;
+        if(!pJson["id_cours"].isNull())
+        {
+            idCours_=std::make_shared<int32_t>((int32_t)pJson["id_cours"].asInt64());
+        }
+    }
+    if(pJson.isMember("id_classe"))
+    {
+        dirtyFlag_[3]=true;
+        if(!pJson["id_classe"].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>((int32_t)pJson["id_classe"].asInt64());
         }
     }
 }
@@ -112,7 +166,7 @@ PresenceCours::PresenceCours(const Json::Value &pJson) noexcept(false)
 void PresenceCours::updateByMasqueradedJson(const Json::Value &pJson,
                                             const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 2)
+    if(pMasqueradingVector.size() != 4)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -128,7 +182,22 @@ void PresenceCours::updateByMasqueradedJson(const Json::Value &pJson,
     {
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson[pMasqueradingVector[1]].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
+        }
+    }
+    if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
+    {
+        if(!pJson[pMasqueradingVector[2]].isNull())
+        {
+            idCours_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[2]].asInt64());
+        }
+    }
+    if(!pMasqueradingVector[3].empty() && pJson.isMember(pMasqueradingVector[3]))
+    {
+        dirtyFlag_[3] = true;
+        if(!pJson[pMasqueradingVector[3]].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[3]].asInt64());
         }
     }
 }
@@ -142,11 +211,26 @@ void PresenceCours::updateByJson(const Json::Value &pJson) noexcept(false)
             idPresence_=std::make_shared<int32_t>((int32_t)pJson["id_presence"].asInt64());
         }
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!pJson["uuid_user"].isNull())
+        if(!pJson["id_user"].isNull())
         {
-            uuidUser_=std::make_shared<std::string>(pJson["uuid_user"].asString());
+            idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
+        }
+    }
+    if(pJson.isMember("id_cours"))
+    {
+        if(!pJson["id_cours"].isNull())
+        {
+            idCours_=std::make_shared<int32_t>((int32_t)pJson["id_cours"].asInt64());
+        }
+    }
+    if(pJson.isMember("id_classe"))
+    {
+        dirtyFlag_[3] = true;
+        if(!pJson["id_classe"].isNull())
+        {
+            idClasse_=std::make_shared<int32_t>((int32_t)pJson["id_classe"].asInt64());
         }
     }
 }
@@ -167,64 +251,87 @@ void PresenceCours::setIdPresence(const int32_t &pIdPresence) noexcept
     idPresence_ = std::make_shared<int32_t>(pIdPresence);
     dirtyFlag_[0] = true;
 }
-
-const std::string &PresenceCours::getValueOfUuidUser() const noexcept
+const typename PresenceCours::PrimaryKeyType & PresenceCours::getPrimaryKey() const
 {
-    static const std::string defaultValue = std::string();
-    if(uuidUser_)
-        return *uuidUser_;
+    assert(idPresence_);
+    return *idPresence_;
+}
+
+const int32_t &PresenceCours::getValueOfIdUser() const noexcept
+{
+    static const int32_t defaultValue = int32_t();
+    if(idUser_)
+        return *idUser_;
     return defaultValue;
 }
-const std::shared_ptr<std::string> &PresenceCours::getUuidUser() const noexcept
+const std::shared_ptr<int32_t> &PresenceCours::getIdUser() const noexcept
 {
-    return uuidUser_;
+    return idUser_;
 }
-void PresenceCours::setUuidUser(const std::string &pUuidUser) noexcept
+void PresenceCours::setIdUser(const int32_t &pIdUser) noexcept
 {
-    uuidUser_ = std::make_shared<std::string>(pUuidUser);
+    idUser_ = std::make_shared<int32_t>(pIdUser);
     dirtyFlag_[1] = true;
 }
-void PresenceCours::setUuidUser(std::string &&pUuidUser) noexcept
+
+const int32_t &PresenceCours::getValueOfIdCours() const noexcept
 {
-    uuidUser_ = std::make_shared<std::string>(std::move(pUuidUser));
-    dirtyFlag_[1] = true;
+    static const int32_t defaultValue = int32_t();
+    if(idCours_)
+        return *idCours_;
+    return defaultValue;
+}
+const std::shared_ptr<int32_t> &PresenceCours::getIdCours() const noexcept
+{
+    return idCours_;
+}
+void PresenceCours::setIdCours(const int32_t &pIdCours) noexcept
+{
+    idCours_ = std::make_shared<int32_t>(pIdCours);
+    dirtyFlag_[2] = true;
+}
+
+const int32_t &PresenceCours::getValueOfIdClasse() const noexcept
+{
+    static const int32_t defaultValue = int32_t();
+    if(idClasse_)
+        return *idClasse_;
+    return defaultValue;
+}
+const std::shared_ptr<int32_t> &PresenceCours::getIdClasse() const noexcept
+{
+    return idClasse_;
+}
+void PresenceCours::setIdClasse(const int32_t &pIdClasse) noexcept
+{
+    idClasse_ = std::make_shared<int32_t>(pIdClasse);
+    dirtyFlag_[3] = true;
+}
+void PresenceCours::setIdClasseToNull() noexcept
+{
+    idClasse_.reset();
+    dirtyFlag_[3] = true;
 }
 
 void PresenceCours::updateId(const uint64_t id)
 {
 }
-typename PresenceCours::PrimaryKeyType PresenceCours::getPrimaryKey() const
-{
-    return std::make_tuple(*idPresence_,*uuidUser_);
-}
 
 const std::vector<std::string> &PresenceCours::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
-        "id_presence",
-        "uuid_user"
+        "id_classe"
     };
     return inCols;
 }
 
 void PresenceCours::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 {
-    if(dirtyFlag_[0])
+    if(dirtyFlag_[3])
     {
-        if(getIdPresence())
+        if(getIdClasse())
         {
-            binder << getValueOfIdPresence();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
-    if(dirtyFlag_[1])
-    {
-        if(getUuidUser())
-        {
-            binder << getValueOfUuidUser();
+            binder << getValueOfIdClasse();
         }
         else
         {
@@ -236,35 +343,20 @@ void PresenceCours::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 const std::vector<std::string> PresenceCours::updateColumns() const
 {
     std::vector<std::string> ret;
-    if(dirtyFlag_[0])
+    if(dirtyFlag_[3])
     {
-        ret.push_back(getColumnName(0));
-    }
-    if(dirtyFlag_[1])
-    {
-        ret.push_back(getColumnName(1));
+        ret.push_back(getColumnName(3));
     }
     return ret;
 }
 
 void PresenceCours::updateArgs(drogon::orm::internal::SqlBinder &binder) const
 {
-    if(dirtyFlag_[0])
+    if(dirtyFlag_[3])
     {
-        if(getIdPresence())
+        if(getIdClasse())
         {
-            binder << getValueOfIdPresence();
-        }
-        else
-        {
-            binder << nullptr;
-        }
-    }
-    if(dirtyFlag_[1])
-    {
-        if(getUuidUser())
-        {
-            binder << getValueOfUuidUser();
+            binder << getValueOfIdClasse();
         }
         else
         {
@@ -283,13 +375,29 @@ Json::Value PresenceCours::toJson() const
     {
         ret["id_presence"]=Json::Value();
     }
-    if(getUuidUser())
+    if(getIdUser())
     {
-        ret["uuid_user"]=getValueOfUuidUser();
+        ret["id_user"]=getValueOfIdUser();
     }
     else
     {
-        ret["uuid_user"]=Json::Value();
+        ret["id_user"]=Json::Value();
+    }
+    if(getIdCours())
+    {
+        ret["id_cours"]=getValueOfIdCours();
+    }
+    else
+    {
+        ret["id_cours"]=Json::Value();
+    }
+    if(getIdClasse())
+    {
+        ret["id_classe"]=getValueOfIdClasse();
+    }
+    else
+    {
+        ret["id_classe"]=Json::Value();
     }
     return ret;
 }
@@ -303,7 +411,7 @@ Json::Value PresenceCours::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {
     Json::Value ret;
-    if(pMasqueradingVector.size() == 2)
+    if(pMasqueradingVector.size() == 4)
     {
         if(!pMasqueradingVector[0].empty())
         {
@@ -318,13 +426,35 @@ Json::Value PresenceCours::toMasqueradedJson(
         }
         if(!pMasqueradingVector[1].empty())
         {
-            if(getUuidUser())
+            if(getIdUser())
             {
-                ret[pMasqueradingVector[1]]=getValueOfUuidUser();
+                ret[pMasqueradingVector[1]]=getValueOfIdUser();
             }
             else
             {
                 ret[pMasqueradingVector[1]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[2].empty())
+        {
+            if(getIdCours())
+            {
+                ret[pMasqueradingVector[2]]=getValueOfIdCours();
+            }
+            else
+            {
+                ret[pMasqueradingVector[2]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[3].empty())
+        {
+            if(getIdClasse())
+            {
+                ret[pMasqueradingVector[3]]=getValueOfIdClasse();
+            }
+            else
+            {
+                ret[pMasqueradingVector[3]]=Json::Value();
             }
         }
         return ret;
@@ -338,13 +468,29 @@ Json::Value PresenceCours::toMasqueradedJson(
     {
         ret["id_presence"]=Json::Value();
     }
-    if(getUuidUser())
+    if(getIdUser())
     {
-        ret["uuid_user"]=getValueOfUuidUser();
+        ret["id_user"]=getValueOfIdUser();
     }
     else
     {
-        ret["uuid_user"]=Json::Value();
+        ret["id_user"]=Json::Value();
+    }
+    if(getIdCours())
+    {
+        ret["id_cours"]=getValueOfIdCours();
+    }
+    else
+    {
+        ret["id_cours"]=Json::Value();
+    }
+    if(getIdClasse())
+    {
+        ret["id_classe"]=getValueOfIdClasse();
+    }
+    else
+    {
+        ret["id_classe"]=Json::Value();
     }
     return ret;
 }
@@ -356,20 +502,20 @@ bool PresenceCours::validateJsonForCreation(const Json::Value &pJson, std::strin
         if(!validJsonOfField(0, "id_presence", pJson["id_presence"], err, true))
             return false;
     }
-    else
+    if(pJson.isMember("id_user"))
     {
-        err="The id_presence column cannot be null";
-        return false;
-    }
-    if(pJson.isMember("uuid_user"))
-    {
-        if(!validJsonOfField(1, "uuid_user", pJson["uuid_user"], err, true))
+        if(!validJsonOfField(1, "id_user", pJson["id_user"], err, true))
             return false;
     }
-    else
+    if(pJson.isMember("id_cours"))
     {
-        err="The uuid_user column cannot be null";
-        return false;
+        if(!validJsonOfField(2, "id_cours", pJson["id_cours"], err, true))
+            return false;
+    }
+    if(pJson.isMember("id_classe"))
+    {
+        if(!validJsonOfField(3, "id_classe", pJson["id_classe"], err, true))
+            return false;
     }
     return true;
 }
@@ -377,7 +523,7 @@ bool PresenceCours::validateMasqueradedJsonForCreation(const Json::Value &pJson,
                                                        const std::vector<std::string> &pMasqueradingVector,
                                                        std::string &err)
 {
-    if(pMasqueradingVector.size() != 2)
+    if(pMasqueradingVector.size() != 4)
     {
         err = "Bad masquerading vector";
         return false;
@@ -390,11 +536,6 @@ bool PresenceCours::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(0, pMasqueradingVector[0], pJson[pMasqueradingVector[0]], err, true))
                   return false;
           }
-        else
-        {
-            err="The " + pMasqueradingVector[0] + " column cannot be null";
-            return false;
-        }
       }
       if(!pMasqueradingVector[1].empty())
       {
@@ -403,11 +544,22 @@ bool PresenceCours::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, true))
                   return false;
           }
-        else
-        {
-            err="The " + pMasqueradingVector[1] + " column cannot be null";
-            return false;
-        }
+      }
+      if(!pMasqueradingVector[2].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[2]))
+          {
+              if(!validJsonOfField(2, pMasqueradingVector[2], pJson[pMasqueradingVector[2]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[3].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[3]))
+          {
+              if(!validJsonOfField(3, pMasqueradingVector[3], pJson[pMasqueradingVector[3]], err, true))
+                  return false;
+          }
       }
     }
     catch(const Json::LogicError &e)
@@ -429,15 +581,20 @@ bool PresenceCours::validateJsonForUpdate(const Json::Value &pJson, std::string 
         err = "The value of primary key must be set in the json object for update";
         return false;
     }
-    if(pJson.isMember("uuid_user"))
+    if(pJson.isMember("id_user"))
     {
-        if(!validJsonOfField(1, "uuid_user", pJson["uuid_user"], err, false))
+        if(!validJsonOfField(1, "id_user", pJson["id_user"], err, false))
             return false;
     }
-    else
+    if(pJson.isMember("id_cours"))
     {
-        err = "The value of primary key must be set in the json object for update";
-        return false;
+        if(!validJsonOfField(2, "id_cours", pJson["id_cours"], err, false))
+            return false;
+    }
+    if(pJson.isMember("id_classe"))
+    {
+        if(!validJsonOfField(3, "id_classe", pJson["id_classe"], err, false))
+            return false;
     }
     return true;
 }
@@ -445,7 +602,7 @@ bool PresenceCours::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
                                                      const std::vector<std::string> &pMasqueradingVector,
                                                      std::string &err)
 {
-    if(pMasqueradingVector.size() != 2)
+    if(pMasqueradingVector.size() != 4)
     {
         err = "Bad masquerading vector";
         return false;
@@ -466,11 +623,16 @@ bool PresenceCours::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
           if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, false))
               return false;
       }
-    else
-    {
-        err = "The value of primary key must be set in the json object for update";
-        return false;
-    }
+      if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
+      {
+          if(!validJsonOfField(2, pMasqueradingVector[2], pJson[pMasqueradingVector[2]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[3].empty() && pJson.isMember(pMasqueradingVector[3]))
+      {
+          if(!validJsonOfField(3, pMasqueradingVector[3], pJson[pMasqueradingVector[3]], err, false))
+              return false;
+      }
     }
     catch(const Json::LogicError &e)
     {
@@ -493,6 +655,11 @@ bool PresenceCours::validJsonOfField(size_t index,
                 err="The " + fieldName + " column cannot be null";
                 return false;
             }
+            if(isForCreation)
+            {
+                err="The automatic primary key cannot be set";
+                return false;
+            }
             if(!pJson.isInt())
             {
                 err="Type error in the "+fieldName+" field";
@@ -505,7 +672,50 @@ bool PresenceCours::validJsonOfField(size_t index,
                 err="The " + fieldName + " column cannot be null";
                 return false;
             }
-            if(!pJson.isString())
+            if(isForCreation)
+            {
+                err="The automatic primary key cannot be set";
+                return false;
+            }
+            else
+            {
+                err="The automatic primary key cannot be update";
+                return false;
+            }
+            if(!pJson.isInt())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 2:
+            if(pJson.isNull())
+            {
+                err="The " + fieldName + " column cannot be null";
+                return false;
+            }
+            if(isForCreation)
+            {
+                err="The automatic primary key cannot be set";
+                return false;
+            }
+            else
+            {
+                err="The automatic primary key cannot be update";
+                return false;
+            }
+            if(!pJson.isInt())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 3:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isInt())
             {
                 err="Type error in the "+fieldName+" field";
                 return false;

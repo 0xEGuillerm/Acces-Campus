@@ -49,6 +49,7 @@ class Cours
         static const std::string _heure_debut;
         static const std::string _heure_fin;
         static const std::string _id_classe;
+        static const std::string _reserve_par;
     };
 
     static const int primaryKeyNumber;
@@ -118,21 +119,19 @@ class Cours
 
     /**  For column heure_debut  */
     ///Get the value of the column heure_debut, returns the default value if the column is null
-    const std::string &getValueOfHeureDebut() const noexcept;
+    const ::trantor::Date &getValueOfHeureDebut() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getHeureDebut() const noexcept;
+    const std::shared_ptr<::trantor::Date> &getHeureDebut() const noexcept;
     ///Set the value of the column heure_debut
-    void setHeureDebut(const std::string &pHeureDebut) noexcept;
-    void setHeureDebut(std::string &&pHeureDebut) noexcept;
+    void setHeureDebut(const ::trantor::Date &pHeureDebut) noexcept;
 
     /**  For column heure_fin  */
     ///Get the value of the column heure_fin, returns the default value if the column is null
-    const std::string &getValueOfHeureFin() const noexcept;
+    const ::trantor::Date &getValueOfHeureFin() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getHeureFin() const noexcept;
+    const std::shared_ptr<::trantor::Date> &getHeureFin() const noexcept;
     ///Set the value of the column heure_fin
-    void setHeureFin(const std::string &pHeureFin) noexcept;
-    void setHeureFin(std::string &&pHeureFin) noexcept;
+    void setHeureFin(const ::trantor::Date &pHeureFin) noexcept;
 
     /**  For column id_classe  */
     ///Get the value of the column id_classe, returns the default value if the column is null
@@ -143,8 +142,16 @@ class Cours
     void setIdClasse(const int32_t &pIdClasse) noexcept;
     void setIdClasseToNull() noexcept;
 
+    /**  For column reserve_par  */
+    ///Get the value of the column reserve_par, returns the default value if the column is null
+    const int32_t &getValueOfReservePar() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<int32_t> &getReservePar() const noexcept;
+    ///Set the value of the column reserve_par
+    void setReservePar(const int32_t &pReservePar) noexcept;
 
-    static size_t getColumnNumber() noexcept {  return 5;  }
+
+    static size_t getColumnNumber() noexcept {  return 6;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -168,9 +175,10 @@ class Cours
     void updateId(const uint64_t id);
     std::shared_ptr<int32_t> idCours_;
     std::shared_ptr<int32_t> numSalle_;
-    std::shared_ptr<std::string> heureDebut_;
-    std::shared_ptr<std::string> heureFin_;
+    std::shared_ptr<::trantor::Date> heureDebut_;
+    std::shared_ptr<::trantor::Date> heureFin_;
     std::shared_ptr<int32_t> idClasse_;
+    std::shared_ptr<int32_t> reservePar_;
     struct MetaData
     {
         const std::string colName_;
@@ -182,7 +190,7 @@ class Cours
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[5]={ false };
+    bool dirtyFlag_[6]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -222,6 +230,8 @@ class Cours
             sql += "id_classe,";
             ++parametersCount;
         }
+            sql += "reserve_par,";
+            ++parametersCount;
         needSelection=true;
         if(parametersCount > 0)
         {
@@ -255,6 +265,7 @@ class Cours
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
+        sql +="default,";
         if(parametersCount > 0)
         {
             sql.resize(sql.length() - 1);

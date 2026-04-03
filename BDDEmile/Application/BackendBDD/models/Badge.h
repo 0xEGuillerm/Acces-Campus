@@ -53,7 +53,7 @@ class Badge
     static const std::string tableName;
     static const bool hasPrimaryKey;
     static const std::string primaryKeyName;
-    using PrimaryKeyType = int32_t;
+    using PrimaryKeyType = std::string;
     const PrimaryKeyType &getPrimaryKey() const;
 
     /**
@@ -100,20 +100,20 @@ class Badge
 
     /**  For column uuid_badge  */
     ///Get the value of the column uuid_badge, returns the default value if the column is null
-    const int32_t &getValueOfUuidBadge() const noexcept;
+    const std::string &getValueOfUuidBadge() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<int32_t> &getUuidBadge() const noexcept;
+    const std::shared_ptr<std::string> &getUuidBadge() const noexcept;
     ///Set the value of the column uuid_badge
-    void setUuidBadge(const int32_t &pUuidBadge) noexcept;
+    void setUuidBadge(const std::string &pUuidBadge) noexcept;
+    void setUuidBadge(std::string &&pUuidBadge) noexcept;
 
     /**  For column uuid_user  */
     ///Get the value of the column uuid_user, returns the default value if the column is null
-    const std::string &getValueOfUuidUser() const noexcept;
+    const int32_t &getValueOfUuidUser() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getUuidUser() const noexcept;
+    const std::shared_ptr<int32_t> &getUuidUser() const noexcept;
     ///Set the value of the column uuid_user
-    void setUuidUser(const std::string &pUuidUser) noexcept;
-    void setUuidUser(std::string &&pUuidUser) noexcept;
+    void setUuidUser(const int32_t &pUuidUser) noexcept;
 
     /**  For column date_creation  */
     ///Get the value of the column date_creation, returns the default value if the column is null
@@ -146,8 +146,8 @@ class Badge
     void updateArgs(drogon::orm::internal::SqlBinder &binder) const;
     ///For mysql or sqlite3
     void updateId(const uint64_t id);
-    std::shared_ptr<int32_t> uuidBadge_;
-    std::shared_ptr<std::string> uuidUser_;
+    std::shared_ptr<std::string> uuidBadge_;
+    std::shared_ptr<int32_t> uuidUser_;
     std::shared_ptr<::trantor::Date> dateCreation_;
     struct MetaData
     {
@@ -183,17 +183,15 @@ class Badge
             sql += "uuid_badge,";
             ++parametersCount;
         }
-        if(dirtyFlag_[1])
-        {
             sql += "uuid_user,";
             ++parametersCount;
-        }
         sql += "date_creation,";
         ++parametersCount;
         if(!dirtyFlag_[2])
         {
             needSelection=true;
         }
+        needSelection=true;
         if(parametersCount > 0)
         {
             sql[sql.length()-1]=')';
@@ -210,11 +208,7 @@ class Badge
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
-        if(dirtyFlag_[1])
-        {
-            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
-            sql.append(placeholderStr, n);
-        }
+        sql +="default,";
         if(dirtyFlag_[2])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
