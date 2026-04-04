@@ -10,8 +10,13 @@
 #include "models/Utilisateur.h"  // Classe générée par drogon_ctl
 #include <functional>
 #include <json/json.h>
-
+#include "resultat/StructResultat.h"
 #include "Badge.h"
+#include "models/Salle.h"
+#include "models/Cours.h"
+#include "AbsenceCours.h"
+#include "PresenceCours.h"
+#include "models/Retardabsence.h"
 
 using namespace drogon::orm;
 
@@ -19,51 +24,61 @@ class BadgeDAO
 {
 public:
     // Obtenir les infos d'un badge
-    void InformationBadge(
+    static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParIDBadge(
         const DbClientPtr &db,
-        const std::string &uid,
-        //Appel la fonction BadgeObtenu(callback)
-        std::function<void(const Json::Value &body)> &&InformationObtenu,
-        std::function<void(const DrogonDbException &)> &&Erreur);
+        const std::string &uidBadge);
 
-    // Crée un nouvel utilisateur
-    void CreeBadge(
+    //DeleteByPrimaryKey
+    static drogon::Task<size_t> SupprimerBadgeParIDBadge(
         const DbClientPtr &db,
-        const std::int32_t &uiduser,
-        const std::string &uidbadge,
-        std::function<void(bool, const std::string&)> &&BadgeCree,
-        std::function<void(const DrogonDbException &)> &&Erreur);
+        const std::string &uidBadge);
 
-    void SupprimerBadge(
+    //FindBy
+    static drogon::Task<std::vector<drogon_model::ProjetV1::Badge>> ChercherBadgeParIDBadge(
         const DbClientPtr &db,
-        const std::string &uid,
-        std::function<void(const drogon_model::ProjetV1::Badge &)> &&BadgeSupprimer,
-        std::function<void(const DrogonDbException &)> &&Erreur);
+        const std::string &uidBadge);
 
-    void ModifierBadge(
-        //La connexion
+    //FindBy
+    static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParIDUtilisateur(
         const DbClientPtr &db,
-        //Uid Badge
-        const std::string &uid,
-        //Body des champs à modifier peut etre vide donc tester les champs
-        const Json::Value &body,
-        //callback reussite / Erreur
-        std::function<void(bool, const std::string&)> &&ModificationReussit,
-        std::function<void(const DrogonDbException &)> &&ErreurVide);
+        const int32_t &uidUtilisateur);
 
-    void VerifierBadge(
-        const DbClientPtr &db,
-        const std::string &uid,
-        const std::string &MAC,
-        std::function<void(bool, const std::string&)> &&BadgeVerifierResultat,
-        std::function<void(const DrogonDbException &)> &&Erreur);
+    //update
+    static drogon::Task<size_t> MettreAJourUser(
+    const DbClientPtr &db,
+    const drogon_model::ProjetV1::Utilisateur);
 
-    void ScannerBadge(
+
+    static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACbae(
         const DbClientPtr &db,
-        const std::string &uid,
-        const std::string &MAC,
-        std::function<void(bool, const std::string&)> &&BadgeScannerResultat,
-        std::function<void(const DrogonDbException &)> &&Erreur);
+        const std::string &MAC);
+
+    static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACpea(
+        const DbClientPtr &db,
+        const std::string &MAC);
+
+    static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursParSalle(
+        const DbClientPtr &db,
+        const int32_t &numSalle);
+
+
+    static drogon::Task<drogon_model::ProjetV1::PresenceCours> AjoutUtilisateurPresenceCours(
+        const DbClientPtr &db,
+        const drogon_model::ProjetV1::PresenceCours &NouvelleEntree);
+
+
+    static drogon::Task<size_t> SupprimerUtilisateurAbsence(
+        const DbClientPtr &db,
+        const int32_t &idAbsence);
+
+    static drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> ChercherUtilisateurDansAbsencecours(
+    const DbClientPtr &db,
+    const int32_t &uidUtilisateur);
+
+
+    static drogon::Task<drogon_model::ProjetV1::Retardabsence> AjoutRetardAbsence(
+    const DbClientPtr &db,
+    const drogon_model::ProjetV1::Retardabsence &NouvelleEntree);
 };
 
 #endif //BACKENDBDD_BADGEDAO_H
