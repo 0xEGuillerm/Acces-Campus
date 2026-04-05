@@ -7,13 +7,12 @@
 #include "models/Utilisateur.h"
 #include "models/Salle.h"
 #include "models/Cours.h"
-#include "AbsenceCours.h"
-#include "PresenceCours.h"
-#include <chrono>
+#include "models/AbsenceCours.h"
+#include "models/PresenceCours.h"
+#include "models/Retardabsence.h"
 #include <drogon/utils/coroutine.h>
 #include <drogon/orm/CoroMapper.h>
-#include "resultat/StructResultat.h"
-#include "models/Retardabsence.h"
+
 
 
 static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParBadge(

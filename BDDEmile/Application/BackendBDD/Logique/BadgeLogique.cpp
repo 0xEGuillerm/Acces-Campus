@@ -198,6 +198,7 @@ const std::uint64_t &heure_badgage) {
                 CreationRetard.setIdCours((*CoursActuelle.getIdCours()));
                 CreationRetard.setIdUser((*utilisateurAVerifier.getIdUser()));
                 CreationRetard.setTempsRetardMin((heure_badgage - cours.getValueOfHeureDebut().secondsSinceEpoch())/1000);
+                CreationRetard.setTimestampHeureCours((*CoursActuelle.getHeureDebut()));
                 CreationRetard.setAbsence(false);
                 auto AjoutRetardAbsence = co_await BadgeDAO::AjoutRetardAbsence(db, CreationRetard);
                 if (AjoutRetardAbsence.getIdUser() != utilisateurAVerifier.getIdUser()) {
@@ -214,8 +215,6 @@ const std::uint64_t &heure_badgage) {
         ResultatScanneBAE.MessageResultat = "Echec mise a jour";
         co_return ResultatScanneBAE;
     }
-
-
     auto AbsenceTable = co_await BadgeDAO::ChercherUtilisateurDansAbsencecours(db, (*SalleAcceder.getNumSalle()));
     if (AbsenceTable.empty()) {
         ResultatScanneBAE.BoolResultat = false;
@@ -223,8 +222,6 @@ const std::uint64_t &heure_badgage) {
         co_return ResultatScanneBAE;
     }
     auto AbsenceUtilisateur = AbsenceTable[0];
-
-
     drogon_model::ProjetV1::PresenceCours UtilisateurPresenceChangement;
     UtilisateurPresenceChangement.setIdClasse((*AbsenceUtilisateur.getIdClasse()));
     UtilisateurPresenceChangement.setIdCours((*AbsenceUtilisateur.getIdCours()));

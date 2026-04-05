@@ -7,10 +7,8 @@
 
 #include <drogon/orm/DbClient.h>
 #include <drogon/orm/Mapper.h>
-#include "models/Utilisateur.h"  // Classe générée par drogon_ctl
+#include "models/Utilisateur.h"
 #include <functional>
-#include <json/json.h>
-#include "resultat/StructResultat.h"
 #include "Badge.h"
 #include "models/Salle.h"
 #include "models/Cours.h"

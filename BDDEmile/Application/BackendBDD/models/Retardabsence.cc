@@ -18,6 +18,7 @@ const std::string Retardabsence::Cols::_id_user = "\"id_user\"";
 const std::string Retardabsence::Cols::_id_cours = "\"id_cours\"";
 const std::string Retardabsence::Cols::_temps_retard_min = "\"temps_retard_min\"";
 const std::string Retardabsence::Cols::_absence = "\"absence\"";
+const std::string Retardabsence::Cols::_timestamp_heure_cours = "\"timestamp_heure_cours\"";
 const std::string Retardabsence::primaryKeyName = "id_retardabsence";
 const bool Retardabsence::hasPrimaryKey = true;
 const std::string Retardabsence::tableName = "\"retardabsence\"";
@@ -27,7 +28,8 @@ const std::vector<typename Retardabsence::MetaData> Retardabsence::metaData_={
 {"id_user","int32_t","integer",4,1,0,1},
 {"id_cours","int32_t","integer",4,0,0,1},
 {"temps_retard_min","int32_t","integer",4,0,0,0},
-{"absence","bool","boolean",1,0,0,1}
+{"absence","bool","boolean",1,0,0,1},
+{"timestamp_heure_cours","::trantor::Date","timestamp without time zone",0,0,0,0}
 };
 const std::string &Retardabsence::getColumnName(size_t index) noexcept(false)
 {
@@ -58,11 +60,33 @@ Retardabsence::Retardabsence(const Row &r, const ssize_t indexOffset) noexcept
         {
             absence_=std::make_shared<bool>(r["absence"].as<bool>());
         }
+        if(!r["timestamp_heure_cours"].isNull())
+        {
+            auto timeStr = r["timestamp_heure_cours"].as<std::string>();
+            struct tm stm;
+            memset(&stm,0,sizeof(stm));
+            auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
+            time_t t = mktime(&stm);
+            size_t decimalNum = 0;
+            if(p)
+            {
+                if(*p=='.')
+                {
+                    std::string decimals(p+1,&timeStr[timeStr.length()]);
+                    while(decimals.length()<6)
+                    {
+                        decimals += "0";
+                    }
+                    decimalNum = (size_t)atol(decimals.c_str());
+                }
+                timestampHeureCours_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
+            }
+        }
     }
     else
     {
         size_t offset = (size_t)indexOffset;
-        if(offset + 5 > r.size())
+        if(offset + 6 > r.size())
         {
             LOG_FATAL << "Invalid SQL result for this model";
             return;
@@ -93,13 +117,36 @@ Retardabsence::Retardabsence(const Row &r, const ssize_t indexOffset) noexcept
         {
             absence_=std::make_shared<bool>(r[index].as<bool>());
         }
+        index = offset + 5;
+        if(!r[index].isNull())
+        {
+            auto timeStr = r[index].as<std::string>();
+            struct tm stm;
+            memset(&stm,0,sizeof(stm));
+            auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
+            time_t t = mktime(&stm);
+            size_t decimalNum = 0;
+            if(p)
+            {
+                if(*p=='.')
+                {
+                    std::string decimals(p+1,&timeStr[timeStr.length()]);
+                    while(decimals.length()<6)
+                    {
+                        decimals += "0";
+                    }
+                    decimalNum = (size_t)atol(decimals.c_str());
+                }
+                timestampHeureCours_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
+            }
+        }
     }
 
 }
 
 Retardabsence::Retardabsence(const Json::Value &pJson, const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 5)
+    if(pMasqueradingVector.size() != 6)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -142,6 +189,32 @@ Retardabsence::Retardabsence(const Json::Value &pJson, const std::vector<std::st
         if(!pJson[pMasqueradingVector[4]].isNull())
         {
             absence_=std::make_shared<bool>(pJson[pMasqueradingVector[4]].asBool());
+        }
+    }
+    if(!pMasqueradingVector[5].empty() && pJson.isMember(pMasqueradingVector[5]))
+    {
+        dirtyFlag_[5] = true;
+        if(!pJson[pMasqueradingVector[5]].isNull())
+        {
+            auto timeStr = pJson[pMasqueradingVector[5]].asString();
+            struct tm stm;
+            memset(&stm,0,sizeof(stm));
+            auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
+            time_t t = mktime(&stm);
+            size_t decimalNum = 0;
+            if(p)
+            {
+                if(*p=='.')
+                {
+                    std::string decimals(p+1,&timeStr[timeStr.length()]);
+                    while(decimals.length()<6)
+                    {
+                        decimals += "0";
+                    }
+                    decimalNum = (size_t)atol(decimals.c_str());
+                }
+                timestampHeureCours_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
+            }
         }
     }
 }
@@ -188,12 +261,38 @@ Retardabsence::Retardabsence(const Json::Value &pJson) noexcept(false)
             absence_=std::make_shared<bool>(pJson["absence"].asBool());
         }
     }
+    if(pJson.isMember("timestamp_heure_cours"))
+    {
+        dirtyFlag_[5]=true;
+        if(!pJson["timestamp_heure_cours"].isNull())
+        {
+            auto timeStr = pJson["timestamp_heure_cours"].asString();
+            struct tm stm;
+            memset(&stm,0,sizeof(stm));
+            auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
+            time_t t = mktime(&stm);
+            size_t decimalNum = 0;
+            if(p)
+            {
+                if(*p=='.')
+                {
+                    std::string decimals(p+1,&timeStr[timeStr.length()]);
+                    while(decimals.length()<6)
+                    {
+                        decimals += "0";
+                    }
+                    decimalNum = (size_t)atol(decimals.c_str());
+                }
+                timestampHeureCours_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
+            }
+        }
+    }
 }
 
 void Retardabsence::updateByMasqueradedJson(const Json::Value &pJson,
                                             const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 5)
+    if(pMasqueradingVector.size() != 6)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -236,6 +335,32 @@ void Retardabsence::updateByMasqueradedJson(const Json::Value &pJson,
             absence_=std::make_shared<bool>(pJson[pMasqueradingVector[4]].asBool());
         }
     }
+    if(!pMasqueradingVector[5].empty() && pJson.isMember(pMasqueradingVector[5]))
+    {
+        dirtyFlag_[5] = true;
+        if(!pJson[pMasqueradingVector[5]].isNull())
+        {
+            auto timeStr = pJson[pMasqueradingVector[5]].asString();
+            struct tm stm;
+            memset(&stm,0,sizeof(stm));
+            auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
+            time_t t = mktime(&stm);
+            size_t decimalNum = 0;
+            if(p)
+            {
+                if(*p=='.')
+                {
+                    std::string decimals(p+1,&timeStr[timeStr.length()]);
+                    while(decimals.length()<6)
+                    {
+                        decimals += "0";
+                    }
+                    decimalNum = (size_t)atol(decimals.c_str());
+                }
+                timestampHeureCours_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
+            }
+        }
+    }
 }
 
 void Retardabsence::updateByJson(const Json::Value &pJson) noexcept(false)
@@ -276,6 +401,32 @@ void Retardabsence::updateByJson(const Json::Value &pJson) noexcept(false)
         if(!pJson["absence"].isNull())
         {
             absence_=std::make_shared<bool>(pJson["absence"].asBool());
+        }
+    }
+    if(pJson.isMember("timestamp_heure_cours"))
+    {
+        dirtyFlag_[5] = true;
+        if(!pJson["timestamp_heure_cours"].isNull())
+        {
+            auto timeStr = pJson["timestamp_heure_cours"].asString();
+            struct tm stm;
+            memset(&stm,0,sizeof(stm));
+            auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
+            time_t t = mktime(&stm);
+            size_t decimalNum = 0;
+            if(p)
+            {
+                if(*p=='.')
+                {
+                    std::string decimals(p+1,&timeStr[timeStr.length()]);
+                    while(decimals.length()<6)
+                    {
+                        decimals += "0";
+                    }
+                    decimalNum = (size_t)atol(decimals.c_str());
+                }
+                timestampHeureCours_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
+            }
         }
     }
 }
@@ -375,6 +526,28 @@ void Retardabsence::setAbsence(const bool &pAbsence) noexcept
     dirtyFlag_[4] = true;
 }
 
+const ::trantor::Date &Retardabsence::getValueOfTimestampHeureCours() const noexcept
+{
+    static const ::trantor::Date defaultValue = ::trantor::Date();
+    if(timestampHeureCours_)
+        return *timestampHeureCours_;
+    return defaultValue;
+}
+const std::shared_ptr<::trantor::Date> &Retardabsence::getTimestampHeureCours() const noexcept
+{
+    return timestampHeureCours_;
+}
+void Retardabsence::setTimestampHeureCours(const ::trantor::Date &pTimestampHeureCours) noexcept
+{
+    timestampHeureCours_ = std::make_shared<::trantor::Date>(pTimestampHeureCours);
+    dirtyFlag_[5] = true;
+}
+void Retardabsence::setTimestampHeureCoursToNull() noexcept
+{
+    timestampHeureCours_.reset();
+    dirtyFlag_[5] = true;
+}
+
 void Retardabsence::updateId(const uint64_t id)
 {
 }
@@ -384,7 +557,8 @@ const std::vector<std::string> &Retardabsence::insertColumns() noexcept
     static const std::vector<std::string> inCols={
         "id_cours",
         "temps_retard_min",
-        "absence"
+        "absence",
+        "timestamp_heure_cours"
     };
     return inCols;
 }
@@ -424,6 +598,17 @@ void Retardabsence::outputArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
+    if(dirtyFlag_[5])
+    {
+        if(getTimestampHeureCours())
+        {
+            binder << getValueOfTimestampHeureCours();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
 }
 
 const std::vector<std::string> Retardabsence::updateColumns() const
@@ -440,6 +625,10 @@ const std::vector<std::string> Retardabsence::updateColumns() const
     if(dirtyFlag_[4])
     {
         ret.push_back(getColumnName(4));
+    }
+    if(dirtyFlag_[5])
+    {
+        ret.push_back(getColumnName(5));
     }
     return ret;
 }
@@ -473,6 +662,17 @@ void Retardabsence::updateArgs(drogon::orm::internal::SqlBinder &binder) const
         if(getAbsence())
         {
             binder << getValueOfAbsence();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[5])
+    {
+        if(getTimestampHeureCours())
+        {
+            binder << getValueOfTimestampHeureCours();
         }
         else
         {
@@ -523,6 +723,14 @@ Json::Value Retardabsence::toJson() const
     {
         ret["absence"]=Json::Value();
     }
+    if(getTimestampHeureCours())
+    {
+        ret["timestamp_heure_cours"]=getTimestampHeureCours()->toDbStringLocal();
+    }
+    else
+    {
+        ret["timestamp_heure_cours"]=Json::Value();
+    }
     return ret;
 }
 
@@ -535,7 +743,7 @@ Json::Value Retardabsence::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {
     Json::Value ret;
-    if(pMasqueradingVector.size() == 5)
+    if(pMasqueradingVector.size() == 6)
     {
         if(!pMasqueradingVector[0].empty())
         {
@@ -592,6 +800,17 @@ Json::Value Retardabsence::toMasqueradedJson(
                 ret[pMasqueradingVector[4]]=Json::Value();
             }
         }
+        if(!pMasqueradingVector[5].empty())
+        {
+            if(getTimestampHeureCours())
+            {
+                ret[pMasqueradingVector[5]]=getTimestampHeureCours()->toDbStringLocal();
+            }
+            else
+            {
+                ret[pMasqueradingVector[5]]=Json::Value();
+            }
+        }
         return ret;
     }
     LOG_ERROR << "Masquerade failed";
@@ -635,6 +854,14 @@ Json::Value Retardabsence::toMasqueradedJson(
     {
         ret["absence"]=Json::Value();
     }
+    if(getTimestampHeureCours())
+    {
+        ret["timestamp_heure_cours"]=getTimestampHeureCours()->toDbStringLocal();
+    }
+    else
+    {
+        ret["timestamp_heure_cours"]=Json::Value();
+    }
     return ret;
 }
 
@@ -675,13 +902,18 @@ bool Retardabsence::validateJsonForCreation(const Json::Value &pJson, std::strin
         err="The absence column cannot be null";
         return false;
     }
+    if(pJson.isMember("timestamp_heure_cours"))
+    {
+        if(!validJsonOfField(5, "timestamp_heure_cours", pJson["timestamp_heure_cours"], err, true))
+            return false;
+    }
     return true;
 }
 bool Retardabsence::validateMasqueradedJsonForCreation(const Json::Value &pJson,
                                                        const std::vector<std::string> &pMasqueradingVector,
                                                        std::string &err)
 {
-    if(pMasqueradingVector.size() != 5)
+    if(pMasqueradingVector.size() != 6)
     {
         err = "Bad masquerading vector";
         return false;
@@ -737,6 +969,14 @@ bool Retardabsence::validateMasqueradedJsonForCreation(const Json::Value &pJson,
             return false;
         }
       }
+      if(!pMasqueradingVector[5].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[5]))
+          {
+              if(!validJsonOfField(5, pMasqueradingVector[5], pJson[pMasqueradingVector[5]], err, true))
+                  return false;
+          }
+      }
     }
     catch(const Json::LogicError &e)
     {
@@ -777,13 +1017,18 @@ bool Retardabsence::validateJsonForUpdate(const Json::Value &pJson, std::string 
         if(!validJsonOfField(4, "absence", pJson["absence"], err, false))
             return false;
     }
+    if(pJson.isMember("timestamp_heure_cours"))
+    {
+        if(!validJsonOfField(5, "timestamp_heure_cours", pJson["timestamp_heure_cours"], err, false))
+            return false;
+    }
     return true;
 }
 bool Retardabsence::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
                                                      const std::vector<std::string> &pMasqueradingVector,
                                                      std::string &err)
 {
-    if(pMasqueradingVector.size() != 5)
+    if(pMasqueradingVector.size() != 6)
     {
         err = "Bad masquerading vector";
         return false;
@@ -817,6 +1062,11 @@ bool Retardabsence::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
       if(!pMasqueradingVector[4].empty() && pJson.isMember(pMasqueradingVector[4]))
       {
           if(!validJsonOfField(4, pMasqueradingVector[4], pJson[pMasqueradingVector[4]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[5].empty() && pJson.isMember(pMasqueradingVector[5]))
+      {
+          if(!validJsonOfField(5, pMasqueradingVector[5], pJson[pMasqueradingVector[5]], err, false))
               return false;
       }
     }
@@ -904,6 +1154,17 @@ bool Retardabsence::validJsonOfField(size_t index,
                 return false;
             }
             if(!pJson.isBool())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 5:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
             {
                 err="Type error in the "+fieldName+" field";
                 return false;

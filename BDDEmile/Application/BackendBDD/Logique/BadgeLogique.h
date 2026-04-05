@@ -10,41 +10,42 @@
 #include "models/Utilisateur.h"  // Classe générée par drogon_ctl
 #include <functional>
 #include <json/json.h>
+#include "resultat/StructResultat.h"
+
+using namespace drogon::orm;
 
 class BadgeLogique {
 public:
-    //Renvoie un json des informations d'un utilisateur
-    drogon::Task<Json::Value> InformationBadge(
-        //Gère les connexion vaec la DB (TCP, nombre de connexion, répartition, etc)
-        const drogon::orm::DbClientPtr &db,
-        const std::string &uidBadge);
+drogon::Task<Json::Value> InformationBadge(
+     //Gère les connexion avecc la DB (TCP, nombre de connexion, répartition, etc)
+     const drogon::orm::DbClientPtr &db,
+     //Uid Badge
+     const std::string &uidBadge);
 
-    // Crée un nouvel utilisateur
-    void CreeBadge(
-        const drogon::orm::DbClientPtr &db,
-        const std::int32_t &uiduser,
-        const std::string &uidbadge);
+drogon::Task<ResultatCoro> SupprimerBadge(
+    const DbClientPtr &db,
+    const std::string &uidBadge);
 
-    void SupprimerBadge(
-        const drogon::orm::DbClientPtr &db,
-        const std::string &uid);
 
-    void ModifierBadge(
-        //La connexion
-        const drogon::orm::DbClientPtr &db,
-        //Uid Badge
-        const std::string &uid,
-        //Body des champs à modifier peut etre vide donc tester les champs
-        const Json::Value &body);
+drogon::Task<ResultatCoro> CreationBadge(
+    const DbClientPtr &db,
+    const std::int32_t &uiduser,
+    const std::string &uidBadge);
 
-    void VerifierBadge(
-        const drogon::orm::DbClientPtr &db,
-        const std::string &uid,
-        const std::string &MAC);
+drogon::Task<ResultatCoro> ModifierInfoUtilisateur(
+    const DbClientPtr &db,
+    const std::string &uidBadge,
+    const Json::Value &body);
 
-    void ScannerBadge(
-        const drogon::orm::DbClientPtr &db,
-        const std::string &uid,
-        const std::string &MAC);
+drogon::Task<ResultatCoro> VerifierBadgePEA(
+    const DbClientPtr &db,
+    const std::string &uidBadge,
+    const std::string &mac);
+
+drogon::Task<ResultatCoro> ScanneBadgeBAE(
+const DbClientPtr &db,
+const std::string &uidBadge,
+const std::string &mac,
+const std::uint64_t &heure_badgage);
 };
 #endif //BACKENDBDD_BADGELOGIQUE_H

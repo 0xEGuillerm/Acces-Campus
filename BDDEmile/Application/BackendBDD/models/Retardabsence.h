@@ -49,6 +49,7 @@ class Retardabsence
         static const std::string _id_cours;
         static const std::string _temps_retard_min;
         static const std::string _absence;
+        static const std::string _timestamp_heure_cours;
     };
 
     static const int primaryKeyNumber;
@@ -141,8 +142,17 @@ class Retardabsence
     ///Set the value of the column absence
     void setAbsence(const bool &pAbsence) noexcept;
 
+    /**  For column timestamp_heure_cours  */
+    ///Get the value of the column timestamp_heure_cours, returns the default value if the column is null
+    const ::trantor::Date &getValueOfTimestampHeureCours() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<::trantor::Date> &getTimestampHeureCours() const noexcept;
+    ///Set the value of the column timestamp_heure_cours
+    void setTimestampHeureCours(const ::trantor::Date &pTimestampHeureCours) noexcept;
+    void setTimestampHeureCoursToNull() noexcept;
 
-    static size_t getColumnNumber() noexcept {  return 5;  }
+
+    static size_t getColumnNumber() noexcept {  return 6;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -169,6 +179,7 @@ class Retardabsence
     std::shared_ptr<int32_t> idCours_;
     std::shared_ptr<int32_t> tempsRetardMin_;
     std::shared_ptr<bool> absence_;
+    std::shared_ptr<::trantor::Date> timestampHeureCours_;
     struct MetaData
     {
         const std::string colName_;
@@ -180,7 +191,7 @@ class Retardabsence
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[5]={ false };
+    bool dirtyFlag_[6]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -218,6 +229,11 @@ class Retardabsence
             sql += "absence,";
             ++parametersCount;
         }
+        if(dirtyFlag_[5])
+        {
+            sql += "timestamp_heure_cours,";
+            ++parametersCount;
+        }
         needSelection=true;
         if(parametersCount > 0)
         {
@@ -247,6 +263,11 @@ class Retardabsence
             sql +="default,";
         }
         if(dirtyFlag_[4])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[5])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
