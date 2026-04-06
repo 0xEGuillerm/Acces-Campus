@@ -2,58 +2,258 @@
   "utilisateurs": [
     {
       "id": 1,
-      "login_user": "mblanchard",
-      "motdepasse": "helloworld1234!",
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
       "nom_user": "Blanchard",
       "prenom_user": "Mathis",
-      "classe": "BTS CIEL 2",
-      "statut": "eleve"
+      "login_user": "mblanchard",
+      "hash_mdp": "helloworld1234!",
+      "classe_user": "BTS CIEL 2",
+      "role_user": "eleve"
     },
     {
       "id": 2,
-      "login_user": "eguillerm",
-      "motdepasse": "helloworld1234!",
+      "uuid_user": "a1b2c3d4-0002-0002-0002-000000000002",
       "nom_user": "Guillerm",
       "prenom_user": "Emile",
-      "classe": "BTS CIEL 2",
-      "statut": "eleve"
+      "login_user": "eguillerm",
+      "hash_mdp": "helloworld1234!",
+      "classe_user": "BTS CIEL 2",
+      "role_user": "eleve"
     },
     {
       "id": 3,
-      "login_user": "mguillon",
-      "motdepasse": "helloworld1234!",
+      "uuid_user": "a1b2c3d4-0003-0003-0003-000000000003",
       "nom_user": "Guillon",
       "prenom_user": "Mael",
-      "classe": "BTS CIEL 2",
-      "statut": "eleve"
+      "login_user": "mguillon",
+      "hash_mdp": "helloworld1234!",
+      "classe_user": "BTS CIEL 2",
+      "role_user": "eleve"
     }
   ],
-
+  "salles": [
+    {
+      "id": 101,
+      "num_salle": 101,
+      "place_maximum": 30
+    },
+    {
+      "id": 202,
+      "num_salle": 202,
+      "place_maximum": 25
+    },
+    {
+      "id": 315,
+      "num_salle": 315,
+      "place_maximum": 20
+    },
+    {
+      "id": 134,
+      "num_salle": "B134",
+      "place_maximum": 24
+    }
+  ],
+  "badges": [
+    {
+      "id": 1,
+      "uuid_badge": "b0a1d9e2-0001-0001-0001-000000000001",
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
+      "date_creation": "2025-09-01T08:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "uuid_badge": "b0a1d9e2-0002-0002-0002-000000000002",
+      "uuid_user": "a1b2c3d4-0002-0002-0002-000000000002",
+      "date_creation": "2025-09-01T08:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "uuid_badge": "b0a1d9e2-0003-0003-0003-000000000003",
+      "uuid_user": "a1b2c3d4-0003-0003-0003-000000000003",
+      "date_creation": "2025-09-01T08:00:00.000Z"
+    }
+  ],
+  "cours": [
+    {
+      "id": 1,
+      "num_salle": 101,
+      "date_cours": "2026-03-31",
+      "heure_debut": "08:15",
+      "heure_fin": "10:05"
+    },
+    {
+      "id": 2,
+      "num_salle": 101,
+      "date_cours": "2026-03-31",
+      "heure_debut": "10:20",
+      "heure_fin": "12:10"
+    },
+    {
+      "id": 3,
+      "num_salle": 202,
+      "date_cours": "2026-04-01",
+      "heure_debut": "13:30",
+      "heure_fin": "15:20"
+    }
+  ],
+  "cours_utilisateurs": [
+    {
+      "id": 1,
+      "id_cours": 1,
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001"
+    },
+    {
+      "id": 2,
+      "id_cours": 1,
+      "uuid_user": "a1b2c3d4-0002-0002-0002-000000000002"
+    },
+    {
+      "id": 3,
+      "id_cours": 2,
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001"
+    }
+  ],
   "etat_salle": [
-    { "id": 1, "salle": 101, "nom_user": "Guillerm",  "prenom_user": "Emile",  "classe": "CIEL2", "present": true,  "statut": "eleve" },
-    { "id": 2, "salle": 101, "nom_user": "Blanchard", "prenom_user": "Mathis", "classe": "CIEL2", "present": false, "statut": "eleve" },
-    { "id": 3, "salle": 101, "nom_user": "Guillon",   "prenom_user": "Mael",   "classe": "CIEL2", "present": false, "statut": "eleve" }
+    {
+      "id": 1,
+      "uuid_user": "a1b2c3d4-0002-0002-0002-000000000002",
+      "id_cours": 1,
+      "num_salle": 101,
+      "statut": "present",
+      "heure_badgeage": "08:20",
+      "temps_retard_min": 0
+    },
+    {
+      "id": 2,
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
+      "id_cours": 1,
+      "num_salle": 101,
+      "statut": "absent",
+      "heure_badgeage": null,
+      "temps_retard_min": 0
+    },
+    {
+      "id": 3,
+      "uuid_user": "a1b2c3d4-0003-0003-0003-000000000003",
+      "id_cours": 1,
+      "num_salle": 101,
+      "statut": "retard",
+      "heure_badgeage": "08:35",
+      "temps_retard_min": 20
+    }
   ],
-
   "historique_eleve": [
-    { "id": 1, "absenceBool": true,  "horaire_du_cours": "2026-03-15T09:30:00.000Z" },
-    { "id": 2, "absenceBool": false, "horaire_du_cours": "2026-04-11T10:12:00.000Z", "temps_retard": 10 },
-    { "id": 3, "absenceBool": false, "horaire_du_cours": "2026-06-10T10:30:00.000Z", "temps_retard": 22 }
+    {
+      "id": 1,
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
+      "date_action": "2026-03-15T09:30:00.000Z",
+      "type_action": "absence"
+    },
+    {
+      "id": 2,
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
+      "date_action": "2026-04-11T10:12:00.000Z",
+      "type_action": "retard"
+    },
+    {
+      "id": 3,
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
+      "date_action": "2026-06-10T10:30:00.000Z",
+      "type_action": "retard"
+    }
   ],
-
-  "planning": [
-    { "id": 1, "salle": 101, "horaire": "2026-03-25T08:00:00.000Z" },
-    { "id": 2, "salle": 101, "horaire": "2026-03-25T10:00:00.000Z" },
-    { "id": 3, "salle": 202, "horaire": "2026-03-25T14:00:00.000Z" }
-  ],
-
   "reserver_salle": [
-    { "id": 1, "horaire": "2026-03-25T14:00:00.000Z", "numero": 101 }
+    {
+      "num_salle": 101,
+      "date_reservation": "2026-03-31",
+      "heure_debut": "09:10",
+      "heure_fin": "14:00",
+      "id": 1
+    },
+    {
+      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
+      "num_salle": 202,
+      "date_reservation": "2026-03-31",
+      "heure_debut": "11:15",
+      "heure_fin": "15:35",
+      "id": 2
+    }
   ],
-
   "salle_crenaux": [
-    { "id": 1, "horaire": "2026-03-25T08:00:00.000Z", "numero": 101 },
-    { "id": 2, "horaire": "2026-03-25T08:00:00.000Z", "numero": 202 },
-    { "id": 3, "horaire": "2026-03-25T08:00:00.000Z", "numero": 315 }
+    {
+      "id": 1,
+      "horaire": "2026-03-31T09:00:00.000Z",
+      "numero": 101
+    },
+    {
+      "id": 2,
+      "horaire": "2026-03-31T11:00:00.000Z",
+      "numero": 202
+    },
+    {
+      "id": 3,
+      "horaire": "2026-04-01T13:00:00.000Z",
+      "numero": 315
+    },
+    {
+      "id": 4,
+      "horaire": "2026-03-31T09:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 5,
+      "horaire": "2026-03-31T11:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 6,
+      "horaire": "2026-04-01T11:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 7,
+      "horaire": "2026-04-01T13:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 8,
+      "horaire": "2026-04-02T09:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 9,
+      "horaire": "2026-04-02T11:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 10,
+      "horaire": "2026-04-07T09:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 11,
+      "horaire": "2026-04-07T11:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 12,
+      "horaire": "2026-04-08T11:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 13,
+      "horaire": "2026-04-08T13:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 14,
+      "horaire": "2026-04-09T09:00:00.000Z",
+      "numero": "B134"
+    },
+    {
+      "id": 15,
+      "horaire": "2026-04-09T11:00:00.000Z",
+      "numero": "B134"
+    }
   ]
 }

@@ -31,9 +31,9 @@ createApp({
         { nom: 'Mael Guillon',     classe: 'BTS CIEL 2', email: 'mael.guillon@campus.fr' },
       ],
 
-      salles: ['Salle B201'],
+      salles: ['Salle B201', 'Salle B134'],
 
-      heures: ['08:15','09:10','10:20','11:15','13:30','14:25','15:35','16:30'],
+      heures: ['08:15','09:10','10:20','13:30','13:55','15:35'],
       jours:  ['Lundi','Mardi','Mercredi','Jeudi','Vendredi'],
 
       creneaux: [
@@ -53,6 +53,22 @@ createApp({
           { jour: 'Mardi',    heure: '10:20', titre: 'TP Reseaux - Mr Jumel',    type: 'tp',    duree: 1 },
           { jour: 'Jeudi',    heure: '13:30', titre: 'Cours Reseaux - Mr Jumel', type: 'cours', duree: 1 },
           { jour: 'Vendredi', heure: '14:25', titre: 'TP Reseaux - Mr Jumel',    type: 'tp',    duree: 1 },
+        ],
+        'Salle B134': [
+          { jour: 'Lundi',    heure: '08:15', titre: 'Informatique & Reseaux ST2IR - ', type: 'cours', duree: 4 },
+          { jour: 'Lundi',    heure: '10:20', titre: 'Informatique & Reseaux ST2IR - Mr Jumel', type: 'tp',    duree: 2 },
+          { jour: 'Lundi',    heure: '13:30', titre: 'Sc. Techniques Ind. ST1IR - Mr Salmon',   type: 'cours', duree: 2 },
+          { jour: 'Lundi',    heure: '15:35', titre: 'Sc. Techniques Ind. ST1IR - Mr Jumel',    type: 'tp',    duree: 2 },
+          { jour: 'Mardi',    heure: '09:10', titre: 'Sc. Techniques Ind. ST1IR - Mr Salmon',   type: 'cours', duree: 1 },
+          { jour: 'Mardi',    heure: '13:55', titre: 'Informatique & Reseaux ST2IR - Mr Jumel', type: 'tp',    duree: 3 },
+          { jour: 'Mercredi', heure: '08:15', titre: 'Informatique & Reseaux ST2IR - Mr Jumel', type: 'cours', duree: 2 },
+          { jour: 'Mercredi', heure: '10:20', titre: 'Informatique & Reseaux ST2IR - Mr Jumel', type: 'tp',    duree: 2 },
+          { jour: 'Jeudi',    heure: '08:15', titre: 'Informatique & Reseaux ST2IR - Mr Jumel', type: 'cours', duree: 2 },
+          { jour: 'Jeudi',    heure: '13:30', titre: 'Sc. Techniques Ind. ST1IR - Mr Salmon',   type: 'cours', duree: 2 },
+          { jour: 'Jeudi',    heure: '15:35', titre: 'Sc. Techniques Ind. ST1IR - Mr Salmon',   type: 'tp',    duree: 2 },
+          { jour: 'Vendredi', heure: '08:15', titre: 'Informatique & Reseaux ST2IR - Mr Jumel', type: 'cours', duree: 2 },
+          { jour: 'Vendredi', heure: '10:20', titre: 'Informatique & Reseaux ST2IR - Mr Jumel', type: 'tp',    duree: 2 },
+          { jour: 'Vendredi', heure: '13:30', titre: 'Sc. Techniques Ind. ST1IR - Mr Salmon',   type: 'cours', duree: 2 },
         ],
       },
 
@@ -83,6 +99,8 @@ createApp({
       reservationHeureFin: '',
       erreurRecherche:     '',
 
+      mesReservations: [],
+
       // Créneaux horaires proposés dans les menus déroulants
       heuresDispos: [
         '08:00', '08:15', '09:00', '09:10', '10:00', '10:20',
@@ -100,6 +118,18 @@ createApp({
 
 
   computed: {
+
+    // Sépare les réservations à venir et passées
+    mesReservationsAVenir() {
+      const now = new Date();
+      return this.mesReservations.filter(r => new Date(`${r.date_reservation}T${r.heure_debut}`) >= now);
+    },
+    mesReservationsPassees() {
+      const now = new Date();
+      return this.mesReservations
+        .filter(r => new Date(`${r.date_reservation}T${r.heure_debut}`) < now)
+        .sort((a, b) => new Date(`${b.date_reservation}T${b.heure_debut}`) - new Date(`${a.date_reservation}T${a.heure_debut}`));
+    },
 
     // Filtre l'annuaire selon la saisie de l'utilisateur
     filteredStudents() {
@@ -126,10 +156,11 @@ createApp({
       return { libre: eventsDuJour.length === 0, events: eventsDuJour, jour: jourAuj };
     },
 
-    // Construit les lignes du tableau planning (une ligne par heure)
+    // Construit les lignes du tableau planning à partir des heures réelles des cours
     planningRows() {
       const events = this.planning[this.selectedPlanning] || [];
-      return this.heures.map(heure => ({
+      const heuresTrie = [...new Set(events.map(e => e.heure))].sort();
+      return heuresTrie.map(heure => ({
         heure,
         jours: this.jours.map(jour => events.find(e => e.jour === jour && e.heure === heure) || null),
       }));
@@ -144,7 +175,10 @@ createApp({
       this.currentPage = page;
       window.scrollTo(0, 0);
       // Charge les créneaux depuis json-server quand on ouvre la réservation
-      if (page === 'reservation') this.chargerCreneaux();
+      if (page === 'reservation') {
+        this.chargerCreneaux();
+        this.chargerMesReservations();
+      }
     },
 
    
@@ -160,19 +194,13 @@ createApp({
       this.loginLoading = true;
 
       try {
-        const url         = `${ROUTES.login}?login_user=${encodeURIComponent(this.loginId.trim())}`;
-        const reponse     = await fetch(url);
+        const reponse      = await fetch(ROUTES.login);
         const utilisateurs = await reponse.json();
+        const user = utilisateurs.find(
+          u => u.login_user === this.loginId.trim() && u.hash_mdp === this.loginPass
+        );
 
-        if (utilisateurs.length === 0) {
-          this.loginError = 'Identifiant ou mot de passe incorrect.';
-          return;
-        }
-
-        const user = utilisateurs[0];
-
-        // Vérifie le mot de passe (json-server ne chiffre pas)
-        if (user.motdepasse !== this.loginPass) {
+        if (!user) {
           this.loginError = 'Identifiant ou mot de passe incorrect.';
           return;
         }
@@ -208,6 +236,11 @@ createApp({
       // Vérifie que tous les champs sont remplis
       if (!this.reservationDate || !this.reservationHeureDeb || !this.reservationHeureFin) {
         this.erreurRecherche = 'Veuillez remplir la date et les deux heures.';
+        return;
+      }
+      const aujourd_hui = new Date().toISOString().split('T')[0];
+      if (this.reservationDate < aujourd_hui) {
+        this.erreurRecherche = 'Impossible de reserver une date passee.';
         return;
       }
       if (this.reservationHeureDeb >= this.reservationHeureFin) {
@@ -272,17 +305,20 @@ createApp({
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
-            horaire:    creneau.horaire,
-            numero:     creneau.numero,
-            login_user: user.login_user,
+            uuid_user:        user.uuid_user,
+            num_salle:        creneau.numero,
+            date_reservation: this.reservationDate,
+            heure_debut:      this.reservationHeureDeb,
+            heure_fin:        this.reservationHeureFin,
           }),
         });
 
         if (!reponse.ok) throw new Error(`Erreur ${reponse.status}`);
 
-        this.showToast(`Salle ${creneau.numero} reservee pour le ${this.formaterHoraire(creneau.horaire)} !`, 'success');
-        // Retire le créneau de la liste
+        this.showToast(`Salle ${creneau.numero} reservee pour le ${this.formaterHoraire(this.reservationDate, this.reservationHeureDeb)} !`, 'success');
+        // Retire le créneau de la liste et recharge les réservations
         this.creneaux_api = this.creneaux_api.filter(c => c.id !== creneau.id);
+        await this.chargerMesReservations();
 
       } catch (err) {
         this.showToast('La reservation a echoue. Reessaie.', 'danger');
@@ -293,21 +329,56 @@ createApp({
       }
     },
 
-    // Formate une date ISO → "25/03/2026"
-    formaterDate(dateISO) {
-      const d = new Date(dateISO);
-      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    // Formate "2026-03-31" → "31/03/2026"
+    formaterDate(dateStr) {
+      const [y, m, d] = dateStr.split('T')[0].split('-');
+      return `${d}/${m}/${y}`;
     },
 
-    // Formate une date → "08h00"
-    formaterHeure(dateISO) {
-      const d = new Date(dateISO);
-      return `${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`;
+    // Formate "09:00" → "09h00"  (ou ISO → heure locale)
+    formaterHeure(heureStr) {
+      if (!heureStr) return '';
+      if (heureStr.includes('T')) {
+        const d = new Date(heureStr);
+        return `${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`;
+      }
+      return heureStr.replace(':', 'h');
     },
 
-    // Formate une date → "25/03/2026 a 08h00" 
-    formaterHoraire(dateISO) {
-      return `${this.formaterDate(dateISO)} a ${this.formaterHeure(dateISO)}`;
+    // Formate "31/03/2026 a 09h00"
+    formaterHoraire(dateStr, heureStr) {
+      return `${this.formaterDate(dateStr)} a ${this.formaterHeure(heureStr)}`;
+    },
+
+    // Charge les réservations de l'utilisateur connecté
+    async chargerMesReservations() {
+      try {
+        const user    = JSON.parse(localStorage.getItem('user_connecte') || '{}');
+        const reponse = await fetch(ROUTES.reserverSalle);
+        const toutes  = await reponse.json();
+        this.mesReservations = toutes.filter(r => r.uuid_user === user.uuid_user);
+      } catch (err) {
+        console.error('Erreur chargement reservations :', err);
+      }
+    },
+
+    // Annule une réservation si elle est à plus de 24h
+    async annulerReservation(id, date_reservation, heure_debut) {
+      const maintenant = new Date();
+      const heureResa  = new Date(`${date_reservation}T${heure_debut}`);
+      if ((heureResa - maintenant) < 24 * 60 * 60 * 1000) {
+        this.showToast("Impossible d'annuler moins de 24h avant.", 'danger');
+        return;
+      }
+      try {
+        const reponse = await fetch(`${ROUTES.reserverSalle}/${id}`, { method: 'DELETE' });
+        if (!reponse.ok) throw new Error(`Erreur ${reponse.status}`);
+        this.mesReservations = this.mesReservations.filter(r => r.id !== id);
+        this.showToast('Reservation annulee.', 'success');
+      } catch (err) {
+        this.showToast("Erreur lors de l'annulation.", 'danger');
+        console.error('Erreur annulation :', err);
+      }
     },
 
     // Affiche une notification temporaire (4 secondes)

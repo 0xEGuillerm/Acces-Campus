@@ -1,9 +1,13 @@
 {
-  "/psw/utilisateurs":     "/utilisateurs",
-  "/psw/login":            "/utilisateurs",
-  "/psw/etat_salle":       "/etat_salle",
-  "/psw/historique_eleve": "/historique_eleve",
-  "/psw/planning":         "/planning",
-  "/psw/reserver_salle":   "/reserver_salle",
-  "/psw/salle_crenaux":    "/salle_crenaux"
+  "/psw/utilisateurs":       "/utilisateurs",
+  "/psw/login":              "/utilisateurs",
+  "/psw/salles":             "/salles",
+  "/psw/badges":             "/badges",
+  "/psw/cours":              "/cours",
+  "/psw/cours_utilisateurs": "/cours_utilisateurs",
+  "/psw/etat_salle":         "/etat_salle",
+  "/psw/historique_eleve":   "/historique_eleve",
+  "/psw/reserver_salle":     "/reserver_salle",
+  "/psw/reserver_salle/:id": "/reserver_salle/:id",
+  "/psw/salle_crenaux":      "/salle_crenaux"
 }

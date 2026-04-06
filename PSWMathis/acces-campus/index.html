@@ -99,7 +99,7 @@
         <div class="row g-3 align-items-end">
           <div class="col-md-4">
             <label class="form-label">Date</label>
-            <input type="date" v-model="reservationDate" class="form-control">
+            <input type="date" v-model="reservationDate" class="form-control" :min="new Date().toISOString().split('T')[0]">
           </div>
           <div class="col-md-3">
             <label class="form-label">Heure de debut</label>
@@ -125,6 +125,53 @@
         <div v-show="erreurRecherche" class="alert alert-danger mt-3 mb-0 py-2" style="font-size:13px">
           {{ erreurRecherche }}
         </div>
+      </div>
+    </div>
+
+    <!-- Mes réservations à venir -->
+    <div class="card mt-4 mb-4">
+      <div class="card-header bg-white"><strong>Mes réservations</strong></div>
+      <div class="card-body">
+        <div v-if="mesReservationsAVenir.length === 0" class="text-muted" style="font-size:13px">
+          Aucune reservation a venir.
+        </div>
+        <table v-else class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>Salle</th><th>Date</th><th>Heure</th><th class="text-end">Action</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in mesReservationsAVenir" :key="r.id">
+              <td><span class="badge bg-primary fs-6">Salle {{ r.num_salle }}</span></td>
+              <td class="align-middle">{{ formaterDate(r.date_reservation) }}</td>
+              <td class="align-middle">{{ formaterHeure(r.heure_debut) }} - {{ formaterHeure(r.heure_fin) }}</td>
+              <td class="text-end">
+                <button class="btn btn-danger btn-sm" @click="annulerReservation(r.id, r.date_reservation, r.heure_debut)">
+                  Annuler
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Historique des réservations passées -->
+    <div class="card mb-4" v-if="mesReservationsPassees.length > 0">
+      <div class="card-header bg-white"><strong>Historique</strong></div>
+      <div class="card-body">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>Salle</th><th>Date</th><th>Heure</th><th><span class="badge bg-secondary">Passe</span></th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in mesReservationsPassees" :key="r.id" class="text-muted">
+              <td><span class="badge bg-secondary fs-6">Salle {{ r.num_salle }}</span></td>
+              <td class="align-middle">{{ formaterDate(r.date_reservation) }}</td>
+              <td class="align-middle">{{ formaterHeure(r.heure_debut) }} - {{ formaterHeure(r.heure_fin) }}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
