@@ -1,19 +1,15 @@
 //
 // Created by Emile Guillerm on 05.04.2026.
 //
-#include "SalleDAO.h"
-#include "models/Salle.h"
+#include "CoursDAO.h"
 #include <drogon/utils/coroutine.h>
 #include <drogon/orm/CoroMapper.h>
 #include "models/Utilisateur.h"
-#include "AbsenceCours.h"
-#include "PresenceCours.h"
 #include "models/Cours.h"
 
 using namespace drogon::orm;
-#include "CoursDAO.h"
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursParSalle(
+drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> CoursDAO::ChercherCoursParSalle(
     const DbClientPtr &db,
     const int32_t &salle) {
     CoroMapper<drogon_model::ProjetV1::Cours> mappercours(db);
@@ -24,7 +20,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursPar
 }
 
 
-static drogon::Task<drogon_model::ProjetV1::Cours> AjoutReservation(
+drogon::Task<drogon_model::ProjetV1::Cours> CoursDAO::AjoutReservation(
     const DbClientPtr &db,
     const drogon_model::ProjetV1::Cours &NouvelleEntree) {
     CoroMapper<drogon_model::ProjetV1::Cours> mapperCours(db);

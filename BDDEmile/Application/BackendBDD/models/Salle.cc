@@ -8,6 +8,8 @@
 #include "Salle.h"
 #include <drogon/utils/Utilities.h>
 #include <string>
+#include <codecvt>
+#include <locale>
 
 using namespace drogon;
 using namespace drogon::orm;

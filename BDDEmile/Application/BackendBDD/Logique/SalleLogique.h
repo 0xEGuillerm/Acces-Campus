@@ -5,7 +5,6 @@
 #ifndef BACKENDBDD_SALLELOGIQUE_H
 #define BACKENDBDD_SALLELOGIQUE_H
 
-#include "SalleLogique.h"
 #include "models/Salle.h"
 #include <drogon/utils/coroutine.h>
 #include "models/Utilisateur.h"

@@ -16,33 +16,33 @@ using namespace drogon::orm;
 
 class BadgeLogique {
 public:
-drogon::Task<Json::Value> InformationBadge(
+static drogon::Task<Json::Value> InformationBadge(
      //Gère les connexion avecc la DB (TCP, nombre de connexion, répartition, etc)
      const drogon::orm::DbClientPtr &db,
      //Uid Badge
      const std::string &uidBadge);
 
-drogon::Task<ResultatCoro> SupprimerBadge(
+static drogon::Task<ResultatCoro> SupprimerBadge(
     const DbClientPtr &db,
     const std::string &uidBadge);
 
 
-drogon::Task<ResultatCoro> CreationBadge(
+static drogon::Task<ResultatCoro> CreationBadge(
     const DbClientPtr &db,
     const std::int32_t &uiduser,
     const std::string &uidBadge);
 
-drogon::Task<ResultatCoro> ModifierInfoUtilisateur(
+static drogon::Task<ResultatCoro> ModifierInfoUtilisateur(
     const DbClientPtr &db,
     const std::string &uidBadge,
     const Json::Value &body);
 
-drogon::Task<ResultatCoro> VerifierBadgePEA(
+static drogon::Task<ResultatCoro> VerifierBadgePEA(
     const DbClientPtr &db,
     const std::string &uidBadge,
     const std::string &mac);
 
-drogon::Task<ResultatCoro> ScanneBadgeBAE(
+static drogon::Task<ResultatCoro> ScanneBadgeBAE(
 const DbClientPtr &db,
 const std::string &uidBadge,
 const std::string &mac,

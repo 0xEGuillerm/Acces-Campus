@@ -21,8 +21,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(${PROJECT_NAME} main.cc
         models/Badge.cc
-        controllers/SalleController.cpp
-        controllers/SalleController.h
         dao/BadgeDAO.cpp
         dao/BadgeDAO.h
         models/AbsenceCours.h
@@ -45,6 +43,14 @@ add_executable(${PROJECT_NAME} main.cc
         Logique/UtilisateurLogique.h
         dao/UtilisateurDAO.cpp
         dao/UtilisateurDAO.h
+        controllers/PEAController.cpp
+        controllers/PEAController.h
+        controllers/BAEController.cpp
+        controllers/BAEController.h
+        controllers/PSWController.cpp
+        controllers/PSWController.h
+        controllers/PGSController.cpp
+        controllers/PGSController.h
 )
 
 # ##############################################################################

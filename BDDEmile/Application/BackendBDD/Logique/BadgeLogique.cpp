@@ -17,7 +17,7 @@ const int VALEURMARGECOURS = 5;
 
 
 //Fonction logique pour obtenir les informatons d'un badge
-drogon::Task<Json::Value> InformationBadge(
+drogon::Task<Json::Value> BadgeLogique::InformationBadge(
      //Gère les connexion avecc la DB (TCP, nombre de connexion, répartition, etc)
      const drogon::orm::DbClientPtr &db,
      //Uid Badge
@@ -30,8 +30,7 @@ drogon::Task<Json::Value> InformationBadge(
     co_return UtilisateurTrouvee[0].toJson();
 }
 
-
-drogon::Task<ResultatCoro> SupprimerBadge(
+drogon::Task<ResultatCoro> BadgeLogique::SupprimerBadge(
     const DbClientPtr &db,
     const std::string &uidBadge) {
     ResultatCoro ResultatSupprimerBadge;
@@ -47,7 +46,7 @@ drogon::Task<ResultatCoro> SupprimerBadge(
 }
 
 
-drogon::Task<ResultatCoro> CreationBadge(
+drogon::Task<ResultatCoro> BadgeLogique::CreationBadge(
     const DbClientPtr &db,
     const std::int32_t &uiduser,
     const std::string &uidBadge) {
@@ -77,7 +76,7 @@ drogon::Task<ResultatCoro> CreationBadge(
 }
 
 
-drogon::Task<ResultatCoro> ModifierInfoUtilisateur(
+drogon::Task<ResultatCoro> BadgeLogique::ModifierInfoUtilisateur(
     const DbClientPtr &db,
     const std::string &uidBadge,
     const Json::Value &body) {
@@ -86,10 +85,11 @@ drogon::Task<ResultatCoro> ModifierInfoUtilisateur(
     if (UtilisateurListe.empty()) {
         ResultatModifierUtilisateur.BoolResultat = false;
         ResultatModifierUtilisateur.MessageResultat = "Utilisateur introuvable";
+        co_return ResultatModifierUtilisateur;
     }
     auto utilisateurModifier = UtilisateurListe[0];
     if (body.isMember("nom"))
-        utilisateurModifier.setNomUser(body["prenom"].asString());
+        utilisateurModifier.setNomUser(body["nom"].asString());
     if (body.isMember("prenom"))
         utilisateurModifier.setPrenomUser(body["prenom"].asString());
     if (body.isMember("classe"))
@@ -113,7 +113,7 @@ drogon::Task<ResultatCoro> ModifierInfoUtilisateur(
 }
 
 
-drogon::Task<ResultatCoro> VerifierBadgePEA(
+drogon::Task<ResultatCoro> BadgeLogique::VerifierBadgePEA(
     const DbClientPtr &db,
     const std::string &uidBadge,
     const std::string &mac) {
@@ -122,12 +122,14 @@ drogon::Task<ResultatCoro> VerifierBadgePEA(
     if (UtilisateurBadge.empty()) {
         ResultatVerificationPEA.BoolResultat = false;
         ResultatVerificationPEA.MessageResultat = "Utilisateur introuvable";
+        co_return ResultatVerificationPEA;
     }
     auto utilisateurAVerifier = UtilisateurBadge[0];
     auto SalleListe = co_await BadgeDAO::ChercherSalleAdresseMACpea(db, mac);
     if (SalleListe.empty()) {
         ResultatVerificationPEA.BoolResultat = false;
         ResultatVerificationPEA.MessageResultat = "Utilisateur introuvable";
+        co_return ResultatVerificationPEA;
     }
     auto SalleAcceder = SalleListe[0];
     auto CoursListe = co_await BadgeDAO::ChercherCoursParSalle(db, (*SalleAcceder.getNumSalle()));
@@ -154,7 +156,7 @@ drogon::Task<ResultatCoro> VerifierBadgePEA(
 }
 
 
-drogon::Task<ResultatCoro> ScanneBadgeBAE(
+drogon::Task<ResultatCoro> BadgeLogique::ScanneBadgeBAE(
 const DbClientPtr &db,
 const std::string &uidBadge,
 const std::string &mac,
@@ -185,8 +187,6 @@ const std::uint64_t &heure_badgage) {
 
     trantor::Date TimestampBrut = trantor::Date::now();
     int64_t TimestampSecond = TimestampBrut.secondsSinceEpoch();
-
-
     bool trouvee = false;
     for (const auto &cours: CoursListe) {
         if (cours.getValueOfHeureDebut().secondsSinceEpoch() - VALEURMARGECOURS < TimestampSecond && cours.getValueOfHeureFin().secondsSinceEpoch() > TimestampSecond) {
