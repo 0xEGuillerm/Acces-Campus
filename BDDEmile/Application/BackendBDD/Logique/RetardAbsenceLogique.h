@@ -6,19 +6,9 @@
 #define BACKENDBDD_RETARDABSENCELOGIQUE_H
 
 
-
-#include "SalleLogique.h"
-#include "models/Salle.h"
 #include <drogon/utils/coroutine.h>
-#include <drogon/orm/CoroMapper.h>
-#include "models/Utilisateur.h"
 #include "AbsenceCours.h"
-#include "PresenceCours.h"
-#include "models/Cours.h"
 #include <json/json.h>
-#include "dao/SalleDAO.h"
-#include "models/Retardabsence.h"
-#include "dao/RetardAbsenceDAO.h"
 
 using namespace drogon::orm;
 

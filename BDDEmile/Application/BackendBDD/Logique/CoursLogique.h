@@ -19,7 +19,7 @@ using namespace drogon::orm;
 
 
 class CoursLogique {
-
+public:
     static drogon::Task<ResultatCoro> ReservationSallePGS(
     const DbClientPtr &db,
     const Json::Value &body);

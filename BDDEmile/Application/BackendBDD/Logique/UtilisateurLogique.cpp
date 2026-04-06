@@ -12,7 +12,7 @@
 
 using namespace drogon::orm;
 
-static drogon::Task<Json::Value> UtilisateurParNomPrenom(
+drogon::Task<Json::Value> UtilisateurLogique::UtilisateurParNomPrenom(
     const DbClientPtr &db,
     const std::string &nom,
     const std::string &prenom) {

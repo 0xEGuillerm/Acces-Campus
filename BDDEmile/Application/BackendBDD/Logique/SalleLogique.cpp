@@ -17,7 +17,7 @@ const int VALEURMARGECOURS = 5;
 
 using namespace drogon::orm;
 
-static drogon::Task<Json::Value> EtatSalleMac(
+drogon::Task<Json::Value> SalleLogique::EtatSalleMac(
     const DbClientPtr &db,
     const std::string &mac) {
     auto SalleListe = co_await SalleDAO::ChercherSalleAdresseMACbae(db, mac);
@@ -66,7 +66,7 @@ static drogon::Task<Json::Value> EtatSalleMac(
 }
 
 
-static drogon::Task<Json::Value> EtatSalleNumeroSalle(
+drogon::Task<Json::Value> SalleLogique::EtatSalleNumeroSalle(
     const DbClientPtr &db,
     const std::string &numerosalle) {
     auto CoursListe = co_await SalleDAO::ChercherCoursParSalle(db, stoi(numerosalle));

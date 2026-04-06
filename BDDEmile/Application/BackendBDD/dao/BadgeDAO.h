@@ -42,9 +42,11 @@ public:
         const int32_t &uidUtilisateur);
 
     //update
+
     static drogon::Task<size_t> MettreAJourUser(
     const DbClientPtr &db,
-    const drogon_model::ProjetV1::Utilisateur);
+    const drogon_model::ProjetV1::Utilisateur &UtilisateurModifier);
+
 
 
     static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACbae(

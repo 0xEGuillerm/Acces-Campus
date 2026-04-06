@@ -20,7 +20,7 @@
 
 using namespace drogon::orm;
 
-static drogon::Task<Json::Value> AbsenceEleve(
+drogon::Task<Json::Value> RetardAbsenceLogique::AbsenceEleve(
     const DbClientPtr &db,
     const int32_t &idUtilisateur) {
     auto RetardAbsenceListe = co_await RetardAbsenceDAO::ChercherRetardAbsenceEleve(db, idUtilisateur);

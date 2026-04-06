@@ -13,7 +13,7 @@
 
 using namespace drogon::orm;
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACbae(
+drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> SalleDAO::ChercherSalleAdresseMACbae(
     const DbClientPtr &db,
     const std::string &MAC) {
     CoroMapper<drogon_model::ProjetV1::Salle> mappersalle(db);
@@ -23,7 +23,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdr
     co_return resultat;
 }
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursParSalle(
+drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> SalleDAO::ChercherCoursParSalle(
     const DbClientPtr &db,
     const int32_t &numSalle) {
     CoroMapper<drogon_model::ProjetV1::Cours> mappercours(db);
@@ -33,7 +33,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursPar
     co_return resultat;
 }
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> ChercherUtilisateurDansAbsencecours(
+drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> SalleDAO::ChercherUtilisateurDansAbsencecours(
     const DbClientPtr &db,
     const int32_t &uidUtilisateur) {
     CoroMapper<drogon_model::ProjetV1::AbsenceCours> mapperabsence(db);
@@ -43,7 +43,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> ChercherU
     co_return resultat;
 }
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::PresenceCours>> ChercherUtilisateurDansPresencecours(
+drogon::Task<std::vector<drogon_model::ProjetV1::PresenceCours>> SalleDAO::ChercherUtilisateurDansPresencecours(
     const DbClientPtr &db,
     const int32_t &uidUtilisateur) {
     CoroMapper<drogon_model::ProjetV1::PresenceCours> mapperPresence(db);

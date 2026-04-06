@@ -15,7 +15,7 @@
 
 
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParBadge(
+drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> BadgeDAO::ChercherUtilisateurParIDBadge(
     const DbClientPtr &db,
     const std::string &uidBadge) {
     CoroMapper<drogon_model::ProjetV1::Utilisateur> mapperuser(db);
@@ -25,7 +25,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUt
     co_return resultat;
 }
 
-static drogon::Task<size_t> SupprimerBadgeParIDBadge(
+drogon::Task<size_t> BadgeDAO::SupprimerBadgeParIDBadge(
     const DbClientPtr &db,
     const std::string &uidBadge) {
     CoroMapper<drogon_model::ProjetV1::Badge> mapperbadge(db);
@@ -34,7 +34,7 @@ static drogon::Task<size_t> SupprimerBadgeParIDBadge(
 }
 
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Badge>> ChercherBadgeParIDBadge(
+drogon::Task<std::vector<drogon_model::ProjetV1::Badge>> BadgeDAO::ChercherBadgeParIDBadge(
     const DbClientPtr &db,
     const std::string &uidBadge){
     CoroMapper<drogon_model::ProjetV1::Badge> mapperbadge(db);
@@ -45,7 +45,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Badge>> ChercherBadgePar
 }
 
 //FindBy
-static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParIDUtilisateur(
+drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> BadgeDAO::ChercherUtilisateurParIDUtilisateur(
     const DbClientPtr &db,
     const int32_t &uidUtilisateur) {
     CoroMapper<drogon_model::ProjetV1::Utilisateur> mapperutilisateur(db);
@@ -56,7 +56,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUt
 }
 
 //update
-static drogon::Task<size_t> MettreAJourUser(
+drogon::Task<size_t> BadgeDAO::MettreAJourUser(
     const DbClientPtr &db,
     const drogon_model::ProjetV1::Utilisateur &UtilisateurModifier) {
     CoroMapper<drogon_model::ProjetV1::Utilisateur> mapperutilisateur(db);
@@ -64,7 +64,7 @@ static drogon::Task<size_t> MettreAJourUser(
     co_return resultat;
     }
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACbae(
+drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> BadgeDAO::ChercherSalleAdresseMACbae(
     const DbClientPtr &db,
     const std::string &MAC) {
     CoroMapper<drogon_model::ProjetV1::Salle> mappersalle(db);
@@ -74,7 +74,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdr
     co_return resultat;
 }
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACpea(
+drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> BadgeDAO::ChercherSalleAdresseMACpea(
     const DbClientPtr &db,
     const std::string &MAC) {
     CoroMapper<drogon_model::ProjetV1::Salle> mappersalle(db);
@@ -84,7 +84,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdr
     co_return resultat;
 }
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursParSalle(
+drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> BadgeDAO::ChercherCoursParSalle(
     const DbClientPtr &db,
     const int32_t &numSalle) {
     CoroMapper<drogon_model::ProjetV1::Cours> mappercours(db);
@@ -95,7 +95,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursPar
 }
 
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> ChercherUtilisateurDansAbsencecours(
+drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> BadgeDAO::ChercherUtilisateurDansAbsencecours(
     const DbClientPtr &db,
     const int32_t &uidUtilisateur) {
     CoroMapper<drogon_model::ProjetV1::AbsenceCours> mapperabsence(db);
@@ -106,7 +106,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> ChercherU
 }
 
 
-static drogon::Task<drogon_model::ProjetV1::PresenceCours> AjoutUtilisateurPresenceCours(
+drogon::Task<drogon_model::ProjetV1::PresenceCours> BadgeDAO::AjoutUtilisateurPresenceCours(
     const DbClientPtr &db,
     const drogon_model::ProjetV1::PresenceCours &NouvelleEntree) {
     CoroMapper<drogon_model::ProjetV1::PresenceCours> mapperPresence(db);
@@ -115,7 +115,7 @@ static drogon::Task<drogon_model::ProjetV1::PresenceCours> AjoutUtilisateurPrese
 }
 
 
-static drogon::Task<size_t> SupprimerUtilisateurAbsence(
+drogon::Task<size_t> BadgeDAO::SupprimerUtilisateurAbsence(
     const DbClientPtr &db,
     const int32_t &idAbsence) {
     CoroMapper<drogon_model::ProjetV1::AbsenceCours> mapperabsence(db);
@@ -123,7 +123,7 @@ static drogon::Task<size_t> SupprimerUtilisateurAbsence(
     co_return resultat;
 }
 
-static drogon::Task<drogon_model::ProjetV1::Retardabsence> AjoutRetardAbsence(
+drogon::Task<drogon_model::ProjetV1::Retardabsence> BadgeDAO::AjoutRetardAbsence(
     const DbClientPtr &db,
     const drogon_model::ProjetV1::Retardabsence &NouvelleEntree) {
     CoroMapper<drogon_model::ProjetV1::Retardabsence> mapperRetardAbsence(db);

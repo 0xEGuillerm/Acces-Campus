@@ -5,13 +5,9 @@
 #ifndef BACKENDBDD_COURSDAO_H
 #define BACKENDBDD_COURSDAO_H
 
-#include "SalleDAO.h"
+
 #include "models/Salle.h"
 #include <drogon/utils/coroutine.h>
-#include <drogon/orm/CoroMapper.h>
-#include "models/Utilisateur.h"
-#include "AbsenceCours.h"
-#include "PresenceCours.h"
 #include "models/Cours.h"
 
 using namespace drogon::orm;

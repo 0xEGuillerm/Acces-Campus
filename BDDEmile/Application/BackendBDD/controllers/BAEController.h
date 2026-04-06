@@ -1,0 +1,32 @@
+//
+// Created by Emile Guillerm on 06.04.2026.
+//
+
+#ifndef BACKENDBDD_BAECONTROLLER_H
+#define BACKENDBDD_BAECONTROLLER_H
+
+#include <drogon/HttpController.h>
+#include "resultat/StructResultat.h"
+#include "Logique/BadgeLogique.h"
+#include "Logique/SalleLogique.h"
+#include <drogon/utils/coroutine.h>
+#include <drogon/orm/CoroMapper.h>
+#include <json/json.h>
+
+
+using namespace drogon::orm;
+
+class BAEController : public drogon::HttpController<BAEController>{
+public:
+    METHOD_LIST_BEGIN
+    METHOD_ADD(BAEController::EtatSalleBAEController, "/bae/etat_salle", drogon::HttpMethod::Get);
+    METHOD_ADD(BAEController::ScannerBadgeBAEController, "/bae/scanner_badge", drogon::HttpMethod::Post);
+    METHOD_LIST_END
+    drogon::Task<drogon::HttpResponsePtr> EtatSalleBAEController(
+        drogon::HttpRequestPtr req);
+    drogon::Task<drogon::HttpResponsePtr> ScannerBadgeBAEController(
+        drogon::HttpRequestPtr req);
+};
+
+
+#endif //BACKENDBDD_BAECONTROLLER_H

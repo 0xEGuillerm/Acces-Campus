@@ -3,10 +3,10 @@
 //
 
 #include "UtilisateurDAO.h"
-
+#include <drogon/orm/CoroMapper.h>
 #include "Utilisateur.h"
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParNom(
+drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> UtilisateurDAO::ChercherUtilisateurParNom(
     const DbClientPtr &db,
     const std::string &nom) {
     CoroMapper<drogon_model::ProjetV1::Utilisateur> mapperUtilisateur(db);
@@ -16,7 +16,7 @@ static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUt
     co_return resultat;
 }
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParPrenom(
+drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> UtilisateurDAO::ChercherUtilisateurParPrenom(
     const DbClientPtr &db,
     const std::string &prenom) {
     CoroMapper<drogon_model::ProjetV1::Utilisateur> mapperUtilisateur(db);

@@ -19,7 +19,7 @@
 using namespace drogon::orm;
 
 
-static drogon::Task<ResultatCoro> ReservationSallePGS(
+drogon::Task<ResultatCoro> CoursLogique::ReservationSallePGS(
     const DbClientPtr &db,
     const Json::Value &body) {
     int32_t heure_debut = body["heure_debut"].asInt();
@@ -52,11 +52,15 @@ static drogon::Task<ResultatCoro> ReservationSallePGS(
     Reservation.setHeureFin(heureFinTrantor);
     Reservation.setNumSalle(salle);
     Reservation.setReservePar(0);
-    ResultatCoro(true, "Finit");
+    auto EnregistrementCours = co_await CoursDAO::AjoutReservation(db, Reservation);
+    if ((*EnregistrementCours.getIdCours()) == 0) {
+        co_return ResultatCoro(false, "Erreur");
+    }
+    co_return ResultatCoro(true, "Finit");
 }
 
 
-static drogon::Task<ResultatCoro> ReservationSallePSW(
+drogon::Task<ResultatCoro> CoursLogique::ReservationSallePSW(
     const DbClientPtr &db,
     const Json::Value &body) {
     int32_t heure_debut = body["heure_debut"].asInt();
@@ -89,11 +93,14 @@ static drogon::Task<ResultatCoro> ReservationSallePSW(
     Reservation.setHeureFin(heureFinTrantor);
     Reservation.setNumSalle(salle);
     Reservation.setReservePar(utilisateur);
-    ResultatCoro(true, "Finit");
+    auto EnregistrementCours = co_await CoursDAO::AjoutReservation(db, Reservation);
+    if ((*EnregistrementCours.getIdCours()) == 0) {
+        co_return ResultatCoro(false, "Erreur");
+    }
+    co_return ResultatCoro(true, "Finit");
 }
 
-
-static drogon::Task<Json::Value> PlanningSalle(
+drogon::Task<Json::Value> CoursLogique::PlanningSalle(
     const DbClientPtr &db,
     const int32_t &salle) {
     auto ListeCours = co_await CoursDAO::ChercherCoursParSalle(db, salle);

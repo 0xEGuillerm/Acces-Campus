@@ -14,9 +14,9 @@
 
 using namespace drogon::orm;
 
-static drogon::Task<std::vector<drogon_model::ProjetV1::Retardabsence>> ChercherRetardAbsenceEleve(
+drogon::Task<std::vector<drogon_model::ProjetV1::Retardabsence>> RetardAbsenceDAO::ChercherRetardAbsenceEleve(
     const DbClientPtr &db,
-    const std::string &idUtilisateur) {
+    const int32_t &idUtilisateur) {
     CoroMapper<drogon_model::ProjetV1::Retardabsence> mapperRetardAbsence(db);
     auto resultat = co_await mapperRetardAbsence.findBy(
         //Cherche à partir de uid dans la colonne _uuid_badge de la table utilisateur
