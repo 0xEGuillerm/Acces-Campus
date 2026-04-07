@@ -22,15 +22,15 @@ using namespace drogon::orm;
 class PGSController : public drogon::HttpController<PGSController>{
 public:
     METHOD_LIST_BEGIN
-    METHOD_ADD(PGSController::PlanningSallePGSController, "/pgs/planning", drogon::HttpMethod::Get);
-    METHOD_ADD(PGSController::EtatSallePGSController, "/pgs/etat_salle", drogon::HttpMethod::Get);
-    METHOD_ADD(PGSController::RechercheUtilisateurPGSController, "/pgs/recherche_utilisateur", drogon::HttpMethod::Get);
-    METHOD_ADD(PGSController::HistoriqueBadgePGSController, "/pgs/historique_badge", drogon::HttpMethod::Get);
-    METHOD_ADD(PGSController::ReserverSallePGSController, "/pgs/reserver_salle", drogon::HttpMethod::Post);
-    METHOD_ADD(PGSController::InformationBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Get);
-    METHOD_ADD(PGSController::SupprimerBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Delete);
-    METHOD_ADD(PGSController::CreationBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Post);
-    METHOD_ADD(PGSController::ModifierBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Put);
+    ADD_METHOD_TO(PGSController::PlanningSallePGSController, "/pgs/planning", drogon::HttpMethod::Get);
+    ADD_METHOD_TO(PGSController::EtatSallePGSController, "/pgs/etat_salle", drogon::HttpMethod::Get);
+    ADD_METHOD_TO(PGSController::RechercheUtilisateurPGSController, "/pgs/recherche_utilisateur", drogon::HttpMethod::Get);
+    ADD_METHOD_TO(PGSController::HistoriqueBadgePGSController, "/pgs/historique_badge", drogon::HttpMethod::Get);
+    ADD_METHOD_TO(PGSController::ReserverSallePGSController, "/pgs/reserver_salle", drogon::HttpMethod::Post);
+    ADD_METHOD_TO(PGSController::InformationBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Get);
+    ADD_METHOD_TO(PGSController::SupprimerBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Delete);
+    ADD_METHOD_TO(PGSController::CreationBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Post);
+    ADD_METHOD_TO(PGSController::ModifierBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Put);
     METHOD_LIST_END
     drogon::Task<drogon::HttpResponsePtr> PlanningSallePGSController(
         drogon::HttpRequestPtr req);
