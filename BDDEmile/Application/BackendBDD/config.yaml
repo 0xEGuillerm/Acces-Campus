@@ -16,16 +16,6 @@ db_clients:
     number_of_connections: 1
     timeout: -1
     auto_batch: false
-redis_clients:
-  - name: default
-    host: 127.0.0.1
-    port: 6379
-    username: ''
-    passwd: ''
-    db: 0
-    is_fast: false
-    number_of_connections: 1
-    timeout: -1
 app:
   # number_of_threads: The number of IO threads, 1 by default, if the value is set to 0, the number of threads
   # is the number of CPU cores
