@@ -76,8 +76,6 @@ drogon::Task<Json::Value> SalleLogique::EtatSalleNumeroSalle(
     drogon_model::ProjetV1::Cours CoursActuelle;
     trantor::Date TimestampBrut = trantor::Date::now();
     int64_t TimestampSecond = TimestampBrut.secondsSinceEpoch();
-
-
     bool trouvee = false;
     for (const auto &cours: CoursListe) {
         if (cours.getValueOfHeureDebut().secondsSinceEpoch() - VALEURMARGECOURS < TimestampSecond && cours.getValueOfHeureFin().secondsSinceEpoch() > TimestampSecond) {
