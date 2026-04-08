@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Fxyj3JLFDZM=",
+  "dgSpecHash": "UAxjOzsdR18=",
   "success": true,
   "projectFilePath": "C:\\Users\\maelg\\ApplicationProjet\\Acces-Campus\\PGSMael\\AccesCampusPGS\\AccesCampusPGS.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\maelg\\.nuget\\packages\\pcsc\\7.0.1\\pcsc.7.0.1.nupkg.sha512"
+  ],
   "logs": []
 }

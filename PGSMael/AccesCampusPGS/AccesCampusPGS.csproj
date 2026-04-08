@@ -8,4 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="PCSC" Version="7.0.1" />
+  </ItemGroup>
+
 </Project>
