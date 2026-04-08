@@ -1,6 +1,8 @@
 #include <drogon/drogon.h>
 #include <filesystem>
 
+#include "controllers/BAEController.h"
+
 int main(int argc, char* argv[]) {
     //Load config file
     auto configPath = std::filesystem::canonical(argv[0]).parent_path() / "config.json";

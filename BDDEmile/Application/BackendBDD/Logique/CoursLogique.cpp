@@ -28,7 +28,7 @@ drogon::Task<ResultatCoro> CoursLogique::ReservationSallePGS(
     int32_t classe = body["classe"].asInt();
     auto ListeCours = co_await CoursDAO::ChercherCoursParSalle(db, salle);
     if (ListeCours.empty()) {
-        co_return ResultatCoro(false, "Erreur");
+        co_return ResultatCoro(false, "Salle introuvable");
     }
     trantor::Date TimestampBrut = trantor::Date::now();
     int64_t TimestampSecond = TimestampBrut.secondsSinceEpoch();
@@ -42,7 +42,7 @@ drogon::Task<ResultatCoro> CoursLogique::ReservationSallePGS(
         }
     }
     if (!trouvee) {
-        co_return ResultatCoro(false, "cours deja present");
+        co_return ResultatCoro(false, "Ce creneau est deja occupe");
     }
     trantor::Date heureDebutTrantor (static_cast<int64_t>(heure_debut)*1000000);
     trantor::Date heureFinTrantor (static_cast<int64_t>(heure_fin)*1000000);
@@ -54,7 +54,7 @@ drogon::Task<ResultatCoro> CoursLogique::ReservationSallePGS(
     Reservation.setReservePar(0);
     auto EnregistrementCours = co_await CoursDAO::AjoutReservation(db, Reservation);
     if ((*EnregistrementCours.getIdCours()) == 0) {
-        co_return ResultatCoro(false, "Erreur");
+        co_return ResultatCoro(false, "Erreur lors de l'enregistrement du cours");
     }
     co_return ResultatCoro(true, "Finit");
 }
@@ -69,7 +69,7 @@ drogon::Task<ResultatCoro> CoursLogique::ReservationSallePSW(
     int32_t utilisateur = body["utilisateur"].asInt();
     auto ListeCours = co_await CoursDAO::ChercherCoursParSalle(db, salle);
     if (ListeCours.empty()) {
-        co_return ResultatCoro(false, "Erreur");
+        co_return ResultatCoro(false, "Salle introuvable");
     }
     trantor::Date TimestampBrut = trantor::Date::now();
     int64_t TimestampSecond = TimestampBrut.secondsSinceEpoch();
@@ -83,7 +83,7 @@ drogon::Task<ResultatCoro> CoursLogique::ReservationSallePSW(
             }
     }
     if (!trouvee) {
-        co_return ResultatCoro(false, "cours deja present");
+        co_return ResultatCoro(false, "Ce creneau est deja occupe");
     }
     trantor::Date heureDebutTrantor (static_cast<int64_t>(heure_debut)*1000000);
     trantor::Date heureFinTrantor (static_cast<int64_t>(heure_fin)*1000000);
@@ -95,7 +95,7 @@ drogon::Task<ResultatCoro> CoursLogique::ReservationSallePSW(
     Reservation.setReservePar(utilisateur);
     auto EnregistrementCours = co_await CoursDAO::AjoutReservation(db, Reservation);
     if ((*EnregistrementCours.getIdCours()) == 0) {
-        co_return ResultatCoro(false, "Erreur");
+        co_return ResultatCoro(false, "Erreur lors de l'enregistrement du cours");
     }
     co_return ResultatCoro(true, "Finit");
 }

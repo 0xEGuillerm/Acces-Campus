@@ -18,7 +18,7 @@ using namespace drogon::orm;
 class PEAController : public drogon::HttpController<PEAController>{
 public:
     METHOD_LIST_BEGIN
-    METHOD_ADD(PEAController::VerifierBadgePEAController, "/pea/verif_badge", drogon::HttpMethod::Get);
+    ADD_METHOD_TO(PEAController::VerifierBadgePEAController, "/pea/verif_badge", drogon::HttpMethod::Get);
     METHOD_LIST_END
 drogon::Task<drogon::HttpResponsePtr> VerifierBadgePEAController(
     drogon::HttpRequestPtr req);

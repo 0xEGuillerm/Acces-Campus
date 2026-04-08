@@ -37,7 +37,7 @@ drogon::Task<ResultatCoro> BadgeLogique::SupprimerBadge(
     auto NbBadgeSupprimer = co_await BadgeDAO::SupprimerBadgeParIDBadge(db, uidBadge);
     if (NbBadgeSupprimer == 0) {
         ResultatSupprimerBadge.BoolResultat = false;
-        ResultatSupprimerBadge.MessageResultat = "Erreur suppression";
+        ResultatSupprimerBadge.MessageResultat = "Badge introuvable";
         co_return ResultatSupprimerBadge;
     }
     ResultatSupprimerBadge.BoolResultat = true;
@@ -67,7 +67,7 @@ drogon::Task<ResultatCoro> BadgeLogique::CreationBadge(
     auto MiseAJourUtilisateurAvecBadge = co_await BadgeDAO::MettreAJourUser(db, TrouverUtilisateurAssocier[0]);
     if (MiseAJourUtilisateurAvecBadge == 0) {
         ResultatMaJBadge.BoolResultat = false;
-        ResultatMaJBadge.MessageResultat = "Echec mise a jour";
+        ResultatMaJBadge.MessageResultat = "Erreur lors de l'association du badge a l'utilisateur";
         co_return ResultatMaJBadge;
     }
     ResultatMaJBadge.BoolResultat = true;
@@ -104,7 +104,7 @@ drogon::Task<ResultatCoro> BadgeLogique::ModifierInfoUtilisateur(
     auto MiseAJourUtilisateur = co_await BadgeDAO::MettreAJourUser(db, utilisateurModifier);
     if (MiseAJourUtilisateur == 0) {
         ResultatModifierUtilisateur.BoolResultat = false;
-        ResultatModifierUtilisateur.MessageResultat = "Echec mise a jour";
+        ResultatModifierUtilisateur.MessageResultat = "Erreur lors de la mise a jour de l'utilisateur";
         co_return ResultatModifierUtilisateur;
     }
     ResultatModifierUtilisateur.BoolResultat = true;
@@ -128,14 +128,14 @@ drogon::Task<ResultatCoro> BadgeLogique::VerifierBadgePEA(
     auto SalleListe = co_await BadgeDAO::ChercherSalleAdresseMACpea(db, mac);
     if (SalleListe.empty()) {
         ResultatVerificationPEA.BoolResultat = false;
-        ResultatVerificationPEA.MessageResultat = "Utilisateur introuvable";
+        ResultatVerificationPEA.MessageResultat = "Salle introuvable";
         co_return ResultatVerificationPEA;
     }
     auto SalleAcceder = SalleListe[0];
     auto CoursListe = co_await BadgeDAO::ChercherCoursParSalle(db, (*SalleAcceder.getNumSalle()));
     if (CoursListe.empty()) {
         ResultatVerificationPEA.BoolResultat = false;
-        ResultatVerificationPEA.MessageResultat = "Echec mise a jour";
+        ResultatVerificationPEA.MessageResultat = "Aucun cours trouve pour cette salle";
         co_return ResultatVerificationPEA;
     }
     bool trouvee = false;
@@ -147,7 +147,7 @@ drogon::Task<ResultatCoro> BadgeLogique::VerifierBadgePEA(
     }
     if (!trouvee) {
         ResultatVerificationPEA.BoolResultat = false;
-        ResultatVerificationPEA.MessageResultat = "Echec mise a jour";
+        ResultatVerificationPEA.MessageResultat = "L'eleve n'est pas inscrit dans cette salle";
         co_return ResultatVerificationPEA;
     }
     ResultatVerificationPEA.BoolResultat = true;
@@ -172,14 +172,14 @@ const std::uint64_t &heure_badgage) {
     auto SalleListe = co_await BadgeDAO::ChercherSalleAdresseMACpea(db, mac);
     if (SalleListe.empty()) {
         ResultatScanneBAE.BoolResultat = false;
-        ResultatScanneBAE.MessageResultat = "Utilisateur introuvable";
+        ResultatScanneBAE.MessageResultat = "Salle introuvable";
         co_return ResultatScanneBAE;
     }
     auto SalleAcceder = SalleListe[0];
     auto CoursListe = co_await BadgeDAO::ChercherCoursParSalle(db, (*SalleAcceder.getNumSalle()));
     if (CoursListe.empty()) {
         ResultatScanneBAE.BoolResultat = false;
-        ResultatScanneBAE.MessageResultat = "Echec mise a jour";
+        ResultatScanneBAE.MessageResultat = "Aucun cours trouve pour cette salle";
         co_return ResultatScanneBAE;
     }
     drogon_model::ProjetV1::Cours CoursActuelle;
@@ -203,7 +203,7 @@ const std::uint64_t &heure_badgage) {
                 auto AjoutRetardAbsence = co_await BadgeDAO::AjoutRetardAbsence(db, CreationRetard);
                 if (AjoutRetardAbsence.getIdUser() != utilisateurAVerifier.getIdUser()) {
                     ResultatScanneBAE.BoolResultat = false;
-                    ResultatScanneBAE.MessageResultat = "Echec mise a jour";
+                    ResultatScanneBAE.MessageResultat = "Erreur lors de l'enregistrement du retard";
                     co_return ResultatScanneBAE;
                 }
             }
@@ -212,13 +212,13 @@ const std::uint64_t &heure_badgage) {
     }
     if (!trouvee) {
         ResultatScanneBAE.BoolResultat = false;
-        ResultatScanneBAE.MessageResultat = "Echec mise a jour";
+        ResultatScanneBAE.MessageResultat = "Aucun cours en cours dans cette salle";
         co_return ResultatScanneBAE;
     }
     auto AbsenceTable = co_await BadgeDAO::ChercherUtilisateurDansAbsencecours(db, (*SalleAcceder.getNumSalle()));
     if (AbsenceTable.empty()) {
         ResultatScanneBAE.BoolResultat = false;
-        ResultatScanneBAE.MessageResultat = "Echec mise a jour";
+        ResultatScanneBAE.MessageResultat = "Utilisateur non trouve dans la liste d'absence";
         co_return ResultatScanneBAE;
     }
     auto AbsenceUtilisateur = AbsenceTable[0];
@@ -230,14 +230,14 @@ const std::uint64_t &heure_badgage) {
     auto AjoutPresence = co_await BadgeDAO::AjoutUtilisateurPresenceCours(db, UtilisateurPresenceChangement);
     if (AjoutPresence.getIdUser() != utilisateurAVerifier.getIdUser()) {
         ResultatScanneBAE.BoolResultat = false;
-        ResultatScanneBAE.MessageResultat = "Echec mise a jour";
+        ResultatScanneBAE.MessageResultat = "Erreur lors de l'enregistrement de la presence";
         co_return ResultatScanneBAE;
     }
 
     auto SuppresionAbsence = co_await BadgeDAO::SupprimerUtilisateurAbsence(db, AbsenceUtilisateur.getValueOfIdAbsence());
     if (SuppresionAbsence == 0) {
         ResultatScanneBAE.BoolResultat = false;
-        ResultatScanneBAE.MessageResultat = "Erreur suppression";
+        ResultatScanneBAE.MessageResultat = "Erreur lors de la suppression de l'absence";
         co_return ResultatScanneBAE;
     }
 
