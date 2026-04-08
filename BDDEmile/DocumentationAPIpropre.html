@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API BDD Accès Campus - Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+    <style>
+        body { margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
+    <script>
+        const spec = {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "API BDD Accès Campus",
+            "description": "Prototype de l'API du projet Accès Campus. Fournit la documentation de l'API de la base de donnée pour le PGS, PSW, BAE et PEA",
+            "contact": {
+              "email": "emile.guillerm@saintaubinlasalle.fr"
+            },
+            "license": {
+              "name": "Apache 2.0",
+              "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+            },
+            "version": "2.0.0"
+          },
+          "servers": [
+            {
+              "url": "https://virtserver.swaggerhub.com/student-fbe/BDD/1.0.0",
+              "description": "SwaggerHub API Auto Mocking"
+            }
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "tags": [
+            { "name": "PGS", "description": "Poste Gestion salle" },
+            { "name": "PSW", "description": "Post Serveur Web" },
+            { "name": "PEA", "description": "Poignée éléctrique autonome" },
+            { "name": "BAE", "description": "Borne Appel Etudiant" }
+          ],
+          "paths": {
+            "/psw/historique_eleve": {
+              "get": {
+                "tags": ["PSW"],
+                "summary": "Absence/retard élève",
+                "description": "Obtenir les informations d'absence et présence de l'élève déjà identifier à partir de son token JWT.",
+                "parameters": [
+                  {
+                    "name": "utilisateur",
+                    "in": "query",
+                    "required": true,
+                    "schema": { "type": "integer" },
+                    "example": 1
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussi. Retour d'une liste avec: absence ou retard, l'horaire du cours et le temps de retard pour une retard en minutes",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/historique_absence" },
+                        "example": {
+                          "nb_absence": 3,
+                          "listeAbsence": [
+                            { "timestamp_debut_cours": 1710495000, "temps_retard": 0, "absence_ou_retard": true },
+                            { "timestamp_debut_cours": 1618131120, "temps_retard": 10, "absence_ou_retard": false },
+                            { "timestamp_debut_cours": 1717920600, "temps_retard": 22, "absence_ou_retard": false }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Aucun historique trouve." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                }
+              }
+            },
+            "/psw/salle_crenaux": {
+              "get": {
+                "tags": ["PSW"],
+                "summary": "Planning des salles",
+                "description": "Permet de lister les salles disponible pour un crénaux et renvoie une liste de salles.",
+                "parameters": [
+                  { "name": "salle", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 112 }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Retour d'une liste de salle disponible pour le créneau choisit",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/planning_cours" },
+                        "example": {
+                          "listeCoursPlanning": [
+                            { "id_cours": 1, "heure_debut": 1710495000, "heure_fin": 1710498600, "classe": "4" },
+                            { "id_cours": 2, "heure_debut": 1710502200, "heure_fin": 1710505800, "classe": "2" }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Aucun cours trouve pour cette salle." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                }
+              }
+            },
+            "/psw/reserver_salle": {
+              "post": {
+                "tags": ["PSW"],
+                "summary": "Reserver une salle",
+                "description": "Permet de reserver une salle à partir de son numéro et d'un utilisateur authentifier (l'utilisateur ne peut pas avoir plus de 3 réservations).",
+                "requestBody": {
+                  "description": "UUID du badge scanné et salle.",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "required": ["heure_debut", "heure_fin", "salle", "utilisateur"],
+                        "properties": {
+                          "heure_debut": { "type": "integer", "description": "Timestamp du début de la réservation", "example": 1710495000 },
+                          "heure_fin": { "type": "integer", "description": "Timestamp de la fin de la réservation", "example": 1710498600 },
+                          "salle": { "type": "integer", "description": "Numéro de la salle", "example": 212 },
+                          "utilisateur": { "type": "integer", "description": "ID de l'utilisateur", "example": 1 }
+                        }
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "204": { "description": "Opération réussie. La salle à bien été reserver" },
+                  "403": {
+                    "description": "Opération refusée/déclinée.",
+                    "content": { "application/json": { "example": "cours deja present" } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                }
+              }
+            },
+            "/psw/planning": {
+              "get": {
+                "tags": ["PSW"],
+                "summary": "Voire le planning d'une salle",
+                "description": "Permet d'obtenir les horaires de reservation d'une salle",
+                "parameters": [
+                  { "name": "salle", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 112 }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Horaire à laquelle une reservation est présente",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/planning_cours" },
+                        "example": {
+                          "listeCoursPlanning": [
+                            { "id_cours": 1, "heure_debut": 1710495000, "heure_fin": 1710498600, "classe": "4" },
+                            { "id_cours": 2, "heure_debut": 1710502200, "heure_fin": 1710505800, "classe": "2" }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Aucun cours trouve pour cette salle." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                }
+              }
+            },
+            "/psw/etat_salle": {
+              "get": {
+                "tags": ["PSW"],
+                "summary": "Voire état salle",
+                "description": "Permet d'obtenir quelle élève est présent dans une salle (prend le numéro d'une salle en entrée) ! uniquement pour le personnl enseignant !",
+                "parameters": [
+                  { "name": "salle", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 112 }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Liste d'élève présent",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/etat_salle" },
+                        "example": {
+                          "nb_eleve_present": 15,
+                          "nb_eleve_absent": 3,
+                          "listeAbsent": [5, 12, 23]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Salle introuvable ou aucun cours en cours." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                }
+              }
+            },
+            "/pgs/planning": {
+              "get": {
+                "tags": ["PGS"],
+                "summary": "Voire le planning d'une salle",
+                "description": "Permet d'obtenir les horaires de reservation d'une salle",
+                "parameters": [
+                  { "name": "salle", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 112 }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Horaire à laquelle une reservation est présente",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/planning_cours" },
+                        "example": {
+                          "listeCoursPlanning": [
+                            { "id_cours": 1, "heure_debut": 1710495000, "heure_fin": 1710498600, "classe": "4" },
+                            { "id_cours": 2, "heure_debut": 1710502200, "heure_fin": 1710505800, "classe": "2" }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Aucun cours trouve pour cette salle." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                },
+                "security": []
+              }
+            },
+            "/pgs/etat_salle": {
+              "get": {
+                "tags": ["PGS"],
+                "summary": "Voire état salle",
+                "description": "Permet d'obtenir la liste des élèves présent(et absent) dans une salle",
+                "parameters": [
+                  { "name": "salle", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 112 }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Liste d'élève présent",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/etat_salle" },
+                        "example": {
+                          "nb_eleve_present": 15,
+                          "nb_eleve_absent": 3,
+                          "listeAbsent": [5, 12, 23]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Salle introuvable ou aucun cours en cours." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                },
+                "security": []
+              }
+            },
+            "/pgs/recherche_utilisateur": {
+              "get": {
+                "tags": ["PGS"],
+                "summary": "Recherche un utilisateur",
+                "description": "Permet d'obtenir la liste des élèves portant le nom ou prénom entrée.",
+                "parameters": [
+                  { "name": "prenom", "in": "query", "required": false, "schema": { "type": "string" }, "example": "emile" },
+                  { "name": "nom", "in": "query", "required": false, "schema": { "type": "string" }, "example": "guillerm" }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Liste d'élève portant le nom et ou prénom entrée",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/recherche_utilisateur" },
+                        "example": {
+                          "Recherche_prenom": [
+                            { "id_utilisateur": 1, "prenom_utilisateur": "Emile", "nom_utilisateur": "Guillerm" },
+                            { "id_utilisateur": 5, "prenom_utilisateur": "Emile", "nom_utilisateur": "Zola" }
+                          ],
+                          "Recherche_nom": [
+                            { "id_utilisateur": 1, "prenom_utilisateur": "Emile", "nom_utilisateur": "Guillerm" }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Aucun utilisateur trouve." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                },
+                "security": []
+              }
+            },
+            "/pgs/historique_badge": {
+              "get": {
+                "tags": ["PGS"],
+                "summary": "Historique badge",
+                "description": "Obtenir les informations sur les modifications d'un utilisateur (badge, classe, etc...)",
+                "parameters": [
+                  { "name": "uuid_user", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussi. Retour d'une liste avec les derniere modification horodaté.",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/historique_absence" },
+                        "example": {
+                          "nb_absence": 3,
+                          "listeAbsence": [
+                            { "timestamp_debut_cours": 1710495000, "temps_retard": 0, "absence_ou_retard": true },
+                            { "timestamp_debut_cours": 1618131120, "temps_retard": 10, "absence_ou_retard": false },
+                            { "timestamp_debut_cours": 1717920600, "temps_retard": 22, "absence_ou_retard": false }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Aucun historique trouve." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                },
+                "security": []
+              }
+            },
+            "/pgs/reserver_salle": {
+              "post": {
+                "tags": ["PGS"],
+                "summary": "Reservation salle",
+                "description": "Permet de de reserver une salle (pas besoin d'ID) à partir du numéro de salle et de l'horaire.",
+                "requestBody": {
+                  "description": "UUID du badge scanné et salle.",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "required": ["heure_debut", "heure_fin", "salle", "classe"],
+                        "properties": {
+                          "heure_debut": { "type": "integer", "description": "Timestamp du début de la réservation", "example": 1710495000 },
+                          "heure_fin": { "type": "integer", "description": "Timestamp de la fin de la réservation", "example": 1710498600 },
+                          "salle": { "type": "integer", "description": "Numéro de la salle", "example": 212 },
+                          "classe": { "type": "integer", "description": "ID de la classe", "example": 4 }
+                        }
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "204": { "description": "Opération réussie. La salle à bien été reserver" },
+                  "403": {
+                    "description": "Opération refusée/déclinée.",
+                    "content": { "application/json": { "example": "cours deja present" } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                },
+                "security": []
+              }
+            },
+            "/pgs/badges/{badgeid}": {
+              "get": {
+                "tags": ["PGS"],
+                "summary": "Information badge",
+                "description": "Permet d'obtenir les informations d'un badge (nom, prénom, classe, statut) à partir de son UUID",
+                "parameters": [
+                  { "name": "badgeid", "in": "path", "required": true, "schema": { "type": "string" } }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Renvoie les informations du badge",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/utilisateur" },
+                        "example": {
+                          "id_user": 1,
+                          "nom_user": "Guillerm",
+                          "prenom_user": "Emile",
+                          "login_user": "eguillerm",
+                          "hash_mdp": "hashed",
+                          "id_classe": 4,
+                          "role_user": "eleve",
+                          "uuid_badge": "abc-123-def"
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Badge inconnu." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                },
+                "security": []
+              },
+              "delete": {
+                "tags": ["PGS"],
+                "summary": "Supprimer un badge",
+                "description": "Permet de supprimer un badge de la base de donnée et donc supprimer son association avec l'individu",
+                "parameters": [
+                  { "name": "badgeid", "in": "path", "required": true, "schema": { "type": "string" } }
+                ],
+                "responses": {
+                  "204": { "description": "Opération réussie. Badge supprimé." },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Erreur suppression" } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                }
+              },
+              "post": {
+                "tags": ["PGS"],
+                "summary": "Ajout d'un badge",
+                "description": "Permet d'ajouter un badge à la base de donnée. Il doit être lié à un UUID",
+                "parameters": [
+                  { "name": "badgeid", "in": "path", "required": true, "schema": { "type": "string" } }
+                ],
+                "requestBody": {
+                  "description": "UUID utilisateur à associé",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "required": ["uuid_user"],
+                        "properties": {
+                          "uuid_user": { "type": "integer", "description": "ID de l'utilisateur à qui le badge vas être associé", "example": 1 }
+                        }
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "204": { "description": "Opération réussie. Badge liée." },
+                  "403": {
+                    "description": "Opération refusée/déclinée.",
+                    "content": { "application/json": { "example": "Badge déja present" } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                }
+              },
+              "put": {
+                "tags": ["PGS"],
+                "summary": "Modifier un badge",
+                "description": "Modifie les informations d'un utilisateur",
+                "parameters": [
+                  { "name": "badgeid", "in": "path", "required": true, "schema": { "type": "string" } }
+                ],
+                "requestBody": {
+                  "description": "Champs de l'utilisateur à modifier",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "nom": { "type": "string", "description": "Nom de l'utilisateur", "example": "Guillerm" },
+                          "prenom": { "type": "string", "description": "Prénom de l'utilisateur", "example": "Emile" },
+                          "classe": { "type": "string", "description": "ID de la classe (converti en entier)", "example": "4" },
+                          "hash_mdp": { "type": "string", "description": "Hash du mot de passe", "example": "newhashedpassword" },
+                          "login": { "type": "string", "description": "Login de l'utilisateur", "example": "eguillerm" },
+                          "role": { "type": "string", "description": "Rôle de l'utilisateur", "example": "eleve" }
+                        }
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "204": { "description": "Opération réussie. Modification des champs de l'utilisateur" },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Utilisateur introuvable" } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                }
+              }
+            },
+            "/pea/verif_badge": {
+              "get": {
+                "tags": ["PEA"],
+                "summary": "Verifier l'accès",
+                "description": "Vérifier que le badge à un droit d'accès à la salle.",
+                "parameters": [
+                  { "name": "badgeid", "in": "query", "required": true, "schema": { "type": "string" }, "example": "abc-123-def" },
+                  { "name": "MAC", "in": "query", "required": true, "schema": { "type": "string" }, "example": "FF:FF:FF:FF:FF:FF" }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Renvoie un booléen indiquant si l'accès est autorisé.",
+                    "content": {
+                      "application/json": { "schema": { "type": "boolean" }, "example": true }
+                    }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requête mal formulée. Veuillez vérifier les champs." } }
+                  }
+                },
+                "security": []
+              }
+            },
+            "/bae/etat_salle": {
+              "get": {
+                "tags": ["BAE"],
+                "summary": "Etat salle",
+                "description": "Permet d'obtenir l'état salle (présence, absences, capacité, type de cours)",
+                "parameters": [
+                  { "name": "MAC", "in": "query", "required": true, "schema": { "type": "string" }, "example": "FF:FF:FF:FF:FF:FF" }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Envoie des informations des élèves absents.",
+                    "content": {
+                      "application/json": {
+                        "schema": { "$ref": "#/components/schemas/etat_salle" },
+                        "example": {
+                          "nb_eleve_present": 15,
+                          "nb_eleve_absent": 3,
+                          "listeAbsent": [5, 12, 23]
+                        }
+                      }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Salle introuvable ou aucun cours en cours." } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                },
+                "security": []
+              }
+            },
+            "/bae/scanner_badge": {
+              "post": {
+                "tags": ["BAE"],
+                "summary": "Pointer une présence",
+                "description": "Permet de pointer une présence à partir de l'UUID d'un badge.",
+                "requestBody": {
+                  "description": "UUID du badge scanné et salle.",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "required": ["uuid", "MAC", "heure_badge"],
+                        "properties": {
+                          "uuid": { "type": "string", "description": "UUID du badge", "example": "abc-123-def" },
+                          "MAC": { "type": "string", "description": "Adresse MAC de l'équipement", "example": "FF:FF:FF:FF:FF:FF" },
+                          "heure_badge": { "type": "integer", "format": "int64", "description": "Timestamp du moment du badgage", "example": 1710495000 }
+                        }
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "Opération réussie. Confimration de l'enregistrement de l'utilisateur.",
+                    "content": {
+                      "application/json": { "schema": { "type": "boolean" }, "example": true }
+                    }
+                  },
+                  "404": {
+                    "description": "Ressource introuvable.",
+                    "content": { "application/json": { "example": "Utilisateur introuvable" } }
+                  },
+                  "400": {
+                    "description": "Requête mal formulé",
+                    "content": { "application/json": { "example": "Requete mal formulee. Veuillez verifier les champs." } }
+                  }
+                },
+                "security": []
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "utilisateur": {
+                "type": "object",
+                "properties": {
+                  "id_user": { "type": "integer", "example": 1 },
+                  "nom_user": { "type": "string", "example": "Guillerm" },
+                  "prenom_user": { "type": "string", "example": "Emile" },
+                  "login_user": { "type": "string", "example": "eguillerm" },
+                  "hash_mdp": { "type": "string", "example": "hashed" },
+                  "id_classe": { "type": "integer", "example": 4 },
+                  "role_user": { "type": "string", "example": "eleve" },
+                  "uuid_badge": { "type": "string", "example": "abc-123-def" }
+                }
+              },
+              "historique_absence": {
+                "type": "object",
+                "properties": {
+                  "nb_absence": { "type": "integer", "description": "Nombre total d'absences/retards", "example": 3 },
+                  "listeAbsence": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/absence" }
+                  }
+                }
+              },
+              "absence": {
+                "type": "object",
+                "properties": {
+                  "timestamp_debut_cours": { "type": "integer", "format": "int64", "description": "Timestamp du début du cours", "example": 1710495000 },
+                  "temps_retard": { "type": "integer", "format": "int64", "description": "Temps de retard en minutes", "example": 10 },
+                  "absence_ou_retard": { "type": "boolean", "description": "true = absence, false = retard", "example": true }
+                }
+              },
+              "planning_cours": {
+                "type": "object",
+                "properties": {
+                  "listeCoursPlanning": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/cours_planning" }
+                  }
+                }
+              },
+              "cours_planning": {
+                "type": "object",
+                "properties": {
+                  "id_cours": { "type": "integer", "description": "ID du cours", "example": 1 },
+                  "heure_debut": { "type": "integer", "description": "Timestamp du début du cours", "example": 1710495000 },
+                  "heure_fin": { "type": "integer", "description": "Timestamp de la fin du cours", "example": 1710498600 },
+                  "classe": { "type": "string", "description": "ID de la classe (en string)", "example": "4" }
+                }
+              },
+              "etat_salle": {
+                "type": "object",
+                "properties": {
+                  "nb_eleve_present": { "type": "integer", "description": "Nombre d'élèves présents", "example": 15 },
+                  "nb_eleve_absent": { "type": "integer", "description": "Nombre d'élèves absents", "example": 3 },
+                  "listeAbsent": {
+                    "type": "array",
+                    "items": { "type": "integer" },
+                    "description": "Liste des ID des élèves absents",
+                    "example": [5, 12, 23]
+                  }
+                }
+              },
+              "recherche_utilisateur": {
+                "type": "object",
+                "properties": {
+                  "Recherche_prenom": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/utilisateur_recherche" }
+                  },
+                  "Recherche_nom": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/utilisateur_recherche" }
+                  }
+                }
+              },
+              "utilisateur_recherche": {
+                "type": "object",
+                "properties": {
+                  "id_utilisateur": { "type": "integer", "example": 1 },
+                  "prenom_utilisateur": { "type": "string", "example": "Emile" },
+                  "nom_utilisateur": { "type": "string", "example": "Guillerm" }
+                }
+              }
+            },
+            "securitySchemes": {
+              "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+              }
+            }
+          }
+        };
+
+        SwaggerUIBundle({
+            spec: spec,
+            dom_id: "#swagger-ui",
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIBundle.SwaggerUIStandalonePreset
+            ],
+            layout: "BaseLayout"
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+ID_Cours;Date_Debut;Heure_Debut;Heure_Fin;Salle;Capacite_Salle;Classe;Professeur;Eleve_Nom;Eleve_Prenom;Badge_Eleve;Statut;Retard_Minutes
+1;2025-04-07;08:00:00;10:00:00;101;30;BTS CIEL IR 1;Simon François;Dupont;Alice;A1B2C3D4;Présent;10
+1;2025-04-07;08:00:00;10:00:00;101;30;BTS CIEL IR 1;Simon François;Martin;Bob;B2C3D4E5;Présent;0
+1;2025-04-07;08:00:00;10:00:00;101;30;BTS CIEL IR 1;Simon François;Leroy;David;D4E5F6G7;Absent;0
+2;2025-04-07;10:00:00;12:00:00;102;25;BTS CIEL IR 2;Laurent Gaëlle;Bernard;Claire;C3D4E5F6;Présent;0
+2;2025-04-07;10:00:00;12:00:00;102;25;BTS CIEL IR 2;Laurent Gaëlle;Leroy;David;D4E5F6G7;Présent;0
+2;2025-04-07;10:00:00;12:00:00;102;25;BTS CIEL IR 2;Laurent Gaëlle;Dupont;Alice;A1B2C3D4;Absent;0
+2;2025-04-07;10:00:00;12:00:00;102;25;BTS CIEL IR 2;Laurent Gaëlle;Moreau;Emma;E5F6G7H8;Absent;0
+3;2025-04-07;13:00:00;15:00:00;103;20;BTS SN 1;Thomas Hugo;Moreau;Emma;E5F6G7H8;Présent;15
+3;2025-04-07;13:00:00;15:00:00;103;20;BTS SN 1;Thomas Hugo;Martin;Bob;B2C3D4E5;Absent;0
+4;2025-04-08;08:00:00;10:00:00;201;35;BTS CIEL IR 1;Simon François;Dupont;Alice;A1B2C3D4;Présent;0
+4;2025-04-08;08:00:00;10:00:00;201;35;BTS CIEL IR 1;Simon François;Martin;Bob;B2C3D4E5;Présent;0
+4;2025-04-08;08:00:00;10:00:00;201;35;BTS CIEL IR 1;Simon François;Bernard;Claire;C3D4E5F6;Absent;0
+5;2025-04-08;10:00:00;12:00:00;202;15;BTS CIEL IR 2;Laurent Gaëlle;Bernard;Claire;C3D4E5F6;Présent;0
+5;2025-04-08;10:00:00;12:00:00;202;15;BTS CIEL IR 2;Laurent Gaëlle;Leroy;David;D4E5F6G7;Présent;5
+6;2025-04-08;13:00:00;15:00:00;101;30;BTS SN 1;Thomas Hugo;Moreau;Emma;E5F6G7H8;Présent;0
+6;2025-04-08;13:00:00;15:00:00;101;30;BTS SN 1;Thomas Hugo;Dupont;Alice;A1B2C3D4;Absent;0
+6;2025-04-08;13:00:00;15:00:00;101;30;BTS SN 1;Thomas Hugo;Leroy;David;D4E5F6G7;Absent;0
+7;2025-04-09;08:00:00;10:00:00;102;25;BTS CIEL IR 1;Simon François;Martin;Bob;B2C3D4E5;Présent;0
+7;2025-04-09;08:00:00;10:00:00;102;25;BTS CIEL IR 1;Simon François;Moreau;Emma;E5F6G7H8;Absent;0
+8;2025-04-09;10:00:00;12:00:00;103;20;BTS CIEL IR 2;Laurent Gaëlle;Bernard;Claire;C3D4E5F6;Présent;30
+8;2025-04-09;10:00:00;12:00:00;103;20;BTS CIEL IR 2;Laurent Gaëlle;Dupont;Alice;A1B2C3D4;Absent;0
+9;2025-04-09;13:00:00;15:00:00;201;35;BTS SN 1;Thomas Hugo;Martin;Bob;B2C3D4E5;Absent;0
+9;2025-04-09;13:00:00;15:00:00;201;35;BTS SN 1;Thomas Hugo;Leroy;David;D4E5F6G7;Absent;0
+10;2025-04-10;08:00:00;10:00:00;202;15;BTS CIEL IR 1;Simon François;Moreau;Emma;E5F6G7H8;Présent;8
+10;2025-04-10;08:00:00;10:00:00;202;15;BTS CIEL IR 1;Simon François;Bernard;Claire;C3D4E5F6;Absent;0
