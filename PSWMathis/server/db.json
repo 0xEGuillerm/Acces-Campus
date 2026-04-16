@@ -7,8 +7,9 @@
       "prenom_user": "Mathis",
       "login_user": "mblanchard",
       "hash_mdp": "helloworld1234!",
-      "classe_user": "BTS CIEL 2",
-      "role_user": "eleve"
+      "id_classe": 1,
+      "role_user": "eleve",
+      "uuid_badge": "b0a1d9e2-0001-0001-0001-000000000001"
     },
     {
       "id": 2,
@@ -17,8 +18,9 @@
       "prenom_user": "Emile",
       "login_user": "eguillerm",
       "hash_mdp": "helloworld1234!",
-      "classe_user": "BTS CIEL 2",
-      "role_user": "eleve"
+      "id_classe": 1,
+      "role_user": "eleve",
+      "uuid_badge": "b0a1d9e2-0002-0002-0002-000000000002"
     },
     {
       "id": 3,
@@ -27,8 +29,49 @@
       "prenom_user": "Mael",
       "login_user": "mguillon",
       "hash_mdp": "helloworld1234!",
-      "classe_user": "BTS CIEL 2",
-      "role_user": "eleve"
+      "id_classe": 1,
+      "role_user": "eleve",
+      "uuid_badge": "b0a1d9e2-0003-0003-0003-000000000003"
+    },
+    {
+      "id": 4,
+      "uuid_user": "a1b2c3d4-0004-0004-0004-000000000004",
+      "nom_user": "Jumel",
+      "prenom_user": "Christophe",
+      "login_user": "cjumel",
+      "hash_mdp": "prof1234!",
+      "id_classe": null,
+      "role_user": "enseignant",
+      "uuid_badge": "b0a1d9e2-0004-0004-0004-000000000004"
+    },
+    {
+      "id": 5,
+      "uuid_user": "a1b2c3d4-0005-0005-0005-000000000005",
+      "nom_user": "Salmon",
+      "prenom_user": "Pierre",
+      "login_user": "psalmon",
+      "hash_mdp": "prof1234!",
+      "id_classe": null,
+      "role_user": "enseignant",
+      "uuid_badge": "b0a1d9e2-0005-0005-0005-000000000005"
+    }
+  ],
+  "classes": [
+    {
+      "id": 1,
+      "nom_classe": "BTS CIEL 2"
+    },
+    {
+      "id": 2,
+      "nom_classe": "BTS CIEL 1"
+    },
+    {
+      "id": 3,
+      "nom_classe": "STI2D T"
+    },
+    {
+      "id": 4,
+      "nom_classe": "STI2D 1"
     }
   ],
   "salles": [
@@ -51,6 +94,11 @@
       "id": 134,
       "num_salle": "B134",
       "place_maximum": 24
+    },
+    {
+      "id": 201,
+      "num_salle": "B201",
+      "place_maximum": 30
     }
   ],
   "badges": [
@@ -58,202 +106,277 @@
       "id": 1,
       "uuid_badge": "b0a1d9e2-0001-0001-0001-000000000001",
       "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
-      "date_creation": "2025-09-01T08:00:00.000Z"
+      "date_creation": 1756684800
     },
     {
       "id": 2,
       "uuid_badge": "b0a1d9e2-0002-0002-0002-000000000002",
       "uuid_user": "a1b2c3d4-0002-0002-0002-000000000002",
-      "date_creation": "2025-09-01T08:00:00.000Z"
+      "date_creation": 1756684800
     },
     {
       "id": 3,
       "uuid_badge": "b0a1d9e2-0003-0003-0003-000000000003",
       "uuid_user": "a1b2c3d4-0003-0003-0003-000000000003",
-      "date_creation": "2025-09-01T08:00:00.000Z"
+      "date_creation": 1756684800
     }
   ],
   "cours": [
     {
       "id": 1,
-      "num_salle": 101,
-      "date_cours": "2026-03-31",
-      "heure_debut": "08:15",
-      "heure_fin": "10:05"
+      "salle": 101,
+      "heure_debut": 1774944900,
+      "heure_fin": 1774951500,
+      "classe": 1
     },
     {
       "id": 2,
-      "num_salle": 101,
-      "date_cours": "2026-03-31",
-      "heure_debut": "10:20",
-      "heure_fin": "12:10"
+      "salle": 101,
+      "heure_debut": 1774952400,
+      "heure_fin": 1774959000,
+      "classe": 1
     },
     {
       "id": 3,
-      "num_salle": 202,
-      "date_cours": "2026-04-01",
-      "heure_debut": "13:30",
-      "heure_fin": "15:20"
+      "salle": 202,
+      "heure_debut": 1775050200,
+      "heure_fin": 1775056800,
+      "classe": 2
     }
   ],
   "cours_utilisateurs": [
     {
       "id": 1,
       "id_cours": 1,
-      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001"
+      "utilisateur": 1
     },
     {
       "id": 2,
       "id_cours": 1,
-      "uuid_user": "a1b2c3d4-0002-0002-0002-000000000002"
+      "utilisateur": 2
     },
     {
       "id": 3,
       "id_cours": 2,
-      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001"
+      "utilisateur": 1
     }
   ],
   "etat_salle": [
     {
       "id": 1,
-      "uuid_user": "a1b2c3d4-0002-0002-0002-000000000002",
-      "id_cours": 1,
       "num_salle": 101,
-      "statut": "present",
-      "heure_badgeage": "08:20",
-      "temps_retard_min": 0
+      "nb_eleve_present": 15,
+      "nb_eleve_absent": 3,
+      "listeAbsent": [
+        1,
+        5,
+        12
+      ]
     },
     {
       "id": 2,
-      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
-      "id_cours": 1,
-      "num_salle": 101,
-      "statut": "absent",
-      "heure_badgeage": null,
-      "temps_retard_min": 0
+      "num_salle": 202,
+      "nb_eleve_present": 22,
+      "nb_eleve_absent": 1,
+      "listeAbsent": [
+        3
+      ]
     },
     {
       "id": 3,
-      "uuid_user": "a1b2c3d4-0003-0003-0003-000000000003",
-      "id_cours": 1,
-      "num_salle": 101,
-      "statut": "retard",
-      "heure_badgeage": "08:35",
-      "temps_retard_min": 20
+      "num_salle": "B134",
+      "nb_eleve_present": 20,
+      "nb_eleve_absent": 4,
+      "listeAbsent": [
+        2,
+        7,
+        11,
+        15
+      ]
+    },
+    {
+      "id": 4,
+      "num_salle": "B201",
+      "nb_eleve_present": 18,
+      "nb_eleve_absent": 2,
+      "listeAbsent": [
+        4,
+        9
+      ]
     }
   ],
   "historique_eleve": [
     {
       "id": 1,
-      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
-      "date_action": "2026-03-15T09:30:00.000Z",
-      "type_action": "absence"
+      "utilisateur": 1,
+      "timestamp_debut_cours": 1773820500,
+      "temps_retard": 0,
+      "absence_ou_retard": true
     },
     {
       "id": 2,
-      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
-      "date_action": "2026-04-11T10:12:00.000Z",
-      "type_action": "retard"
+      "utilisateur": 1,
+      "timestamp_debut_cours": 1776067920,
+      "temps_retard": 10,
+      "absence_ou_retard": false
     },
     {
       "id": 3,
-      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
-      "date_action": "2026-06-10T10:30:00.000Z",
-      "type_action": "retard"
+      "utilisateur": 1,
+      "timestamp_debut_cours": 1781268600,
+      "temps_retard": 22,
+      "absence_ou_retard": false
+    },
+    {
+      "id": 4,
+      "utilisateur": 2,
+      "timestamp_debut_cours": 1773820500,
+      "temps_retard": 5,
+      "absence_ou_retard": false
     }
   ],
   "reserver_salle": [
     {
-      "num_salle": 101,
-      "date_reservation": "2026-03-31",
-      "heure_debut": "09:10",
-      "heure_fin": "14:00",
-      "id": 1
+      "id": 1,
+      "utilisateur": 1,
+      "salle": 101,
+      "heure_debut": 1774948200,
+      "heure_fin": 1774965600
     },
     {
-      "uuid_user": "a1b2c3d4-0001-0001-0001-000000000001",
-      "num_salle": 202,
-      "date_reservation": "2026-03-31",
-      "heure_debut": "11:15",
-      "heure_fin": "15:35",
-      "id": 2
+      "id": 2,
+      "utilisateur": 1,
+      "salle": 202,
+      "heure_debut": 1774955700,
+      "heure_fin": 1774971300
+    },
+    {
+      "id": 4,
+      "utilisateur": 1,
+      "salle": "B134",
+      "heure_debut": 1775556000,
+      "heure_fin": 1775574000
+    },
+    {
+      "id": 5,
+      "utilisateur": 1,
+      "salle": "B134",
+      "heure_debut": 1775642400,
+      "heure_fin": 1775660400
     }
   ],
   "salle_crenaux": [
     {
       "id": 1,
-      "horaire": "2026-03-31T09:00:00.000Z",
-      "numero": 101
+      "heure_debut": 1774947600,
+      "heure_fin": 1774951200,
+      "salle": 101,
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 2,
-      "horaire": "2026-03-31T11:00:00.000Z",
-      "numero": 202
+      "heure_debut": 1774954800,
+      "heure_fin": 1774958400,
+      "salle": 202,
+      "classe": "BTS CIEL 1"
     },
     {
       "id": 3,
-      "horaire": "2026-04-01T13:00:00.000Z",
-      "numero": 315
+      "heure_debut": 1775048400,
+      "heure_fin": 1775052000,
+      "salle": 315,
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 4,
-      "horaire": "2026-03-31T09:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1774947600,
+      "heure_fin": 1774951200,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 5,
-      "horaire": "2026-03-31T11:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1774954800,
+      "heure_fin": 1774958400,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 6,
-      "horaire": "2026-04-01T11:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775041200,
+      "heure_fin": 1775044800,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 7,
-      "horaire": "2026-04-01T13:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775048400,
+      "heure_fin": 1775052000,
+      "salle": "B134",
+      "classe": "STI2D T"
     },
     {
       "id": 8,
-      "horaire": "2026-04-02T09:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775120400,
+      "heure_fin": 1775124000,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 9,
-      "horaire": "2026-04-02T11:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775127600,
+      "heure_fin": 1775131200,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 10,
-      "horaire": "2026-04-07T09:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775552400,
+      "heure_fin": 1775556000,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 11,
-      "horaire": "2026-04-07T11:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775559600,
+      "heure_fin": 1775563200,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 12,
-      "horaire": "2026-04-08T11:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775646000,
+      "heure_fin": 1775649600,
+      "salle": "B134",
+      "classe": "STI2D T"
     },
     {
       "id": 13,
-      "horaire": "2026-04-08T13:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775653200,
+      "heure_fin": 1775656800,
+      "salle": "B134",
+      "classe": "STI2D T"
     },
     {
       "id": 14,
-      "horaire": "2026-04-09T09:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775725200,
+      "heure_fin": 1775728800,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     },
     {
       "id": 15,
-      "horaire": "2026-04-09T11:00:00.000Z",
-      "numero": "B134"
+      "heure_debut": 1775732400,
+      "heure_fin": 1775736000,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
+    },
+    {
+      "id": 16,
+      "heure_debut": 1776164400,
+      "heure_fin": 1776168000,
+      "salle": "B134",
+      "classe": "BTS CIEL 2"
     }
   ]
 }

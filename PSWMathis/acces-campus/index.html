@@ -15,7 +15,7 @@
     <button v-show="currentPage !== 'login'" class="btn btn-outline-light btn-sm" @click="logout">Deconnexion</button>
   </nav>
 
-  <div v-show="currentPage === 'login'" style="position:fixed; top:56px; left:0; right:0; bottom:0; background:#343a40; display:flex; align-items:center; justify-content:center; z-index:100">
+  <div v-if="currentPage === 'login'" style="position:fixed; top:56px; left:0; right:0; bottom:0; background:#343a40; display:flex; align-items:center; justify-content:center; z-index:100">
     <div class="card" style="width:380px">
       <div class="card-header bg-primary text-white text-center">
         <h5 class="mb-0">Connexion</h5>
@@ -30,7 +30,7 @@
           <label class="form-label">Mot de passe</label>
           <input type="password" v-model="loginPass" class="form-control" placeholder="Votre mot de passe">
         </div>
-        <button class="btn btn-primary w-100" @click="handleLogin" :disabled="loginLoading">
+        <button class="btn btn-primary w-100" @click="handleLogin(loginId, loginPass)" :disabled="loginLoading">
           <span v-if="loginLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
           {{ loginLoading ? 'Connexion...' : 'Se connecter' }}
         </button>
@@ -44,7 +44,7 @@
       <p class="mb-0" style="opacity:0.8">Selectionnez un module.</p>
     </div>
     <div class="row g-3">
-      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('dispo')"><h6>Disponibilite des Salles</h6><small class="text-muted">Verifiez quelles salles sont libres.</small></div></div>
+      <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('dispo')"><h6>Disponibilite des Salles</h6><small class="text-muted">Verifiez quelles salles sont libres et leur etat.</small></div></div>
       <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('reservation')"><h6>Reserver une Salle</h6><small class="text-muted">Gerez vos reservations.</small></div></div>
       <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('annuaire')"><h6>Annuaire Campus</h6><small class="text-muted">Trouvez un etudiant.</small></div></div>
       <div class="col-md-6"><div class="card p-3 module-card" @click="goTo('planning')"><h6>Planning Salles</h6><small class="text-muted">Emploi du temps des salles.</small></div></div>
@@ -65,7 +65,7 @@
         <option value="">-- Tous les creneaux --</option>
         <option v-for="c in creneaux" :key="c" :value="c">{{ c }}</option>
       </select>
-      <div class="mt-3" v-if="dispoInfo">
+      <div class="mt-3" v-if="dispoInfo && selectedCreneauDispo">
         <div v-if="dispoInfo.libre" class="alert alert-success">
           La salle est <strong>libre</strong>
           <span v-if="selectedCreneauDispo"> sur le creneau {{ selectedCreneauDispo }}</span>
@@ -85,6 +85,38 @@
           </ul>
         </div>
       </div>
+
+      <!-- Etat salle (API: /psw/etat_salle) — chargé automatiquement -->
+      <div class="mt-3" v-if="etatSalleData && selectedCreneauDispo">
+        <h6>Etat de la salle</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="card text-center p-3 border-success">
+              <h3 class="text-success mb-0">{{ etatSalleData.nb_eleve_present }}</h3>
+              <small class="text-muted">Present(s)</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-center p-3 border-danger">
+              <h3 class="text-danger mb-0">{{ etatSalleData.nb_eleve_absent }}</h3>
+              <small class="text-muted">Absent(s)</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-center p-3">
+              <h3 class="mb-0">{{ etatSalleData.nb_eleve_present + etatSalleData.nb_eleve_absent }}</h3>
+              <small class="text-muted">Total</small>
+            </div>
+          </div>
+        </div>
+        <div v-if="etatAbsentNoms.length > 0" class="mt-2">
+          <small class="text-muted">Eleves absents :</small>
+          <ul class="list-group list-group-flush mt-1">
+            <li v-for="nom in etatAbsentNoms" :key="nom" class="list-group-item py-1" style="font-size:13px">{{ nom }}</li>
+          </ul>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -92,7 +124,7 @@
     <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
     <h4>Reserver une Salle</h4>
 
-    <! formulaire de recherche >
+    <!-- formulaire de recherche -->
     <div class="card mt-3 mb-4">
       <div class="card-header bg-white"><strong>Etape 1</strong> — Choisissez un creneau</div>
       <div class="card-body">
@@ -116,7 +148,7 @@
             </select>
           </div>
           <div class="col-md-2">
-            <button class="btn btn-primary w-100" @click="rechercherCreneaux" :disabled="creneauxCharge">
+            <button class="btn btn-primary w-100" @click="rechercherCreneaux(reservationDate, reservationHeureDeb, reservationHeureFin)" :disabled="creneauxCharge">
               <span v-if="creneauxCharge" class="spinner-border spinner-border-sm me-1"></span>
               Rechercher
             </button>
@@ -141,11 +173,11 @@
           </thead>
           <tbody>
             <tr v-for="r in mesReservationsAVenir" :key="r.id">
-              <td><span class="badge bg-primary fs-6">Salle {{ r.num_salle }}</span></td>
-              <td class="align-middle">{{ formaterDate(r.date_reservation) }}</td>
-              <td class="align-middle">{{ formaterHeure(r.heure_debut) }} - {{ formaterHeure(r.heure_fin) }}</td>
+              <td><span class="badge bg-primary fs-6">Salle {{ r.salle }}</span></td>
+              <td class="align-middle">{{ tsDate(r.heure_debut) }}</td>
+              <td class="align-middle">{{ tsHeure(r.heure_debut) }} - {{ tsHeure(r.heure_fin) }}</td>
               <td class="text-end">
-                <button class="btn btn-danger btn-sm" @click="annulerReservation(r.id, r.date_reservation, r.heure_debut)">
+                <button class="btn btn-danger btn-sm" @click="annulerReservation(r.id, r.heure_debut)">
                   Annuler
                 </button>
               </td>
@@ -165,9 +197,9 @@
           </thead>
           <tbody>
             <tr v-for="r in mesReservationsPassees" :key="r.id" class="text-muted">
-              <td><span class="badge bg-secondary fs-6">Salle {{ r.num_salle }}</span></td>
-              <td class="align-middle">{{ formaterDate(r.date_reservation) }}</td>
-              <td class="align-middle">{{ formaterHeure(r.heure_debut) }} - {{ formaterHeure(r.heure_fin) }}</td>
+              <td><span class="badge bg-secondary fs-6">Salle {{ r.salle }}</span></td>
+              <td class="align-middle">{{ tsDate(r.heure_debut) }}</td>
+              <td class="align-middle">{{ tsHeure(r.heure_debut) }} - {{ tsHeure(r.heure_fin) }}</td>
               <td></td>
             </tr>
           </tbody>
@@ -175,7 +207,58 @@
       </div>
     </div>
 
-    <!résultats>
+    <!-- Toutes les reservations avec noms -->
+    <div class="card mb-4" v-if="toutesReservations.length > 0">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <strong>Toutes les reservations</strong>
+        <small class="text-muted">{{ reservationsTriees.length }} reservation(s)</small>
+      </div>
+      <div class="card-body">
+        <div class="row g-2 mb-3">
+          <div class="col-md-4">
+            <input type="text" v-model="filtreResaNom" class="form-control form-control-sm" placeholder="Rechercher par nom...">
+          </div>
+          <div class="col-md-3">
+            <select v-model="filtreResaSalle" class="form-select form-select-sm">
+              <option value="">-- Toutes les salles --</option>
+              <option v-for="s in sallesReservees" :key="s" :value="s">Salle {{ s }}</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select v-model="triReservations" class="form-select form-select-sm">
+              <option value="recent">Plus recentes</option>
+              <option value="ancien">Plus anciennes</option>
+              <option value="nom_asc">Nom A → Z</option>
+              <option value="nom_desc">Nom Z → A</option>
+              <option value="salle_asc">Salle A → Z</option>
+            </select>
+          </div>
+        </div>
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="cursor:pointer" @click="triReservations = triReservations === 'nom_asc' ? 'nom_desc' : 'nom_asc'">Reserve par {{ triReservations === 'nom_asc' ? '▲' : triReservations === 'nom_desc' ? '▼' : '' }}</th>
+              <th style="cursor:pointer" @click="triReservations = 'salle_asc'">Salle {{ triReservations === 'salle_asc' ? '▲' : '' }}</th>
+              <th style="cursor:pointer" @click="triReservations = triReservations === 'recent' ? 'ancien' : 'recent'">Date {{ triReservations === 'recent' ? '▼' : triReservations === 'ancien' ? '▲' : '' }}</th>
+              <th>Horaire</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in reservationsTriees" :key="r.id">
+              <td>{{ r.nom_complet }}</td>
+              <td><span class="badge bg-primary fs-6">Salle {{ r.salle }}</span></td>
+              <td class="align-middle">{{ tsDate(r.heure_debut) }}</td>
+              <td class="align-middle">{{ tsHeure(r.heure_debut) }} - {{ tsHeure(r.heure_fin) }}</td>
+            </tr>
+            <tr v-if="reservationsTriees.length === 0">
+              <td colspan="4" class="text-center text-muted">Aucun resultat.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- résultats -->
     <div v-show="rechercheEffectuee">
       <div class="card">
         <div class="card-header bg-white"><strong>Etape 2</strong> — Salles disponibles</div>
@@ -189,9 +272,9 @@
             </thead>
             <tbody>
               <tr v-for="creneau in creneauxFiltres" :key="creneau.id">
-                <td><span class="badge bg-primary fs-6">Salle {{ creneau.numero }}</span></td>
-                <td class="align-middle">{{ formaterDate(creneau.horaire) }}</td>
-                <td class="align-middle">{{ formaterHeure(creneau.horaire) }}</td>
+                <td><span class="badge bg-primary fs-6">Salle {{ creneau.salle }}</span></td>
+                <td class="align-middle">{{ tsDate(creneau.heure_debut) }}</td>
+                <td class="align-middle">{{ tsHeure(creneau.heure_debut) }} - {{ tsHeure(creneau.heure_fin) }}</td>
                 <td class="text-end">
                   <button class="btn btn-success btn-sm"
                     @click="demanderConfirmation(creneau)"
@@ -211,32 +294,113 @@
   <div v-show="currentPage === 'annuaire'" class="p-4">
     <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
     <h4>Annuaire du Campus</h4>
-    <input type="text" v-model="searchAnnuaire" class="form-control my-3" placeholder="Rechercher par nom ou classe...">
+
+    <!-- Filtres -->
+    <div class="row g-3 my-3 align-items-end">
+      <div class="col-md-5">
+        <input type="text" v-model="searchAnnuaire" class="form-control" placeholder="Rechercher par nom, prenom ou classe...">
+      </div>
+      <div class="col-md-3">
+        <select v-model="filtreRole" class="form-select">
+          <option value="">-- Tous les roles --</option>
+          <option value="eleve">Eleve</option>
+          <option value="enseignant">Enseignant</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select v-model="filtreClasse" class="form-select">
+          <option value="">-- Toutes les classes --</option>
+          <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.nom_classe }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="text-muted mb-2" style="font-size:13px">{{ filteredStudents.length }} resultat(s)</div>
+
     <table class="table table-hover">
-      <thead><tr><th>Nom</th><th>Classe</th><th>Email</th></tr></thead>
+      <thead class="table-light">
+        <tr><th>Nom</th><th>Classe</th><th>Role</th><th>Identifiant</th><th>Badge</th></tr>
+      </thead>
       <tbody>
         <tr v-if="filteredStudents.length === 0">
-          <td colspan="3" class="text-center text-muted">Aucun resultat.</td>
+          <td colspan="5" class="text-center text-muted">Aucun resultat.</td>
         </tr>
-        <tr v-for="s in filteredStudents" :key="s.email">
-          <td>{{ s.nom }}</td><td>{{ s.classe }}</td><td>{{ s.email }}</td>
+        <tr v-for="s in filteredStudents" :key="s.login_user" @click="voirProfil(s)" style="cursor:pointer">
+          <td>{{ s.prenom_user }} {{ s.nom_user }}</td>
+          <td>{{ s.nom_classe }}</td>
+          <td><span class="badge" :class="s.role_user === 'enseignant' ? 'bg-warning text-dark' : 'bg-info'">{{ s.role_user }}</span></td>
+          <td>{{ s.login_user }}</td>
+          <td><span class="badge" :class="s.uuid_badge ? 'bg-success' : 'bg-secondary'">{{ s.uuid_badge ? 'Attribue' : 'Aucun' }}</span></td>
         </tr>
       </tbody>
     </table>
+
+    <!-- Detail utilisateur + historique -->
+    <div v-if="selectedUser" class="card mt-3">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <strong>{{ selectedUser.prenom_user }} {{ selectedUser.nom_user }}</strong>
+        <button class="btn btn-sm btn-outline-light" @click="fermerProfil()">Fermer</button>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-3"><small class="text-muted">Classe</small><br>{{ selectedUser.nom_classe }}</div>
+          <div class="col-md-3"><small class="text-muted">Role</small><br><span class="badge" :class="selectedUser.role_user === 'enseignant' ? 'bg-warning text-dark' : 'bg-info'">{{ selectedUser.role_user }}</span></div>
+          <div class="col-md-3"><small class="text-muted">Identifiant</small><br>{{ selectedUser.login_user }}</div>
+          <div class="col-md-3"><small class="text-muted">Badge</small><br><span class="badge" :class="selectedUser.uuid_badge ? 'bg-success' : 'bg-secondary'">{{ selectedUser.uuid_badge ? 'Attribue' : 'Aucun' }}</span></div>
+        </div>
+
+        <h6>Historique absences / retards</h6>
+        <div v-if="!historiqueCharge" class="text-center py-3">
+          <div class="spinner-border spinner-border-sm text-primary" role="status"></div> Chargement...
+        </div>
+        <div v-else-if="historiqueEleve.length === 0" class="alert alert-success py-2 mb-0" style="font-size:13px">
+          Aucune absence ni retard.
+        </div>
+        <div v-else>
+          <div class="alert alert-info py-2 mb-2" style="font-size:13px">
+            <strong>{{ historiqueEleve.filter(h => h.absence_ou_retard).length }}</strong> absence(s) —
+            <strong>{{ historiqueEleve.filter(h => !h.absence_ou_retard).length }}</strong> retard(s)
+          </div>
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+              <tr><th>Date du cours</th><th>Type</th><th>Retard</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="h in historiqueEleve" :key="h.id">
+                <td>{{ formaterTimestamp(h.timestamp_debut_cours) }}</td>
+                <td>
+                  <span v-if="h.absence_ou_retard" class="badge bg-danger">Absence</span>
+                  <span v-else class="badge bg-warning text-dark">Retard</span>
+                </td>
+                <td>{{ h.absence_ou_retard ? '—' : h.temps_retard + ' min' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div v-show="currentPage === 'planning'" class="p-4">
     <button class="btn btn-secondary btn-sm mb-3" @click="goTo('dashboard')">← Retour</button>
     <h4>Planning Salles</h4>
-    <div class="mb-3">
-      <label class="form-label">Salle :</label>
-      <select v-model="selectedPlanning" class="form-select" style="max-width:250px">
-        <option v-for="salle in salles" :key="salle" :value="salle">{{ salle }}</option>
-      </select>
+    <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+      <div>
+        <label class="form-label mb-1">Salle :</label>
+        <select v-model="selectedPlanning" class="form-select" style="max-width:250px">
+          <option v-for="salle in salles" :key="salle" :value="salle">{{ salle }}</option>
+        </select>
+      </div>
+      <div class="d-flex align-items-center gap-2 mt-auto">
+        <button class="btn btn-outline-secondary btn-sm" @click="semainePrecedente">&larr; Precedente</button>
+        <button class="btn btn-outline-primary btn-sm" @click="semaineActuelle">Aujourd'hui</button>
+        <button class="btn btn-outline-secondary btn-sm" @click="semaineSuivante">Suivante &rarr;</button>
+      </div>
+      <span class="mt-auto fw-bold text-primary">{{ labelSemaine }}</span>
     </div>
     <div class="table-responsive">
       <table class="table table-bordered">
-        <thead class="table-light"><tr><th>Heure</th><th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th></tr></thead>
+        <thead class="table-light"><tr><th>Heure</th><th v-for="j in joursAvecDates" :key="j">{{ j }}</th></tr></thead>
         <tbody>
           <tr v-for="row in planningRows" :key="row.heure">
             <td class="text-muted" style="font-size:12px">{{ row.heure }}</td>
@@ -249,7 +413,7 @@
     </div>
   </div>
 
-  <div v-show="confirmationVisible"
+  <div v-if="confirmationVisible"
        style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5);
               display:flex; align-items:center; justify-content:center; z-index:200">
     <div class="card" style="width:400px">
@@ -258,12 +422,12 @@
       </div>
       <div class="card-body">
         <div v-if="creneauSelectionne">
-          <p class="mb-1"><strong>Salle :</strong> {{ creneauSelectionne.numero }}</p>
-          <p class="mb-3"><strong>Horaire :</strong> {{ formaterHoraire(creneauSelectionne.horaire) }}</p>
+          <p class="mb-1"><strong>Salle :</strong> {{ creneauSelectionne.salle }}</p>
+          <p class="mb-3"><strong>Horaire :</strong> {{ reservationDate }} de {{ reservationHeureDeb }} a {{ reservationHeureFin }}</p>
         </div>
         <div class="d-flex gap-2 justify-content-end">
-          <button class="btn btn-outline-secondary" @click="annulerConfirmation">Annuler</button>
-          <button class="btn btn-success" @click="confirmerReservation">Confirmer</button>
+          <button class="btn btn-outline-secondary" @click="annulerConfirmation()">Annuler</button>
+          <button class="btn btn-success" @click="validerReservation()">Confirmer</button>
         </div>
       </div>
     </div>

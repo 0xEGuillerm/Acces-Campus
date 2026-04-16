@@ -9,5 +9,6 @@
   "/psw/historique_eleve":   "/historique_eleve",
   "/psw/reserver_salle":     "/reserver_salle",
   "/psw/reserver_salle/:id": "/reserver_salle/:id",
-  "/psw/salle_crenaux":      "/salle_crenaux"
+  "/psw/salle_crenaux":      "/salle_crenaux",
+  "/psw/classes":            "/classes"
 }

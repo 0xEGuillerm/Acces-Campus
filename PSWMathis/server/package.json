@@ -2,7 +2,7 @@
   "name": "acces-campus-server",
   "version": "1.0.0",
   "scripts": {
-    "start": "json-server --watch db.json --routes routes.json --port 3001"
+    "start": "json-server --watch db.json --routes routes.json --port 3001 --static ../acces-campus"
   },
   "dependencies": {
     "json-server": "0.17.4"
