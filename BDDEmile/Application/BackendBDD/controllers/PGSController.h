@@ -6,15 +6,9 @@
 #define BACKENDBDD_PGSCONTROLLER_H
 
 #include <drogon/HttpController.h>
-#include "resultat/StructResultat.h"
-#include "Logique/BadgeLogique.h"
 #include "Logique/SalleLogique.h"
-#include "Logique/CoursLogique.h"
-#include "Logique/RetardAbsenceLogique.h"
-#include "Logique/UtilisateurLogique.h"
 #include <drogon/utils/coroutine.h>
-#include <drogon/orm/CoroMapper.h>
-#include <json/json.h>
+
 
 
 using namespace drogon::orm;
@@ -32,26 +26,26 @@ public:
     ADD_METHOD_TO(PGSController::CreationBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Post);
     ADD_METHOD_TO(PGSController::ModifierBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Put);
     METHOD_LIST_END
-    drogon::Task<drogon::HttpResponsePtr> PlanningSallePGSController(
+    static drogon::Task<drogon::HttpResponsePtr> PlanningSallePGSController(
         drogon::HttpRequestPtr req);
-    drogon::Task<drogon::HttpResponsePtr> EtatSallePGSController(
+    static drogon::Task<drogon::HttpResponsePtr> EtatSallePGSController(
         drogon::HttpRequestPtr req);
-    drogon::Task<drogon::HttpResponsePtr> RechercheUtilisateurPGSController(
+    static drogon::Task<drogon::HttpResponsePtr> RechercheUtilisateurPGSController(
         drogon::HttpRequestPtr req);
-    drogon::Task<drogon::HttpResponsePtr> HistoriqueBadgePGSController(
+    static drogon::Task<drogon::HttpResponsePtr> HistoriqueBadgePGSController(
         drogon::HttpRequestPtr req);
-    drogon::Task<drogon::HttpResponsePtr> ReserverSallePGSController(
+    static drogon::Task<drogon::HttpResponsePtr> ReserverSallePGSController(
         drogon::HttpRequestPtr req);
-    drogon::Task<drogon::HttpResponsePtr> InformationBadgePGSController(
+    static drogon::Task<drogon::HttpResponsePtr> InformationBadgePGSController(
         drogon::HttpRequestPtr req,
         std::string badgeid);
-    drogon::Task<drogon::HttpResponsePtr> SupprimerBadgePGSController(
+    static drogon::Task<drogon::HttpResponsePtr> SupprimerBadgePGSController(
         drogon::HttpRequestPtr req,
         std::string badgeid);
-    drogon::Task<drogon::HttpResponsePtr> CreationBadgePGSController(
+    static drogon::Task<drogon::HttpResponsePtr> CreationBadgePGSController(
         drogon::HttpRequestPtr req,
         std::string badgeid);
-    drogon::Task<drogon::HttpResponsePtr> ModifierBadgePGSController(
+    static drogon::Task<drogon::HttpResponsePtr> ModifierBadgePGSController(
         drogon::HttpRequestPtr req,
         std::string badgeid);
 };

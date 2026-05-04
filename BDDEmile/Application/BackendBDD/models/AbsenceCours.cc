@@ -11,7 +11,7 @@
 
 using namespace drogon;
 using namespace drogon::orm;
-using namespace drogon_model::ProjetV1;
+using namespace drogon_model::acces_campus_bdd;
 
 const std::string AbsenceCours::Cols::_id_absence = "\"id_absence\"";
 const std::string AbsenceCours::Cols::_id_user = "\"id_user\"";
@@ -23,8 +23,8 @@ const std::string AbsenceCours::tableName = "\"absence_cours\"";
 
 const std::vector<typename AbsenceCours::MetaData> AbsenceCours::metaData_={
 {"id_absence","int32_t","integer",4,1,1,1},
-{"id_user","int32_t","integer",4,1,0,1},
-{"id_cours","int32_t","integer",4,1,0,1},
+{"id_user","int32_t","integer",4,0,0,0},
+{"id_cours","int32_t","integer",4,0,0,0},
 {"id_classe","int32_t","integer",4,0,0,0}
 };
 const std::string &AbsenceCours::getColumnName(size_t index) noexcept(false)
@@ -180,6 +180,7 @@ void AbsenceCours::updateByMasqueradedJson(const Json::Value &pJson,
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
     {
+        dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
             idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
@@ -187,6 +188,7 @@ void AbsenceCours::updateByMasqueradedJson(const Json::Value &pJson,
     }
     if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
     {
+        dirtyFlag_[2] = true;
         if(!pJson[pMasqueradingVector[2]].isNull())
         {
             idCours_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[2]].asInt64());
@@ -213,6 +215,7 @@ void AbsenceCours::updateByJson(const Json::Value &pJson) noexcept(false)
     }
     if(pJson.isMember("id_user"))
     {
+        dirtyFlag_[1] = true;
         if(!pJson["id_user"].isNull())
         {
             idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
@@ -220,6 +223,7 @@ void AbsenceCours::updateByJson(const Json::Value &pJson) noexcept(false)
     }
     if(pJson.isMember("id_cours"))
     {
+        dirtyFlag_[2] = true;
         if(!pJson["id_cours"].isNull())
         {
             idCours_=std::make_shared<int32_t>((int32_t)pJson["id_cours"].asInt64());
@@ -273,6 +277,11 @@ void AbsenceCours::setIdUser(const int32_t &pIdUser) noexcept
     idUser_ = std::make_shared<int32_t>(pIdUser);
     dirtyFlag_[1] = true;
 }
+void AbsenceCours::setIdUserToNull() noexcept
+{
+    idUser_.reset();
+    dirtyFlag_[1] = true;
+}
 
 const int32_t &AbsenceCours::getValueOfIdCours() const noexcept
 {
@@ -288,6 +297,11 @@ const std::shared_ptr<int32_t> &AbsenceCours::getIdCours() const noexcept
 void AbsenceCours::setIdCours(const int32_t &pIdCours) noexcept
 {
     idCours_ = std::make_shared<int32_t>(pIdCours);
+    dirtyFlag_[2] = true;
+}
+void AbsenceCours::setIdCoursToNull() noexcept
+{
+    idCours_.reset();
     dirtyFlag_[2] = true;
 }
 
@@ -320,6 +334,8 @@ void AbsenceCours::updateId(const uint64_t id)
 const std::vector<std::string> &AbsenceCours::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
+        "id_user",
+        "id_cours",
         "id_classe"
     };
     return inCols;
@@ -327,6 +343,28 @@ const std::vector<std::string> &AbsenceCours::insertColumns() noexcept
 
 void AbsenceCours::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 {
+    if(dirtyFlag_[1])
+    {
+        if(getIdUser())
+        {
+            binder << getValueOfIdUser();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[2])
+    {
+        if(getIdCours())
+        {
+            binder << getValueOfIdCours();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
     if(dirtyFlag_[3])
     {
         if(getIdClasse())
@@ -343,6 +381,14 @@ void AbsenceCours::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 const std::vector<std::string> AbsenceCours::updateColumns() const
 {
     std::vector<std::string> ret;
+    if(dirtyFlag_[1])
+    {
+        ret.push_back(getColumnName(1));
+    }
+    if(dirtyFlag_[2])
+    {
+        ret.push_back(getColumnName(2));
+    }
     if(dirtyFlag_[3])
     {
         ret.push_back(getColumnName(3));
@@ -352,6 +398,28 @@ const std::vector<std::string> AbsenceCours::updateColumns() const
 
 void AbsenceCours::updateArgs(drogon::orm::internal::SqlBinder &binder) const
 {
+    if(dirtyFlag_[1])
+    {
+        if(getIdUser())
+        {
+            binder << getValueOfIdUser();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[2])
+    {
+        if(getIdCours())
+        {
+            binder << getValueOfIdCours();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
     if(dirtyFlag_[3])
     {
         if(getIdClasse())
@@ -669,18 +737,7 @@ bool AbsenceCours::validJsonOfField(size_t index,
         case 1:
             if(pJson.isNull())
             {
-                err="The " + fieldName + " column cannot be null";
-                return false;
-            }
-            if(isForCreation)
-            {
-                err="The automatic primary key cannot be set";
-                return false;
-            }
-            else
-            {
-                err="The automatic primary key cannot be update";
-                return false;
+                return true;
             }
             if(!pJson.isInt())
             {
@@ -691,18 +748,7 @@ bool AbsenceCours::validJsonOfField(size_t index,
         case 2:
             if(pJson.isNull())
             {
-                err="The " + fieldName + " column cannot be null";
-                return false;
-            }
-            if(isForCreation)
-            {
-                err="The automatic primary key cannot be set";
-                return false;
-            }
-            else
-            {
-                err="The automatic primary key cannot be update";
-                return false;
+                return true;
             }
             if(!pJson.isInt())
             {

@@ -36,7 +36,7 @@ using DbClientPtr = std::shared_ptr<DbClient>;
 }
 namespace drogon_model
 {
-namespace ProjetV1
+namespace acces_campus_bdd
 {
 
 class Historique
@@ -190,8 +190,11 @@ class Historique
         needSelection = false;
             sql += "id_historique,";
             ++parametersCount;
+        if(dirtyFlag_[1])
+        {
             sql += "id_user,";
             ++parametersCount;
+        }
         sql += "date_action,";
         ++parametersCount;
         if(!dirtyFlag_[2])
@@ -216,7 +219,11 @@ class Historique
         char placeholderStr[64];
         size_t n=0;
         sql +="default,";
-        sql +="default,";
+        if(dirtyFlag_[1])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
         if(dirtyFlag_[2])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
@@ -247,5 +254,5 @@ class Historique
         return sql;
     }
 };
-} // namespace ProjetV1
+} // namespace acces_campus_bdd
 } // namespace drogon_model

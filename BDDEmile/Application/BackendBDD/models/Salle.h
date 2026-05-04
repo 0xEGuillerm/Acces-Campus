@@ -36,7 +36,7 @@ using DbClientPtr = std::shared_ptr<DbClient>;
 }
 namespace drogon_model
 {
-namespace ProjetV1
+namespace acces_campus_bdd
 {
 
 class Salle
@@ -54,7 +54,7 @@ class Salle
     static const std::string tableName;
     static const bool hasPrimaryKey;
     static const std::string primaryKeyName;
-    using PrimaryKeyType = int32_t;
+    using PrimaryKeyType = std::string;
     const PrimaryKeyType &getPrimaryKey() const;
 
     /**
@@ -101,11 +101,12 @@ class Salle
 
     /**  For column num_salle  */
     ///Get the value of the column num_salle, returns the default value if the column is null
-    const int32_t &getValueOfNumSalle() const noexcept;
+    const std::string &getValueOfNumSalle() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<int32_t> &getNumSalle() const noexcept;
+    const std::shared_ptr<std::string> &getNumSalle() const noexcept;
     ///Set the value of the column num_salle
-    void setNumSalle(const int32_t &pNumSalle) noexcept;
+    void setNumSalle(const std::string &pNumSalle) noexcept;
+    void setNumSalle(std::string &&pNumSalle) noexcept;
 
     /**  For column place_maximum  */
     ///Get the value of the column place_maximum, returns the default value if the column is null
@@ -158,7 +159,7 @@ class Salle
     void updateArgs(drogon::orm::internal::SqlBinder &binder) const;
     ///For mysql or sqlite3
     void updateId(const uint64_t id);
-    std::shared_ptr<int32_t> numSalle_;
+    std::shared_ptr<std::string> numSalle_;
     std::shared_ptr<int32_t> placeMaximum_;
     std::shared_ptr<std::string> macBae_;
     std::shared_ptr<std::string> macPea_;
@@ -258,5 +259,5 @@ class Salle
         return sql;
     }
 };
-} // namespace ProjetV1
+} // namespace acces_campus_bdd
 } // namespace drogon_model

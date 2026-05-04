@@ -18,7 +18,9 @@ using namespace drogon::orm;
 
 drogon::Task<drogon::HttpResponsePtr> PGSController::PlanningSallePGSController(drogon::HttpRequestPtr req){
     std::string salleStr = req->getParameter("salle");
-    if (salleStr.empty())
+    int64_t timestamp_debut= std::stoll(req->getParameter("debut"));
+    int64_t timestamp_fin= std::stoll(req->getParameter("fin"));
+    if (salleStr.empty() || timestamp_debut == 0 || timestamp_fin == 0)
     {
         Json::Value MessageErreur;
         MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
@@ -26,18 +28,15 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::PlanningSallePGSController(
         ReponseAPI->setStatusCode(drogon::k400BadRequest);
         co_return ReponseAPI;
     }
-    int32_t salle = stoi(salleStr);
     auto DbClientPtr = drogon::app().getDbClient();
-    auto planning = co_await CoursLogique::PlanningSalle(DbClientPtr, salle);
-    if (planning.isNull())
+    auto resultat = co_await CoursLogique::PlanningSalle(DbClientPtr, salleStr, timestamp_debut, timestamp_fin);
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = "Aucun cours trouve pour cette salle.";
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
         ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }
-    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(planning);
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);
     ReponseAPI->setStatusCode(drogon::k200OK);
     co_return ReponseAPI;
 }
@@ -54,16 +53,14 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::EtatSallePGSController(drog
         co_return ReponseAPI;
     }
     auto DbClientPtr = drogon::app().getDbClient();
-    auto etatSalle = co_await SalleLogique::EtatSalleNumeroSalle(DbClientPtr, salleStr);
-    if (etatSalle.isNull())
+    auto resultat = co_await SalleLogique::EtatSalleNumeroSalle(DbClientPtr, salleStr);
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = "Salle introuvable ou aucun cours en cours.";
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
         ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }
-    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(etatSalle);
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);
     ReponseAPI->setStatusCode(drogon::k200OK);
     co_return ReponseAPI;
 }
@@ -81,16 +78,14 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::RechercheUtilisateurPGSCont
         co_return ReponseAPI;
     }
     auto DbClientPtr = drogon::app().getDbClient();
-    auto utilisateurs = co_await UtilisateurLogique::UtilisateurParNomPrenom(DbClientPtr, nom, prenom);
-    if (utilisateurs.isNull())
+    auto resultat = co_await UtilisateurLogique::UtilisateurParNomPrenom(DbClientPtr, nom, prenom);
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = "Aucun utilisateur trouve.";
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
         ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }
-    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(utilisateurs);
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);
     ReponseAPI->setStatusCode(drogon::k200OK);
     co_return ReponseAPI;
 }
@@ -108,16 +103,14 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::HistoriqueBadgePGSControlle
     }
     int32_t idUtilisateur = stoi(uuidUserStr);
     auto DbClientPtr = drogon::app().getDbClient();
-    auto historique = co_await RetardAbsenceLogique::AbsenceEleve(DbClientPtr, idUtilisateur);
-    if (historique.isNull())
+    auto resultat = co_await RetardAbsenceLogique::AbsenceEleve(DbClientPtr, idUtilisateur);
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = "Aucun historique trouve.";
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
         ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }
-    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(historique);
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);
     ReponseAPI->setStatusCode(drogon::k200OK);
     co_return ReponseAPI;
 }
@@ -125,7 +118,7 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::HistoriqueBadgePGSControlle
 
 drogon::Task<drogon::HttpResponsePtr> PGSController::ReserverSallePGSController(drogon::HttpRequestPtr req){
     auto body = req->getJsonObject();
-    if (!body || !body->isMember("heure_debut") || !body->isMember("heure_fin") || !body->isMember("salle") || !body->isMember("classe"))
+    if (!body || !body->isMember("heure_debut") || !body->isMember("heure_fin") || !body->isMember("salle") || !body->isMember("classe") || !body->isMember("professeur"))
     {
         Json::Value MessageErreur;
         MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
@@ -135,12 +128,10 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::ReserverSallePGSController(
     }
     auto DbClientPtr = drogon::app().getDbClient();
     auto resultat = co_await CoursLogique::ReservationSallePGS(DbClientPtr, *body);
-    if (!resultat.BoolResultat)
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = resultat.MessageResultat;
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
-        ReponseAPI->setStatusCode(drogon::k403Forbidden);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
+        ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }
     auto ReponseAPI = drogon::HttpResponse::newHttpResponse();
@@ -159,16 +150,14 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::InformationBadgePGSControll
         co_return ReponseAPI;
     }
     auto DbClientPtr = drogon::app().getDbClient();
-    auto utilisateur = co_await BadgeLogique::InformationBadge(DbClientPtr, badgeid);
-    if (utilisateur.isNull())
+    auto resultat = co_await BadgeLogique::InformationBadge(DbClientPtr, badgeid);
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = "Badge inconnu.";
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
         ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }
-    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(utilisateur);
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);
     ReponseAPI->setStatusCode(drogon::k200OK);
     co_return ReponseAPI;
 }
@@ -185,11 +174,9 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::SupprimerBadgePGSController
     }
     auto DbClientPtr = drogon::app().getDbClient();
     auto resultat = co_await BadgeLogique::SupprimerBadge(DbClientPtr, badgeid);
-    if (!resultat.BoolResultat)
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = resultat.MessageResultat;
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
         ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }
@@ -212,12 +199,10 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::CreationBadgePGSController(
     int32_t uuidUser = (*body)["uuid_user"].asInt();
     auto DbClientPtr = drogon::app().getDbClient();
     auto resultat = co_await BadgeLogique::CreationBadge(DbClientPtr, uuidUser, badgeid);
-    if (!resultat.BoolResultat)
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = resultat.MessageResultat;
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
-        ReponseAPI->setStatusCode(drogon::k403Forbidden);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
+        ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }
     auto ReponseAPI = drogon::HttpResponse::newHttpResponse();
@@ -238,11 +223,9 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::ModifierBadgePGSController(
     }
     auto DbClientPtr = drogon::app().getDbClient();
     auto resultat = co_await BadgeLogique::ModifierInfoUtilisateur(DbClientPtr, badgeid, *body);
-    if (!resultat.BoolResultat)
+    if (resultat.BoolResultat == false)
     {
-        Json::Value MessageErreur;
-        MessageErreur = resultat.MessageResultat;
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
         ReponseAPI->setStatusCode(drogon::k404NotFound);
         co_return ReponseAPI;
     }

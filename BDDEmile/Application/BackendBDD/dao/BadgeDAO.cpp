@@ -6,127 +6,128 @@
 #include "models/Badge.h"
 #include "models/Utilisateur.h"
 #include "models/Salle.h"
-#include "models/Cours.h"
-#include "models/AbsenceCours.h"
-#include "models/PresenceCours.h"
-#include "models/Retardabsence.h"
 #include <drogon/utils/coroutine.h>
 #include <drogon/orm/CoroMapper.h>
+#include <resultat/StructResultat.h>
 
-
-
-drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> BadgeDAO::ChercherUtilisateurParIDBadge(
+//Recherche un utilisateur à partir de l'id d'un badge
+//Renvoie un vecteur d'utilisateur
+drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>>> BadgeDAO::ChercherUtilisateurParIDBadge(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
+    //uid badge
     const std::string &uidBadge) {
-    CoroMapper<drogon_model::ProjetV1::Utilisateur> mapperuser(db);
-    auto resultat = co_await mapperuser.findBy(
-        //Cherche à partir de uid dans la colonne _uuid_badge de la table utilisateur
-        Criteria(drogon_model::ProjetV1::Utilisateur::Cols::_uuid_badge, CompareOperator::EQ, uidBadge));
+    //Mapper de utilisateur / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::Utilisateur> mapperuser(db);
+    //Variable pour le résultat / envoie du type vector Utilisateur pour la template
+    ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>> resultat;
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL recherche dans la colonne _uuid_badge de la table utilisateur
+        resultat.donnee = co_await mapperuser.findBy(
+        Criteria(drogon_model::acces_campus_bdd::Utilisateur::Cols::_uuid_badge, CompareOperator::EQ, uidBadge));
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    //Envoie du résultat
     co_return resultat;
 }
 
-drogon::Task<size_t> BadgeDAO::SupprimerBadgeParIDBadge(
+//Supprime un badge à partir de l'id
+//Renvoie rien dans donnee (verifier le bool)
+drogon::Task<ResultatCoro<>> BadgeDAO::SupprimerBadgeParIDBadge(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
+    //uid badge
     const std::string &uidBadge) {
-    CoroMapper<drogon_model::ProjetV1::Badge> mapperbadge(db);
-    auto resultat = co_await mapperbadge.deleteByPrimaryKey(uidBadge);
+    //Mapper de badge / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::Badge> mapperbadge(db);
+    //Variable pour le résultat / envoie du type nombre de suppression pour la template (rien monostate)
+    ResultatCoro<> resultat;
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL pour supprimer
+        co_await mapperbadge.deleteByPrimaryKey(uidBadge);
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    //Envoie du résultat
     co_return resultat;
 }
 
-
-drogon::Task<std::vector<drogon_model::ProjetV1::Badge>> BadgeDAO::ChercherBadgeParIDBadge(
+//Recherche un badge à partir de l'id d'un badge
+//Renvoie un objet badge
+drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Badge>>> BadgeDAO::ChercherBadgeParIDBadge(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
+    //uid badge
     const std::string &uidBadge){
-    CoroMapper<drogon_model::ProjetV1::Badge> mapperbadge(db);
-    auto resultat = co_await mapperbadge.findBy(
-        //Cherche à partir de uid dans la colonne _uuid_badge de la table utilisateur
-        Criteria(drogon_model::ProjetV1::Badge::Cols::_uuid_badge, CompareOperator::EQ, uidBadge));
+    //Mapper de badge / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::Badge> mapperbadge(db);
+    //Variable pour le résultat / envoie du type vector badge pour la template
+    ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Badge>> resultat;
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL recherche dans la colonne _uuid_badge de la table badge
+        resultat.donnee = co_await mapperbadge.findBy(
+        Criteria(drogon_model::acces_campus_bdd::Badge::Cols::_uuid_badge, CompareOperator::EQ, uidBadge));
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    //Envoie du résultat
     co_return resultat;
 }
 
-//FindBy
-drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> BadgeDAO::ChercherUtilisateurParIDUtilisateur(
+//Ajout d'une entrée dans la table Badge
+//A besoin d'un objet Badge avec les informations remplis
+//insert vas ajouté une nouvelle entrée dans la table Badge
+//Renvoie l'objet Badge ajouté
+drogon::Task<ResultatCoro<drogon_model::acces_campus_bdd::Badge>> BadgeDAO::AjoutBadge(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
-    const int32_t &uidUtilisateur) {
-    CoroMapper<drogon_model::ProjetV1::Utilisateur> mapperutilisateur(db);
-    auto resultat = co_await mapperutilisateur.findBy(
-        //Cherche à partir de uid dans la colonne _uuid_badge de la table utilisateur
-        Criteria(drogon_model::ProjetV1::Utilisateur::Cols::_id_user, CompareOperator::EQ, uidUtilisateur));
-    co_return resultat;
-}
-
-//update
-drogon::Task<size_t> BadgeDAO::MettreAJourUser(
-    const DbClientPtr &db,
-    const drogon_model::ProjetV1::Utilisateur &UtilisateurModifier) {
-    CoroMapper<drogon_model::ProjetV1::Utilisateur> mapperutilisateur(db);
-    auto resultat = co_await mapperutilisateur.update(UtilisateurModifier);
-    co_return resultat;
-    }
-
-drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> BadgeDAO::ChercherSalleAdresseMACbae(
-    const DbClientPtr &db,
-    const std::string &MAC) {
-    CoroMapper<drogon_model::ProjetV1::Salle> mappersalle(db);
-    auto resultat = co_await mappersalle.findBy(
-        //Cherche à partir de uid dans la colonne _uuid_badge de la table utilisateur
-        Criteria(drogon_model::ProjetV1::Salle::Cols::_mac_bae, CompareOperator::EQ, MAC));
-    co_return resultat;
-}
-
-drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> BadgeDAO::ChercherSalleAdresseMACpea(
-    const DbClientPtr &db,
-    const std::string &MAC) {
-    CoroMapper<drogon_model::ProjetV1::Salle> mappersalle(db);
-    auto resultat = co_await mappersalle.findBy(
-        //Cherche à partir de uid dans la colonne _uuid_badge de la table utilisateur
-        Criteria(drogon_model::ProjetV1::Salle::Cols::_mac_pea, CompareOperator::EQ, MAC));
-    co_return resultat;
-}
-
-drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> BadgeDAO::ChercherCoursParSalle(
-    const DbClientPtr &db,
-    const int32_t &numSalle) {
-    CoroMapper<drogon_model::ProjetV1::Cours> mappercours(db);
-    auto resultat = co_await mappercours.findBy(
-        //Cherche à partir de uid dans la colonne _uuid_badge de la table utilisateur
-        Criteria(drogon_model::ProjetV1::Cours::Cols::_num_salle, CompareOperator::EQ, numSalle));
+    //Objet Badge avec les informations remplis
+    const drogon_model::acces_campus_bdd::Badge &NouvelleEntree) {
+    //Mapper de classe / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::Badge> mapperCours(db);
+    //Variable pour le résultat / envoie du type Badge pour la template
+    ResultatCoro<drogon_model::acces_campus_bdd::Badge> resultat;
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL d'ajout de l'entrée
+        resultat.donnee = co_await mapperCours.insert(NouvelleEntree);
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    //Envoie du résultat
     co_return resultat;
 }
 
 
-drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> BadgeDAO::ChercherUtilisateurDansAbsencecours(
-    const DbClientPtr &db,
-    const int32_t &uidUtilisateur) {
-    CoroMapper<drogon_model::ProjetV1::AbsenceCours> mapperabsence(db);
-    auto resultat = co_await mapperabsence.findBy(
-        //Cherche à partir de uid dans la colonne _uuid_badge de la table utilisateur
-        Criteria(drogon_model::ProjetV1::AbsenceCours::Cols::_id_user, CompareOperator::EQ, uidUtilisateur));
-    co_return resultat;
-}
 
 
-drogon::Task<drogon_model::ProjetV1::PresenceCours> BadgeDAO::AjoutUtilisateurPresenceCours(
-    const DbClientPtr &db,
-    const drogon_model::ProjetV1::PresenceCours &NouvelleEntree) {
-    CoroMapper<drogon_model::ProjetV1::PresenceCours> mapperPresence(db);
-    auto resultat = co_await mapperPresence.insert(NouvelleEntree);
-    co_return resultat;
-}
 
 
-drogon::Task<size_t> BadgeDAO::SupprimerUtilisateurAbsence(
-    const DbClientPtr &db,
-    const int32_t &idAbsence) {
-    CoroMapper<drogon_model::ProjetV1::AbsenceCours> mapperabsence(db);
-    auto resultat = co_await mapperabsence.deleteByPrimaryKey(idAbsence);
-    co_return resultat;
-}
 
-drogon::Task<drogon_model::ProjetV1::Retardabsence> BadgeDAO::AjoutRetardAbsence(
-    const DbClientPtr &db,
-    const drogon_model::ProjetV1::Retardabsence &NouvelleEntree) {
-    CoroMapper<drogon_model::ProjetV1::Retardabsence> mapperRetardAbsence(db);
-    auto resultat = co_await mapperRetardAbsence.insert(NouvelleEntree);
-    co_return resultat;
-}
+
+
+
+
+
+
+

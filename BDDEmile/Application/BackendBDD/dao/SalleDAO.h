@@ -8,29 +8,38 @@
 #include "models/Salle.h"
 #include <drogon/utils/coroutine.h>
 #include "models/Utilisateur.h"
-#include "AbsenceCours.h"
-#include "PresenceCours.h"
-#include "models/Cours.h"
+#include <resultat/StructResultat.h>
 
 using namespace drogon::orm;
 
 class SalleDAO {
 public:
-    static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACbae(
+
+//Chercher une salle à partir de l'adresse MAC
+//Renvoie une liste de salle
+static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Salle>>> ChercherSalleAdresseMACbae(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
+    //Adresse MAC
     const std::string &MAC);
 
-    static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursParSalle(
-        const DbClientPtr &db,
-        const int32_t &numSalle);
+//Chercher une salle à partir de l'adresse MAC
+//Renvoie une liste de salle
+static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Salle>>> ChercherSalleAdresseMACpea(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //Adresse MAC
+    const std::string &MAC);
 
-    static drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> ChercherUtilisateurDansAbsencecours(
-        const DbClientPtr &db,
-        const int32_t &uidUtilisateur);
+    static drogon::Task<ResultatCoro<>> VerifierExistanceSalle(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //nom salle
+    const std::string &nomsalle);
 
-    static drogon::Task<std::vector<drogon_model::ProjetV1::PresenceCours>> ChercherUtilisateurDansPresencecours(
-        const DbClientPtr &db,
-        const int32_t &uidUtilisateur);
+    static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Salle>>> ListeSalle(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db);
 };
 
 

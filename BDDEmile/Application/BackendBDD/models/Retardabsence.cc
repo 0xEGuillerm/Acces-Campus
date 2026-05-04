@@ -11,7 +11,7 @@
 
 using namespace drogon;
 using namespace drogon::orm;
-using namespace drogon_model::ProjetV1;
+using namespace drogon_model::acces_campus_bdd;
 
 const std::string Retardabsence::Cols::_id_retardabsence = "\"id_retardabsence\"";
 const std::string Retardabsence::Cols::_id_user = "\"id_user\"";
@@ -25,7 +25,7 @@ const std::string Retardabsence::tableName = "\"retardabsence\"";
 
 const std::vector<typename Retardabsence::MetaData> Retardabsence::metaData_={
 {"id_retardabsence","int32_t","integer",4,1,1,1},
-{"id_user","int32_t","integer",4,1,0,1},
+{"id_user","int32_t","integer",4,0,0,1},
 {"id_cours","int32_t","integer",4,0,0,1},
 {"temps_retard_min","int32_t","integer",4,0,0,0},
 {"absence","bool","boolean",1,0,0,1},
@@ -306,6 +306,7 @@ void Retardabsence::updateByMasqueradedJson(const Json::Value &pJson,
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
     {
+        dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
             idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
@@ -374,6 +375,7 @@ void Retardabsence::updateByJson(const Json::Value &pJson) noexcept(false)
     }
     if(pJson.isMember("id_user"))
     {
+        dirtyFlag_[1] = true;
         if(!pJson["id_user"].isNull())
         {
             idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
@@ -555,6 +557,7 @@ void Retardabsence::updateId(const uint64_t id)
 const std::vector<std::string> &Retardabsence::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
+        "id_user",
         "id_cours",
         "temps_retard_min",
         "absence",
@@ -565,6 +568,17 @@ const std::vector<std::string> &Retardabsence::insertColumns() noexcept
 
 void Retardabsence::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 {
+    if(dirtyFlag_[1])
+    {
+        if(getIdUser())
+        {
+            binder << getValueOfIdUser();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
     if(dirtyFlag_[2])
     {
         if(getIdCours())
@@ -614,6 +628,10 @@ void Retardabsence::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 const std::vector<std::string> Retardabsence::updateColumns() const
 {
     std::vector<std::string> ret;
+    if(dirtyFlag_[1])
+    {
+        ret.push_back(getColumnName(1));
+    }
     if(dirtyFlag_[2])
     {
         ret.push_back(getColumnName(2));
@@ -635,6 +653,17 @@ const std::vector<std::string> Retardabsence::updateColumns() const
 
 void Retardabsence::updateArgs(drogon::orm::internal::SqlBinder &binder) const
 {
+    if(dirtyFlag_[1])
+    {
+        if(getIdUser())
+        {
+            binder << getValueOfIdUser();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
     if(dirtyFlag_[2])
     {
         if(getIdCours())
@@ -877,6 +906,11 @@ bool Retardabsence::validateJsonForCreation(const Json::Value &pJson, std::strin
         if(!validJsonOfField(1, "id_user", pJson["id_user"], err, true))
             return false;
     }
+    else
+    {
+        err="The id_user column cannot be null";
+        return false;
+    }
     if(pJson.isMember("id_cours"))
     {
         if(!validJsonOfField(2, "id_cours", pJson["id_cours"], err, true))
@@ -934,6 +968,11 @@ bool Retardabsence::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, true))
                   return false;
           }
+        else
+        {
+            err="The " + pMasqueradingVector[1] + " column cannot be null";
+            return false;
+        }
       }
       if(!pMasqueradingVector[2].empty())
       {
@@ -1106,16 +1145,6 @@ bool Retardabsence::validJsonOfField(size_t index,
             if(pJson.isNull())
             {
                 err="The " + fieldName + " column cannot be null";
-                return false;
-            }
-            if(isForCreation)
-            {
-                err="The automatic primary key cannot be set";
-                return false;
-            }
-            else
-            {
-                err="The automatic primary key cannot be update";
                 return false;
             }
             if(!pJson.isInt())

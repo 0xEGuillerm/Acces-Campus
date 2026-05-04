@@ -10,21 +10,29 @@
 
 using namespace drogon::orm;
 
-
+//bae/scanner_badge
+//Prend l'adresse MAC du PEA
+//En cas de réussite renvoie les infos de l'élèves
+//En cas d'échec renvoie un code d'erreur
+//Utilisation de task pour l'asynchrone
 drogon::Task<drogon::HttpResponsePtr> PEAController::VerifierBadgePEAController(drogon::HttpRequestPtr req){
     std::string mac = req->getParameter("MAC");
     std::string badgeid = req->getParameter("badgeid");
     if (badgeid.empty() || mac.empty())
     {
-        Json::Value MessageErreur;
-        MessageErreur = "Requête mal formulée. Veuillez vérifier les champs.";
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse("Requête mal formulée. Veuillez vérifier les champs.");
         ReponseAPI->setStatusCode(drogon::k400BadRequest);
         co_return ReponseAPI;
     }
     auto DbClientPtr = drogon::app().getDbClient();
-    auto utilisateur = co_await BadgeLogique::VerifierBadgePEA(DbClientPtr, badgeid, mac);
-    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse((utilisateur.BoolResultat));
+    auto resultat = co_await BadgeLogique::VerifierBadgePEA(DbClientPtr, badgeid, mac);
+    if (resultat.BoolResultat == false)
+    {
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
+        ReponseAPI->setStatusCode(drogon::k404NotFound);
+        co_return ReponseAPI;
+    }
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse((resultat.donnee));
     ReponseAPI->setStatusCode(drogon::k200OK);
     co_return ReponseAPI;
 }

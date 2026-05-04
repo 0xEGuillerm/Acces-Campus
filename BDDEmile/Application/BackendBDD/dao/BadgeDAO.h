@@ -10,75 +10,46 @@
 #include "models/Utilisateur.h"
 #include <functional>
 #include "Badge.h"
-#include "models/Salle.h"
-#include "models/Cours.h"
-#include "AbsenceCours.h"
-#include "PresenceCours.h"
-#include "models/Retardabsence.h"
+#include <resultat/StructResultat.h>
 
 using namespace drogon::orm;
 
 class BadgeDAO
 {
 public:
-    // Obtenir les infos d'un badge
-    static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParIDBadge(
-        const DbClientPtr &db,
-        const std::string &uidBadge);
-
-    //DeleteByPrimaryKey
-    static drogon::Task<size_t> SupprimerBadgeParIDBadge(
-        const DbClientPtr &db,
-        const std::string &uidBadge);
-
-    //FindBy
-    static drogon::Task<std::vector<drogon_model::ProjetV1::Badge>> ChercherBadgeParIDBadge(
-        const DbClientPtr &db,
-        const std::string &uidBadge);
-
-    //FindBy
-    static drogon::Task<std::vector<drogon_model::ProjetV1::Utilisateur>> ChercherUtilisateurParIDUtilisateur(
-        const DbClientPtr &db,
-        const int32_t &uidUtilisateur);
-
-    //update
-
-    static drogon::Task<size_t> MettreAJourUser(
+//Recherche un utilisateur à partir de l'id d'un badge
+//Renvoie un vecteur d'utilisateur
+static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>>> ChercherUtilisateurParIDBadge(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
-    const drogon_model::ProjetV1::Utilisateur &UtilisateurModifier);
+    //uid badge
+    const std::string &uidBadge);
 
-
-
-    static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACbae(
-        const DbClientPtr &db,
-        const std::string &MAC);
-
-    static drogon::Task<std::vector<drogon_model::ProjetV1::Salle>> ChercherSalleAdresseMACpea(
-        const DbClientPtr &db,
-        const std::string &MAC);
-
-    static drogon::Task<std::vector<drogon_model::ProjetV1::Cours>> ChercherCoursParSalle(
-        const DbClientPtr &db,
-        const int32_t &numSalle);
-
-
-    static drogon::Task<drogon_model::ProjetV1::PresenceCours> AjoutUtilisateurPresenceCours(
-        const DbClientPtr &db,
-        const drogon_model::ProjetV1::PresenceCours &NouvelleEntree);
-
-
-    static drogon::Task<size_t> SupprimerUtilisateurAbsence(
-        const DbClientPtr &db,
-        const int32_t &idAbsence);
-
-    static drogon::Task<std::vector<drogon_model::ProjetV1::AbsenceCours>> ChercherUtilisateurDansAbsencecours(
+//Supprime un badge à partir de l'id
+//Renvoie le nombre d'élément supprimer
+static drogon::Task<ResultatCoro<>> SupprimerBadgeParIDBadge(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
-    const int32_t &uidUtilisateur);
+    //uid badge
+    const std::string &uidBadge);
 
-
-    static drogon::Task<drogon_model::ProjetV1::Retardabsence> AjoutRetardAbsence(
+//Recherche un badge à partir de l'id d'un badge
+//Renvoie un vecteur de badge
+static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Badge>>> ChercherBadgeParIDBadge(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
-    const drogon_model::ProjetV1::Retardabsence &NouvelleEntree);
+    //uid badge
+    const std::string &uidBadge);
+
+//Ajout d'une entrée dans la table Badge
+//A besoin d'un objet Badge avec les informations remplis
+//insert vas ajouté une nouvelle entrée dans la table Badge
+//Renvoie l'objet Badge ajouté
+static drogon::Task<ResultatCoro<drogon_model::acces_campus_bdd::Badge>> AjoutBadge(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //Objet Badge avec les informations remplis
+    const drogon_model::acces_campus_bdd::Badge &NouvelleEntree);
 };
 
 #endif //BACKENDBDD_BADGEDAO_H

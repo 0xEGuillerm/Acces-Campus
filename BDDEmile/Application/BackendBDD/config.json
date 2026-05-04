@@ -7,7 +7,7 @@
             //address: Ip address,0.0.0.0 by default
             "address": "0.0.0.0",
             //port: Port number
-            "port": 80,
+            "port": 4444,
             //https: If true, use https for security,false by default
             "https": false
         }
@@ -21,15 +21,15 @@
             //filename: Sqlite3 db file name
             //"filename":"",
             //host: Server address,localhost by default
-            "host": "127.0.0.1",
+            "host": "bddpostgres",
             //port: Server port, 5432 by default
             "port": 5432,
             //dbname: Database name
-            "dbname": "ProjetV1",
+            "dbname": "acces_campus_bdd",
             //user: 'postgres' by default
-            "user": "emileguillerm",
+            "user": "drogon",
             //passwd: '' by default
-            "passwd": "",
+            "passwd": "pF4Z1gA5H2",
             //is_fast: false by default, if it is true, the client is faster but user can't call
             //any synchronous interface of it.
             "is_fast": false,

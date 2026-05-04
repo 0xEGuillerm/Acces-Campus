@@ -36,7 +36,7 @@ using DbClientPtr = std::shared_ptr<DbClient>;
 }
 namespace drogon_model
 {
-namespace ProjetV1
+namespace acces_campus_bdd
 {
 
 class Retardabsence
@@ -211,8 +211,11 @@ class Retardabsence
         needSelection = false;
             sql += "id_retardabsence,";
             ++parametersCount;
+        if(dirtyFlag_[1])
+        {
             sql += "id_user,";
             ++parametersCount;
+        }
         if(dirtyFlag_[2])
         {
             sql += "id_cours,";
@@ -247,7 +250,11 @@ class Retardabsence
         char placeholderStr[64];
         size_t n=0;
         sql +="default,";
-        sql +="default,";
+        if(dirtyFlag_[1])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
         if(dirtyFlag_[2])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
@@ -288,5 +295,5 @@ class Retardabsence
         return sql;
     }
 };
-} // namespace ProjetV1
+} // namespace acces_campus_bdd
 } // namespace drogon_model

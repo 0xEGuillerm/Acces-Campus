@@ -8,12 +8,10 @@
 #include "Salle.h"
 #include <drogon/utils/Utilities.h>
 #include <string>
-#include <codecvt>
-#include <locale>
 
 using namespace drogon;
 using namespace drogon::orm;
-using namespace drogon_model::ProjetV1;
+using namespace drogon_model::acces_campus_bdd;
 
 const std::string Salle::Cols::_num_salle = "\"num_salle\"";
 const std::string Salle::Cols::_place_maximum = "\"place_maximum\"";
@@ -24,7 +22,7 @@ const bool Salle::hasPrimaryKey = true;
 const std::string Salle::tableName = "\"salle\"";
 
 const std::vector<typename Salle::MetaData> Salle::metaData_={
-{"num_salle","int32_t","integer",4,0,1,1},
+{"num_salle","std::string","character varying",4,0,1,1},
 {"place_maximum","int32_t","integer",4,0,0,1},
 {"mac_bae","std::string","character varying",17,0,0,0},
 {"mac_pea","std::string","character varying",17,0,0,0}
@@ -40,7 +38,7 @@ Salle::Salle(const Row &r, const ssize_t indexOffset) noexcept
     {
         if(!r["num_salle"].isNull())
         {
-            numSalle_=std::make_shared<int32_t>(r["num_salle"].as<int32_t>());
+            numSalle_=std::make_shared<std::string>(r["num_salle"].as<std::string>());
         }
         if(!r["place_maximum"].isNull())
         {
@@ -67,7 +65,7 @@ Salle::Salle(const Row &r, const ssize_t indexOffset) noexcept
         index = offset + 0;
         if(!r[index].isNull())
         {
-            numSalle_=std::make_shared<int32_t>(r[index].as<int32_t>());
+            numSalle_=std::make_shared<std::string>(r[index].as<std::string>());
         }
         index = offset + 1;
         if(!r[index].isNull())
@@ -100,7 +98,7 @@ Salle::Salle(const Json::Value &pJson, const std::vector<std::string> &pMasquera
         dirtyFlag_[0] = true;
         if(!pJson[pMasqueradingVector[0]].isNull())
         {
-            numSalle_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[0]].asInt64());
+            numSalle_=std::make_shared<std::string>(pJson[pMasqueradingVector[0]].asString());
         }
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
@@ -136,7 +134,7 @@ Salle::Salle(const Json::Value &pJson) noexcept(false)
         dirtyFlag_[0]=true;
         if(!pJson["num_salle"].isNull())
         {
-            numSalle_=std::make_shared<int32_t>((int32_t)pJson["num_salle"].asInt64());
+            numSalle_=std::make_shared<std::string>(pJson["num_salle"].asString());
         }
     }
     if(pJson.isMember("place_maximum"))
@@ -177,7 +175,7 @@ void Salle::updateByMasqueradedJson(const Json::Value &pJson,
     {
         if(!pJson[pMasqueradingVector[0]].isNull())
         {
-            numSalle_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[0]].asInt64());
+            numSalle_=std::make_shared<std::string>(pJson[pMasqueradingVector[0]].asString());
         }
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
@@ -212,7 +210,7 @@ void Salle::updateByJson(const Json::Value &pJson) noexcept(false)
     {
         if(!pJson["num_salle"].isNull())
         {
-            numSalle_=std::make_shared<int32_t>((int32_t)pJson["num_salle"].asInt64());
+            numSalle_=std::make_shared<std::string>(pJson["num_salle"].asString());
         }
     }
     if(pJson.isMember("place_maximum"))
@@ -241,20 +239,25 @@ void Salle::updateByJson(const Json::Value &pJson) noexcept(false)
     }
 }
 
-const int32_t &Salle::getValueOfNumSalle() const noexcept
+const std::string &Salle::getValueOfNumSalle() const noexcept
 {
-    static const int32_t defaultValue = int32_t();
+    static const std::string defaultValue = std::string();
     if(numSalle_)
         return *numSalle_;
     return defaultValue;
 }
-const std::shared_ptr<int32_t> &Salle::getNumSalle() const noexcept
+const std::shared_ptr<std::string> &Salle::getNumSalle() const noexcept
 {
     return numSalle_;
 }
-void Salle::setNumSalle(const int32_t &pNumSalle) noexcept
+void Salle::setNumSalle(const std::string &pNumSalle) noexcept
 {
-    numSalle_ = std::make_shared<int32_t>(pNumSalle);
+    numSalle_ = std::make_shared<std::string>(pNumSalle);
+    dirtyFlag_[0] = true;
+}
+void Salle::setNumSalle(std::string &&pNumSalle) noexcept
+{
+    numSalle_ = std::make_shared<std::string>(std::move(pNumSalle));
     dirtyFlag_[0] = true;
 }
 const typename Salle::PrimaryKeyType & Salle::getPrimaryKey() const
@@ -777,9 +780,17 @@ bool Salle::validJsonOfField(size_t index,
                 err="The " + fieldName + " column cannot be null";
                 return false;
             }
-            if(!pJson.isInt())
+            if(!pJson.isString())
             {
                 err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            if(pJson.isString() && std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}
+                .from_bytes(pJson.asCString()).size() > 4)
+            {
+                err="String length exceeds limit for the " +
+                    fieldName +
+                    " field (the maximum value is 4)";
                 return false;
             }
             break;
