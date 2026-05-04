@@ -8,12 +8,10 @@
 #include "Historique.h"
 #include <drogon/utils/Utilities.h>
 #include <string>
-#include <codecvt>
-#include <locale>
 
 using namespace drogon;
 using namespace drogon::orm;
-using namespace drogon_model::ProjetV1;
+using namespace drogon_model::acces_campus_bdd;
 
 const std::string Historique::Cols::_id_historique = "\"id_historique\"";
 const std::string Historique::Cols::_id_user = "\"id_user\"";
@@ -25,7 +23,7 @@ const std::string Historique::tableName = "\"historique\"";
 
 const std::vector<typename Historique::MetaData> Historique::metaData_={
 {"id_historique","int32_t","integer",4,1,1,1},
-{"id_user","int32_t","integer",4,1,0,1},
+{"id_user","int32_t","integer",4,0,0,1},
 {"date_action","::trantor::Date","timestamp without time zone",0,0,0,1},
 {"type_action","std::string","character varying",50,0,0,1}
 };
@@ -254,6 +252,7 @@ void Historique::updateByMasqueradedJson(const Json::Value &pJson,
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
     {
+        dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
             idUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
@@ -306,6 +305,7 @@ void Historique::updateByJson(const Json::Value &pJson) noexcept(false)
     }
     if(pJson.isMember("id_user"))
     {
+        dirtyFlag_[1] = true;
         if(!pJson["id_user"].isNull())
         {
             idUser_=std::make_shared<int32_t>((int32_t)pJson["id_user"].asInt64());
@@ -432,6 +432,7 @@ void Historique::updateId(const uint64_t id)
 const std::vector<std::string> &Historique::insertColumns() noexcept
 {
     static const std::vector<std::string> inCols={
+        "id_user",
         "date_action",
         "type_action"
     };
@@ -440,6 +441,17 @@ const std::vector<std::string> &Historique::insertColumns() noexcept
 
 void Historique::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 {
+    if(dirtyFlag_[1])
+    {
+        if(getIdUser())
+        {
+            binder << getValueOfIdUser();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
     if(dirtyFlag_[2])
     {
         if(getDateAction())
@@ -467,6 +479,10 @@ void Historique::outputArgs(drogon::orm::internal::SqlBinder &binder) const
 const std::vector<std::string> Historique::updateColumns() const
 {
     std::vector<std::string> ret;
+    if(dirtyFlag_[1])
+    {
+        ret.push_back(getColumnName(1));
+    }
     if(dirtyFlag_[2])
     {
         ret.push_back(getColumnName(2));
@@ -480,6 +496,17 @@ const std::vector<std::string> Historique::updateColumns() const
 
 void Historique::updateArgs(drogon::orm::internal::SqlBinder &binder) const
 {
+    if(dirtyFlag_[1])
+    {
+        if(getIdUser())
+        {
+            binder << getValueOfIdUser();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
     if(dirtyFlag_[2])
     {
         if(getDateAction())
@@ -646,6 +673,11 @@ bool Historique::validateJsonForCreation(const Json::Value &pJson, std::string &
         if(!validJsonOfField(1, "id_user", pJson["id_user"], err, true))
             return false;
     }
+    else
+    {
+        err="The id_user column cannot be null";
+        return false;
+    }
     if(pJson.isMember("date_action"))
     {
         if(!validJsonOfField(2, "date_action", pJson["date_action"], err, true))
@@ -688,6 +720,11 @@ bool Historique::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, true))
                   return false;
           }
+        else
+        {
+            err="The " + pMasqueradingVector[1] + " column cannot be null";
+            return false;
+        }
       }
       if(!pMasqueradingVector[2].empty())
       {
@@ -819,16 +856,6 @@ bool Historique::validJsonOfField(size_t index,
             if(pJson.isNull())
             {
                 err="The " + fieldName + " column cannot be null";
-                return false;
-            }
-            if(isForCreation)
-            {
-                err="The automatic primary key cannot be set";
-                return false;
-            }
-            else
-            {
-                err="The automatic primary key cannot be update";
                 return false;
             }
             if(!pJson.isInt())

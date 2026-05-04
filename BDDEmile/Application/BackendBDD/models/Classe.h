@@ -36,7 +36,7 @@ using DbClientPtr = std::shared_ptr<DbClient>;
 }
 namespace drogon_model
 {
-namespace ProjetV1
+namespace acces_campus_bdd
 {
 
 class Classe
@@ -215,5 +215,5 @@ class Classe
         return sql;
     }
 };
-} // namespace ProjetV1
+} // namespace acces_campus_bdd
 } // namespace drogon_model

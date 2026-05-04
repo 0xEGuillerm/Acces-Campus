@@ -8,6 +8,7 @@
 #include <json/value.h>
 #include <drogon/HttpController.h>
 #include "dao/UtilisateurDAO.h"
+#include <resultat/StructResultat.h>
 
 
 
@@ -15,13 +16,22 @@ using namespace drogon::orm;
 
 
 
-
+//Logique en lien avec utilisateur
 class UtilisateurLogique {
 public:
-    static drogon::Task<Json::Value> UtilisateurParNomPrenom(
+    //Recherche utilisateur par prenom et/ou nom.
+    //Renvoie une liste d'utilisateur dans un JSON
+    static drogon::Task<ResultatCoro<Json::Value>> UtilisateurParNomPrenom(
         const DbClientPtr &db,
         const std::string &nom,
         const std::string &prenom);
+
+    //Logique pour le login d'un utilisateur sur le PSW.
+    //Renvoi Un token JWT en JSON dans le cas d'une réussite.
+    static drogon::Task<ResultatCoro<Json::Value>> LoginPSW(
+        const DbClientPtr &db,
+        const std::string &login,
+        const std::string &motdepasse);
 };
 
 

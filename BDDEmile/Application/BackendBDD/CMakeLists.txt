@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.5)
+#version de cmake minimum
+cmake_minimum_required(VERSION 3.20)
+#nom de l'éxecutable --> BackendBDD
 project(BackendBDD CXX)
 
+#standard c++ à 20
 set(CMAKE_CXX_STANDARD 20)
-add_compile_options(-fcoroutines)
 
+#verification des fonctionnalité du compilateur (pour les coroutines)
 include(CheckIncludeFileCXX)
 
 check_include_file_cxx(any HAS_ANY)
@@ -19,9 +22,11 @@ else ()
     set(CMAKE_CXX_STANDARD 14)
 endif ()
 
+#obligation d'utiliser le standard 20 en c++
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+#fichier a compiler
 add_executable(${PROJECT_NAME} main.cc
         models/Badge.cc
         dao/BadgeDAO.cpp
@@ -54,6 +59,10 @@ add_executable(${PROJECT_NAME} main.cc
         controllers/PSWController.h
         controllers/PGSController.cpp
         controllers/PGSController.h
+        dao/ClasseDAO.cpp
+        dao/ClasseDAO.h
+        dao/PresenceAbsenceCoursDAO.cpp
+        dao/PresenceAbsenceCoursDAO.h
 )
 
 # ##############################################################################
@@ -63,13 +72,17 @@ add_executable(${PROJECT_NAME} main.cc
 # target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
 #
 # and comment out the following lines
+#recherche de drogon sur ma machine
 find_package(Drogon CONFIG REQUIRED)
+#ajout de drogon en lien
 target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
 
+#copie de la config drogon vers mon dossier
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.json ${CMAKE_CURRENT_BINARY_DIR}/config.json COPYONLY)
 
 # ##############################################################################
 
+#reverification de version
 if (CMAKE_CXX_STANDARD LESS 17)
     message(FATAL_ERROR "c++17 or higher is required")
 elseif (CMAKE_CXX_STANDARD LESS 20)
@@ -93,6 +106,7 @@ drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
 # drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
 #                     ${CMAKE_CURRENT_BINARY_DIR} TRUE CHANGE_ME)
 
+#préprocesseur
 target_include_directories(${PROJECT_NAME}
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
                                    ${CMAKE_CURRENT_SOURCE_DIR}/models)
@@ -109,4 +123,19 @@ target_sources(${PROJECT_NAME}
 
 # ##############################################################################
 
-add_subdirectory(test)
+#verification openssl (pour jwt)
+find_package(OpenSSL REQUIRED)
+
+#Dit au compilateur de prendre en compte le dossier avec la librairie jwt
+target_include_directories(${PROJECT_NAME}  PRIVATE ${CMAKE_SOURCE_DIR}/librairie_divers/jwt-cpp/include)
+
+#linker openssl
+target_link_libraries(${PROJECT_NAME}  PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+
+#ajout librairie libsodium (chiffrement)
+#recherche
+find_package(PkgConfig REQUIRED)
+#ajout du pkg
+pkg_check_modules(SODIUM REQUIRED libsodium)
+target_include_directories(${PROJECT_NAME} PRIVATE ${SODIUM_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${SODIUM_LIBRARIES})

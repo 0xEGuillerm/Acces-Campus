@@ -36,7 +36,7 @@ using DbClientPtr = std::shared_ptr<DbClient>;
 }
 namespace drogon_model
 {
-namespace ProjetV1
+namespace acces_campus_bdd
 {
 
 class Badge
@@ -45,7 +45,6 @@ class Badge
     struct Cols
     {
         static const std::string _uuid_badge;
-        static const std::string _uuid_user;
         static const std::string _date_creation;
     };
 
@@ -107,14 +106,6 @@ class Badge
     void setUuidBadge(const std::string &pUuidBadge) noexcept;
     void setUuidBadge(std::string &&pUuidBadge) noexcept;
 
-    /**  For column uuid_user  */
-    ///Get the value of the column uuid_user, returns the default value if the column is null
-    const int32_t &getValueOfUuidUser() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<int32_t> &getUuidUser() const noexcept;
-    ///Set the value of the column uuid_user
-    void setUuidUser(const int32_t &pUuidUser) noexcept;
-
     /**  For column date_creation  */
     ///Get the value of the column date_creation, returns the default value if the column is null
     const ::trantor::Date &getValueOfDateCreation() const noexcept;
@@ -124,7 +115,7 @@ class Badge
     void setDateCreation(const ::trantor::Date &pDateCreation) noexcept;
 
 
-    static size_t getColumnNumber() noexcept {  return 3;  }
+    static size_t getColumnNumber() noexcept {  return 2;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -147,7 +138,6 @@ class Badge
     ///For mysql or sqlite3
     void updateId(const uint64_t id);
     std::shared_ptr<std::string> uuidBadge_;
-    std::shared_ptr<int32_t> uuidUser_;
     std::shared_ptr<::trantor::Date> dateCreation_;
     struct MetaData
     {
@@ -160,7 +150,7 @@ class Badge
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[3]={ false };
+    bool dirtyFlag_[2]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -183,15 +173,12 @@ class Badge
             sql += "uuid_badge,";
             ++parametersCount;
         }
-            sql += "uuid_user,";
-            ++parametersCount;
         sql += "date_creation,";
         ++parametersCount;
-        if(!dirtyFlag_[2])
+        if(!dirtyFlag_[1])
         {
             needSelection=true;
         }
-        needSelection=true;
         if(parametersCount > 0)
         {
             sql[sql.length()-1]=')';
@@ -208,8 +195,7 @@ class Badge
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
-        sql +="default,";
-        if(dirtyFlag_[2])
+        if(dirtyFlag_[1])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
@@ -234,5 +220,5 @@ class Badge
         return sql;
     }
 };
-} // namespace ProjetV1
+} // namespace acces_campus_bdd
 } // namespace drogon_model

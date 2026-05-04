@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/intellij+all,visualstudio,visualstudiocode,cmake,c,c++
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij+all,visualstudio,visualstudiocode,cmake,c,c++
 
+#Enlever les fichier qui storent les informations sensible (à ajouter)
+.env
+.env.local
+
 ### C ###
 # Prerequisites
 *.d

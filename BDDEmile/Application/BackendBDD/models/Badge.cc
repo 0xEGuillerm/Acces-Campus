@@ -8,15 +8,12 @@
 #include "Badge.h"
 #include <drogon/utils/Utilities.h>
 #include <string>
-#include <codecvt>
-#include <locale>
 
 using namespace drogon;
 using namespace drogon::orm;
-using namespace drogon_model::ProjetV1;
+using namespace drogon_model::acces_campus_bdd;
 
 const std::string Badge::Cols::_uuid_badge = "\"uuid_badge\"";
-const std::string Badge::Cols::_uuid_user = "\"uuid_user\"";
 const std::string Badge::Cols::_date_creation = "\"date_creation\"";
 const std::string Badge::primaryKeyName = "uuid_badge";
 const bool Badge::hasPrimaryKey = true;
@@ -24,7 +21,6 @@ const std::string Badge::tableName = "\"badge\"";
 
 const std::vector<typename Badge::MetaData> Badge::metaData_={
 {"uuid_badge","std::string","character varying",8,0,1,1},
-{"uuid_user","int32_t","integer",4,1,0,1},
 {"date_creation","::trantor::Date","timestamp without time zone",0,0,0,1}
 };
 const std::string &Badge::getColumnName(size_t index) noexcept(false)
@@ -39,10 +35,6 @@ Badge::Badge(const Row &r, const ssize_t indexOffset) noexcept
         if(!r["uuid_badge"].isNull())
         {
             uuidBadge_=std::make_shared<std::string>(r["uuid_badge"].as<std::string>());
-        }
-        if(!r["uuid_user"].isNull())
-        {
-            uuidUser_=std::make_shared<int32_t>(r["uuid_user"].as<int32_t>());
         }
         if(!r["date_creation"].isNull())
         {
@@ -70,7 +62,7 @@ Badge::Badge(const Row &r, const ssize_t indexOffset) noexcept
     else
     {
         size_t offset = (size_t)indexOffset;
-        if(offset + 3 > r.size())
+        if(offset + 2 > r.size())
         {
             LOG_FATAL << "Invalid SQL result for this model";
             return;
@@ -82,11 +74,6 @@ Badge::Badge(const Row &r, const ssize_t indexOffset) noexcept
             uuidBadge_=std::make_shared<std::string>(r[index].as<std::string>());
         }
         index = offset + 1;
-        if(!r[index].isNull())
-        {
-            uuidUser_=std::make_shared<int32_t>(r[index].as<int32_t>());
-        }
-        index = offset + 2;
         if(!r[index].isNull())
         {
             auto timeStr = r[index].as<std::string>();
@@ -115,7 +102,7 @@ Badge::Badge(const Row &r, const ssize_t indexOffset) noexcept
 
 Badge::Badge(const Json::Value &pJson, const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 3)
+    if(pMasqueradingVector.size() != 2)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -133,15 +120,7 @@ Badge::Badge(const Json::Value &pJson, const std::vector<std::string> &pMasquera
         dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
-            uuidUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
-        }
-    }
-    if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
-    {
-        dirtyFlag_[2] = true;
-        if(!pJson[pMasqueradingVector[2]].isNull())
-        {
-            auto timeStr = pJson[pMasqueradingVector[2]].asString();
+            auto timeStr = pJson[pMasqueradingVector[1]].asString();
             struct tm stm;
             memset(&stm,0,sizeof(stm));
             auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
@@ -174,17 +153,9 @@ Badge::Badge(const Json::Value &pJson) noexcept(false)
             uuidBadge_=std::make_shared<std::string>(pJson["uuid_badge"].asString());
         }
     }
-    if(pJson.isMember("uuid_user"))
-    {
-        dirtyFlag_[1]=true;
-        if(!pJson["uuid_user"].isNull())
-        {
-            uuidUser_=std::make_shared<int32_t>((int32_t)pJson["uuid_user"].asInt64());
-        }
-    }
     if(pJson.isMember("date_creation"))
     {
-        dirtyFlag_[2]=true;
+        dirtyFlag_[1]=true;
         if(!pJson["date_creation"].isNull())
         {
             auto timeStr = pJson["date_creation"].asString();
@@ -213,7 +184,7 @@ Badge::Badge(const Json::Value &pJson) noexcept(false)
 void Badge::updateByMasqueradedJson(const Json::Value &pJson,
                                             const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 3)
+    if(pMasqueradingVector.size() != 2)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -227,17 +198,10 @@ void Badge::updateByMasqueradedJson(const Json::Value &pJson,
     }
     if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
     {
+        dirtyFlag_[1] = true;
         if(!pJson[pMasqueradingVector[1]].isNull())
         {
-            uuidUser_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[1]].asInt64());
-        }
-    }
-    if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
-    {
-        dirtyFlag_[2] = true;
-        if(!pJson[pMasqueradingVector[2]].isNull())
-        {
-            auto timeStr = pJson[pMasqueradingVector[2]].asString();
+            auto timeStr = pJson[pMasqueradingVector[1]].asString();
             struct tm stm;
             memset(&stm,0,sizeof(stm));
             auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
@@ -269,16 +233,9 @@ void Badge::updateByJson(const Json::Value &pJson) noexcept(false)
             uuidBadge_=std::make_shared<std::string>(pJson["uuid_badge"].asString());
         }
     }
-    if(pJson.isMember("uuid_user"))
-    {
-        if(!pJson["uuid_user"].isNull())
-        {
-            uuidUser_=std::make_shared<int32_t>((int32_t)pJson["uuid_user"].asInt64());
-        }
-    }
     if(pJson.isMember("date_creation"))
     {
-        dirtyFlag_[2] = true;
+        dirtyFlag_[1] = true;
         if(!pJson["date_creation"].isNull())
         {
             auto timeStr = pJson["date_creation"].asString();
@@ -331,23 +288,6 @@ const typename Badge::PrimaryKeyType & Badge::getPrimaryKey() const
     return *uuidBadge_;
 }
 
-const int32_t &Badge::getValueOfUuidUser() const noexcept
-{
-    static const int32_t defaultValue = int32_t();
-    if(uuidUser_)
-        return *uuidUser_;
-    return defaultValue;
-}
-const std::shared_ptr<int32_t> &Badge::getUuidUser() const noexcept
-{
-    return uuidUser_;
-}
-void Badge::setUuidUser(const int32_t &pUuidUser) noexcept
-{
-    uuidUser_ = std::make_shared<int32_t>(pUuidUser);
-    dirtyFlag_[1] = true;
-}
-
 const ::trantor::Date &Badge::getValueOfDateCreation() const noexcept
 {
     static const ::trantor::Date defaultValue = ::trantor::Date();
@@ -362,7 +302,7 @@ const std::shared_ptr<::trantor::Date> &Badge::getDateCreation() const noexcept
 void Badge::setDateCreation(const ::trantor::Date &pDateCreation) noexcept
 {
     dateCreation_ = std::make_shared<::trantor::Date>(pDateCreation);
-    dirtyFlag_[2] = true;
+    dirtyFlag_[1] = true;
 }
 
 void Badge::updateId(const uint64_t id)
@@ -391,7 +331,7 @@ void Badge::outputArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
-    if(dirtyFlag_[2])
+    if(dirtyFlag_[1])
     {
         if(getDateCreation())
         {
@@ -411,9 +351,9 @@ const std::vector<std::string> Badge::updateColumns() const
     {
         ret.push_back(getColumnName(0));
     }
-    if(dirtyFlag_[2])
+    if(dirtyFlag_[1])
     {
-        ret.push_back(getColumnName(2));
+        ret.push_back(getColumnName(1));
     }
     return ret;
 }
@@ -431,7 +371,7 @@ void Badge::updateArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
-    if(dirtyFlag_[2])
+    if(dirtyFlag_[1])
     {
         if(getDateCreation())
         {
@@ -454,14 +394,6 @@ Json::Value Badge::toJson() const
     {
         ret["uuid_badge"]=Json::Value();
     }
-    if(getUuidUser())
-    {
-        ret["uuid_user"]=getValueOfUuidUser();
-    }
-    else
-    {
-        ret["uuid_user"]=Json::Value();
-    }
     if(getDateCreation())
     {
         ret["date_creation"]=getDateCreation()->toDbStringLocal();
@@ -482,7 +414,7 @@ Json::Value Badge::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {
     Json::Value ret;
-    if(pMasqueradingVector.size() == 3)
+    if(pMasqueradingVector.size() == 2)
     {
         if(!pMasqueradingVector[0].empty())
         {
@@ -497,24 +429,13 @@ Json::Value Badge::toMasqueradedJson(
         }
         if(!pMasqueradingVector[1].empty())
         {
-            if(getUuidUser())
+            if(getDateCreation())
             {
-                ret[pMasqueradingVector[1]]=getValueOfUuidUser();
+                ret[pMasqueradingVector[1]]=getDateCreation()->toDbStringLocal();
             }
             else
             {
                 ret[pMasqueradingVector[1]]=Json::Value();
-            }
-        }
-        if(!pMasqueradingVector[2].empty())
-        {
-            if(getDateCreation())
-            {
-                ret[pMasqueradingVector[2]]=getDateCreation()->toDbStringLocal();
-            }
-            else
-            {
-                ret[pMasqueradingVector[2]]=Json::Value();
             }
         }
         return ret;
@@ -527,14 +448,6 @@ Json::Value Badge::toMasqueradedJson(
     else
     {
         ret["uuid_badge"]=Json::Value();
-    }
-    if(getUuidUser())
-    {
-        ret["uuid_user"]=getValueOfUuidUser();
-    }
-    else
-    {
-        ret["uuid_user"]=Json::Value();
     }
     if(getDateCreation())
     {
@@ -559,14 +472,9 @@ bool Badge::validateJsonForCreation(const Json::Value &pJson, std::string &err)
         err="The uuid_badge column cannot be null";
         return false;
     }
-    if(pJson.isMember("uuid_user"))
-    {
-        if(!validJsonOfField(1, "uuid_user", pJson["uuid_user"], err, true))
-            return false;
-    }
     if(pJson.isMember("date_creation"))
     {
-        if(!validJsonOfField(2, "date_creation", pJson["date_creation"], err, true))
+        if(!validJsonOfField(1, "date_creation", pJson["date_creation"], err, true))
             return false;
     }
     return true;
@@ -575,7 +483,7 @@ bool Badge::validateMasqueradedJsonForCreation(const Json::Value &pJson,
                                                const std::vector<std::string> &pMasqueradingVector,
                                                std::string &err)
 {
-    if(pMasqueradingVector.size() != 3)
+    if(pMasqueradingVector.size() != 2)
     {
         err = "Bad masquerading vector";
         return false;
@@ -602,14 +510,6 @@ bool Badge::validateMasqueradedJsonForCreation(const Json::Value &pJson,
                   return false;
           }
       }
-      if(!pMasqueradingVector[2].empty())
-      {
-          if(pJson.isMember(pMasqueradingVector[2]))
-          {
-              if(!validJsonOfField(2, pMasqueradingVector[2], pJson[pMasqueradingVector[2]], err, true))
-                  return false;
-          }
-      }
     }
     catch(const Json::LogicError &e)
     {
@@ -630,14 +530,9 @@ bool Badge::validateJsonForUpdate(const Json::Value &pJson, std::string &err)
         err = "The value of primary key must be set in the json object for update";
         return false;
     }
-    if(pJson.isMember("uuid_user"))
-    {
-        if(!validJsonOfField(1, "uuid_user", pJson["uuid_user"], err, false))
-            return false;
-    }
     if(pJson.isMember("date_creation"))
     {
-        if(!validJsonOfField(2, "date_creation", pJson["date_creation"], err, false))
+        if(!validJsonOfField(1, "date_creation", pJson["date_creation"], err, false))
             return false;
     }
     return true;
@@ -646,7 +541,7 @@ bool Badge::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
                                              const std::vector<std::string> &pMasqueradingVector,
                                              std::string &err)
 {
-    if(pMasqueradingVector.size() != 3)
+    if(pMasqueradingVector.size() != 2)
     {
         err = "Bad masquerading vector";
         return false;
@@ -665,11 +560,6 @@ bool Badge::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
       if(!pMasqueradingVector[1].empty() && pJson.isMember(pMasqueradingVector[1]))
       {
           if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, false))
-              return false;
-      }
-      if(!pMasqueradingVector[2].empty() && pJson.isMember(pMasqueradingVector[2]))
-      {
-          if(!validJsonOfField(2, pMasqueradingVector[2], pJson[pMasqueradingVector[2]], err, false))
               return false;
       }
     }
@@ -709,28 +599,6 @@ bool Badge::validJsonOfField(size_t index,
             }
             break;
         case 1:
-            if(pJson.isNull())
-            {
-                err="The " + fieldName + " column cannot be null";
-                return false;
-            }
-            if(isForCreation)
-            {
-                err="The automatic primary key cannot be set";
-                return false;
-            }
-            else
-            {
-                err="The automatic primary key cannot be update";
-                return false;
-            }
-            if(!pJson.isInt())
-            {
-                err="Type error in the "+fieldName+" field";
-                return false;
-            }
-            break;
-        case 2:
             if(pJson.isNull())
             {
                 err="The " + fieldName + " column cannot be null";

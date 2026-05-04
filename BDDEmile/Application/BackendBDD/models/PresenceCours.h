@@ -36,7 +36,7 @@ using DbClientPtr = std::shared_ptr<DbClient>;
 }
 namespace drogon_model
 {
-namespace ProjetV1
+namespace acces_campus_bdd
 {
 
 class PresenceCours
@@ -114,6 +114,7 @@ class PresenceCours
     const std::shared_ptr<int32_t> &getIdUser() const noexcept;
     ///Set the value of the column id_user
     void setIdUser(const int32_t &pIdUser) noexcept;
+    void setIdUserToNull() noexcept;
 
     /**  For column id_cours  */
     ///Get the value of the column id_cours, returns the default value if the column is null
@@ -122,6 +123,7 @@ class PresenceCours
     const std::shared_ptr<int32_t> &getIdCours() const noexcept;
     ///Set the value of the column id_cours
     void setIdCours(const int32_t &pIdCours) noexcept;
+    void setIdCoursToNull() noexcept;
 
     /**  For column id_classe  */
     ///Get the value of the column id_classe, returns the default value if the column is null
@@ -190,10 +192,16 @@ class PresenceCours
         needSelection = false;
             sql += "id_presence,";
             ++parametersCount;
+        if(dirtyFlag_[1])
+        {
             sql += "id_user,";
             ++parametersCount;
+        }
+        if(dirtyFlag_[2])
+        {
             sql += "id_cours,";
             ++parametersCount;
+        }
         if(dirtyFlag_[3])
         {
             sql += "id_classe,";
@@ -212,8 +220,16 @@ class PresenceCours
         char placeholderStr[64];
         size_t n=0;
         sql +="default,";
-        sql +="default,";
-        sql +="default,";
+        if(dirtyFlag_[1])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[2])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
         if(dirtyFlag_[3])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
@@ -235,5 +251,5 @@ class PresenceCours
         return sql;
     }
 };
-} // namespace ProjetV1
+} // namespace acces_campus_bdd
 } // namespace drogon_model

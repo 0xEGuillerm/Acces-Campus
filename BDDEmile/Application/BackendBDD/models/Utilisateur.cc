@@ -8,12 +8,10 @@
 #include "Utilisateur.h"
 #include <drogon/utils/Utilities.h>
 #include <string>
-#include <codecvt>
-#include <locale>
 
 using namespace drogon;
 using namespace drogon::orm;
-using namespace drogon_model::ProjetV1;
+using namespace drogon_model::acces_campus_bdd;
 
 const std::string Utilisateur::Cols::_id_user = "\"id_user\"";
 const std::string Utilisateur::Cols::_nom_user = "\"nom_user\"";
@@ -34,7 +32,7 @@ const std::vector<typename Utilisateur::MetaData> Utilisateur::metaData_={
 {"login_user","std::string","character varying",60,0,0,1},
 {"hash_mdp","std::string","character varying",255,0,0,1},
 {"id_classe","int32_t","integer",4,0,0,0},
-{"role_user","std::string","character",0,0,0,1},
+{"role_user","std::string","character varying",16,0,0,1},
 {"uuid_badge","std::string","character varying",8,0,0,0}
 };
 const std::string &Utilisateur::getColumnName(size_t index) noexcept(false)
@@ -1459,6 +1457,14 @@ bool Utilisateur::validJsonOfField(size_t index,
             if(!pJson.isString())
             {
                 err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            if(pJson.isString() && std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}
+                .from_bytes(pJson.asCString()).size() > 16)
+            {
+                err="String length exceeds limit for the " +
+                    fieldName +
+                    " field (the maximum value is 16)";
                 return false;
             }
             break;

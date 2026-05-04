@@ -11,7 +11,7 @@
 
 using namespace drogon;
 using namespace drogon::orm;
-using namespace drogon_model::ProjetV1;
+using namespace drogon_model::acces_campus_bdd;
 
 const std::string Classe::Cols::_id_classe = "\"id_classe\"";
 const std::string Classe::Cols::_nom_classe = "\"nom_classe\"";

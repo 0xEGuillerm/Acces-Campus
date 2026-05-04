@@ -36,7 +36,7 @@ using DbClientPtr = std::shared_ptr<DbClient>;
 }
 namespace drogon_model
 {
-namespace ProjetV1
+namespace acces_campus_bdd
 {
 
 class Cours
@@ -50,6 +50,7 @@ class Cours
         static const std::string _heure_fin;
         static const std::string _id_classe;
         static const std::string _reserve_par;
+        static const std::string _professeur;
     };
 
     static const int primaryKeyNumber;
@@ -111,11 +112,12 @@ class Cours
 
     /**  For column num_salle  */
     ///Get the value of the column num_salle, returns the default value if the column is null
-    const int32_t &getValueOfNumSalle() const noexcept;
+    const std::string &getValueOfNumSalle() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<int32_t> &getNumSalle() const noexcept;
+    const std::shared_ptr<std::string> &getNumSalle() const noexcept;
     ///Set the value of the column num_salle
-    void setNumSalle(const int32_t &pNumSalle) noexcept;
+    void setNumSalle(const std::string &pNumSalle) noexcept;
+    void setNumSalle(std::string &&pNumSalle) noexcept;
 
     /**  For column heure_debut  */
     ///Get the value of the column heure_debut, returns the default value if the column is null
@@ -149,9 +151,19 @@ class Cours
     const std::shared_ptr<int32_t> &getReservePar() const noexcept;
     ///Set the value of the column reserve_par
     void setReservePar(const int32_t &pReservePar) noexcept;
+    void setReserveParToNull() noexcept;
+
+    /**  For column professeur  */
+    ///Get the value of the column professeur, returns the default value if the column is null
+    const int32_t &getValueOfProfesseur() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<int32_t> &getProfesseur() const noexcept;
+    ///Set the value of the column professeur
+    void setProfesseur(const int32_t &pProfesseur) noexcept;
+    void setProfesseurToNull() noexcept;
 
 
-    static size_t getColumnNumber() noexcept {  return 6;  }
+    static size_t getColumnNumber() noexcept {  return 7;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -174,11 +186,12 @@ class Cours
     ///For mysql or sqlite3
     void updateId(const uint64_t id);
     std::shared_ptr<int32_t> idCours_;
-    std::shared_ptr<int32_t> numSalle_;
+    std::shared_ptr<std::string> numSalle_;
     std::shared_ptr<::trantor::Date> heureDebut_;
     std::shared_ptr<::trantor::Date> heureFin_;
     std::shared_ptr<int32_t> idClasse_;
     std::shared_ptr<int32_t> reservePar_;
+    std::shared_ptr<int32_t> professeur_;
     struct MetaData
     {
         const std::string colName_;
@@ -190,7 +203,7 @@ class Cours
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[6]={ false };
+    bool dirtyFlag_[7]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -230,8 +243,16 @@ class Cours
             sql += "id_classe,";
             ++parametersCount;
         }
+        if(dirtyFlag_[5])
+        {
             sql += "reserve_par,";
             ++parametersCount;
+        }
+        if(dirtyFlag_[6])
+        {
+            sql += "professeur,";
+            ++parametersCount;
+        }
         needSelection=true;
         if(parametersCount > 0)
         {
@@ -265,7 +286,16 @@ class Cours
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
-        sql +="default,";
+        if(dirtyFlag_[5])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[6])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
         if(parametersCount > 0)
         {
             sql.resize(sql.length() - 1);
@@ -282,5 +312,5 @@ class Cours
         return sql;
     }
 };
-} // namespace ProjetV1
+} // namespace acces_campus_bdd
 } // namespace drogon_model

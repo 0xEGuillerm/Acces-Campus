@@ -1,0 +1,35 @@
+services:
+  bddpostgres:
+    build:
+      context: ./docker_bdd
+      dockerfile: Dockerfile
+    container_name: acces_campus_bdd
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: K5QGdgygCs
+      POSTGRES_DB: acces_campus_bdd
+    volumes:
+      - postgresql_donnee:/var/lib/postgresql/data
+    # attend que postgres se lance avant de lancer le backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d acces_campus_bdd"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+  backend:
+    build:
+      context: .
+      dockerfile: docker_backend/Dockerfile
+    container_name: acces_campus_backend
+    ports:
+      - "4444:4444"
+    depends_on:
+      bddpostgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgresql_donnee:

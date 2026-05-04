@@ -1,0 +1,23 @@
+# Pas utile a ajoute a docker */
+*.o
+*.a
+
+# CLion / IDE
+.idea/
+.vscode/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Logs
+*.log

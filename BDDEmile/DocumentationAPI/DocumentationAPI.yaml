@@ -1,0 +1,1128 @@
+openapi: 3.0.0
+info:
+  title: API BDD Acces Campus
+  description: >-
+    Documentation de l'API du backend Acces Campus.
+    Cette API expose les routes utilisees par le PGS (Poste de Gestion
+    de Salle), PSW (Poste Serveur Web), BAE (Borne d'Appel Etudiant) et PEA
+    (Poignee Electrique Autonome).
+  contact:
+    email: emile.guillerm@saintaubinlasalle.fr
+  version: 2.0.0
+servers:
+  - url: http://localhost
+    description: Serveur de developpement local
+tags:
+  - name: BAE
+    description: Borne d'Appel Etudiant
+  - name: PEA
+    description: Poignee Electrique Autonome
+  - name: PGS
+    description: Poste Gestion Salle
+  - name: PSW
+    description: Poste Serveur Web
+
+paths:
+  /bae/etat_salle:
+    get:
+      tags:
+        - BAE
+      summary: Etat actuel de la salle a partir de l'adresse MAC du BAE
+      description: >-
+        Recupere les informations du cours en cours dans la salle correspondant
+        a l'adresse MAC du BAE (classe, duree depuis le debut, professeur,
+        nombre de presents, nombre d'absents, liste des presents, liste des
+        absents).
+      parameters:
+        - in: query
+          name: MAC
+          required: true
+          description: Adresse MAC du BAE
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operation reussie. Retour des informations du cours en cours.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EtatSalle"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur (salle introuvable, pas de cours, etc.)
+          content:
+            application/json:
+              examples:
+                salleIntrouvable:
+                  value: "Salle introuvable"
+                pasDeCours:
+                  value: "Pas de cours"
+                erreur:
+                  value: "Erreur"
+
+  /bae/scanner_badge:
+    post:
+      tags:
+        - BAE
+      summary: Scanne d'un badge sur le BAE
+      description: >-
+        Enregistre le scanne d'un badge (uuid) sur le BAE identifie par son
+        adresse MAC. Met a jour la presence et eventuellement enregistre un
+        retard si le badge est scanne apres le debut du cours (marge de 5min).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScannerBadgeBAE"
+      responses:
+        "200":
+          description: Operation reussie. Retour des informations de l'eleve scanne.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EleveScanne"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur (utilisateur introuvable, salle introuvable, pas de cours, badge deja scanne, etc.)
+          content:
+            application/json:
+              examples:
+                utilisateurIntrouvable:
+                  value: "Utilisateur introuvable"
+                salleIntrouvable:
+                  value: "Salle introuvable"
+                pasAcces:
+                  value: "L'utilisateur n'as pas acces"
+                pasDeCoursActuellement:
+                  value: "Pas de cours dans cette salle actuellement"
+                badgeDejaScanne:
+                  value: "badge deja scanne"
+                erreurEnregistrementRetard:
+                  value: "Erreur lors de l'enregistrement du retard"
+                erreurEnregistrementPresence:
+                  value: "Erreur lors de l'enregistrement de la presence"
+                erreurSuppressionAbsence:
+                  value: "Erreur lors de la suppression de l'absence"
+
+  /pea/verif_badge:
+    get:
+      tags:
+        - PEA
+      summary: Verifier l'autorisation d'un badge sur une PEA
+      description: >-
+        Verifie si un badge est autorise a ouvrir la salle correspondant a
+        l'adresse MAC de la PEA. Un admin ou un professeur a acces a toutes
+        les salles. Un eleve doit avoir deja eu cours dans cette salle.
+      parameters:
+        - in: query
+          name: MAC
+          required: true
+          description: Adresse MAC de la PEA
+          schema:
+            type: string
+        - in: query
+          name: badgeid
+          required: true
+          description: Identifiant unique (uuid) du badge
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operation reussie. Retour des informations utilisateur et autorisation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifBadgePEA"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur (utilisateur introuvable, salle introuvable, pas d'acces).
+          content:
+            application/json:
+              examples:
+                utilisateurIntrouvable:
+                  value: "Utilisateur introuvable"
+                salleIntrouvable:
+                  value: "Salle introuvable"
+                pasAcces:
+                  value: "L'utilisateur n'as pas acces"
+
+  /pgs/planning:
+    get:
+      tags:
+        - PGS
+      summary: Planning d'une salle entre deux timestamps
+      description: >-
+        Retourne la liste des cours d'une salle dont l'heure de debut et l'heure
+        de fin sont comprises dans l'intervalle [debut, fin].
+      parameters:
+        - in: query
+          name: salle
+          required: true
+          description: Numero/identifiant de la salle
+          schema:
+            type: string
+        - in: query
+          name: debut
+          required: true
+          description: Timestamp UNIX (secondes) de debut de l'intervalle
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: fin
+          required: true
+          description: Timestamp UNIX (secondes) de fin de l'intervalle
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Operation reussie. Liste des cours dans l'intervalle.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CoursPlanning"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: La salle n'existe pas.
+          content:
+            application/json:
+              example: "La salle n'existe pas"
+
+  /pgs/etat_salle:
+    get:
+      tags:
+        - PGS
+      summary: Etat actuel d'une salle a partir de son numero
+      description: >-
+        Recupere les informations du cours en cours dans la salle (classe,
+        duree depuis le debut, professeur, nombre de presents/absents, listes).
+      parameters:
+        - in: query
+          name: salle
+          required: true
+          description: Numero/identifiant de la salle
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operation reussie. Retour des informations du cours en cours.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EtatSalle"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur (pas de cours, classe ou professeur introuvable, etc.)
+          content:
+            application/json:
+              examples:
+                pasDeCours:
+                  value: "Pas de cours"
+                erreur:
+                  value: "Erreur"
+
+  /pgs/recherche_utilisateur:
+    get:
+      tags:
+        - PGS
+      summary: Recherche d'utilisateur par nom et/ou prenom
+      description: >-
+        Retourne deux listes (recherche_prenom et recherche_nom) d'utilisateurs
+        correspondants. Au moins un des deux parametres (nom ou prenom) doit
+        etre fourni.
+      parameters:
+        - in: query
+          name: prenom
+          required: false
+          description: Prenom recherche
+          schema:
+            type: string
+        - in: query
+          name: nom
+          required: false
+          description: Nom recherche
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operation reussie. Retour des deux listes de resultats.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RechercheUtilisateur"
+        "400":
+          description: Requete mal formulee (aucun parametre fourni).
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Aucun utilisateur trouve ou erreur.
+          content:
+            application/json:
+              examples:
+                aucunUtilisateur:
+                  value: "Aucun utilisateur trouve"
+                erreur:
+                  value: "Erreur"
+
+  /pgs/historique_badge:
+    get:
+      tags:
+        - PGS
+      summary: Historique d'absence/retard d'un eleve
+      description: >-
+        Retourne la liste des absences et retards d'un eleve identifie par son
+        id utilisateur (champ uuid_user).
+      parameters:
+        - in: query
+          name: uuid_user
+          required: true
+          description: Identifiant numerique de l'utilisateur
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operation reussie. Retour de l'historique d'absences.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoriqueAbsence"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur lors de la recherche.
+          content:
+            application/json:
+              example: "Erreur"
+
+  /pgs/reserver_salle:
+    post:
+      tags:
+        - PGS
+      summary: Reservation d'une salle
+      description: >-
+        Cree un cours/reservation dans une salle pour une classe, un
+        professeur, sur un creneau [heure_debut, heure_fin]. Verifie que la
+        salle, la classe et le professeur existent, et que le creneau est libre.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationPGS"
+      responses:
+        "204":
+          description: Reservation enregistree avec succes.
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur (salle, classe ou professeur introuvable, creneau occupe, etc.)
+          content:
+            application/json:
+              examples:
+                champManquant:
+                  value: "Un champ est manquant"
+                salleIntrouvable:
+                  value: "Salle introuvable"
+                erreur:
+                  value: "Erreur"
+                creneauOccupe:
+                  value: "Creneau occupe"
+                classeInexistante:
+                  value: "Classe inexistante"
+                professeurInexistant:
+                  value: "Professeur inexistante"
+                erreurEnregistrementCours:
+                  value: "Erreur enregistrement cours"
+
+  /pgs/badges/{badgeid}:
+    get:
+      tags:
+        - PGS
+      summary: Informations d'un badge
+      description: >-
+        Retourne les informations de l'utilisateur lie au badge identifie par
+        son uuid (nom, prenom, classe pour un eleve, statut).
+      parameters:
+        - in: path
+          name: badgeid
+          required: true
+          description: Identifiant unique (uuid) du badge
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operation reussie. Retour des informations du badge.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InformationBadge"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Pas d'utilisateur trouve.
+          content:
+            application/json:
+              example: "Pas d'utilisateur trouvee"
+    delete:
+      tags:
+        - PGS
+      summary: Suppression d'un badge
+      description: >-
+        Supprime le badge identifie par son uuid (le champ correspondant est
+        mis a NULL cote utilisateur).
+      parameters:
+        - in: path
+          name: badgeid
+          required: true
+          description: Identifiant unique (uuid) du badge
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Suppression reussie.
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur lors de la suppression.
+          content:
+            application/json:
+              example: "Erreur lors de la suppression du badge"
+    post:
+      tags:
+        - PGS
+      summary: Creation d'un badge et liaison a un utilisateur
+      description: >-
+        Cree un nouveau badge avec l'uuid passe en URL et le lie a
+        l'utilisateur dont l'id est passe dans le body (uuid_user).
+      parameters:
+        - in: path
+          name: badgeid
+          required: true
+          description: Identifiant unique (uuid) du nouveau badge
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreationBadge"
+      responses:
+        "204":
+          description: Badge cree et lie a l'utilisateur.
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur (badge deja present, utilisateur introuvable, etc.)
+          content:
+            application/json:
+              examples:
+                badgeDejaPresent:
+                  value: "Badge deja present ou erreur"
+                utilisateurIntrouvable:
+                  value: "Utilisateur introuvable"
+                badgeNonCree:
+                  value: "Le badge n'a pas pus etre cree"
+                badgeNonLie:
+                  value: "Le badge n'a pas pus etre lie"
+    put:
+      tags:
+        - PGS
+      summary: Modification des informations de l'utilisateur lie a un badge
+      description: >-
+        Met a jour les informations de l'utilisateur associe au badge. Tous
+        les champs sont optionnels : seuls ceux presents dans le body sont
+        modifies.
+      parameters:
+        - in: path
+          name: badgeid
+          required: true
+          description: Identifiant unique (uuid) du badge
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModificationBadge"
+      responses:
+        "204":
+          description: Modification effectuee.
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Pas d'utilisateur trouve ou erreur de mise a jour.
+          content:
+            application/json:
+              examples:
+                pasUtilisateurTrouvee:
+                  value: "Pas d'utilisateur trouvee"
+                infoNonMisesAJour:
+                  value: "Les informations n'ont pus etre mis a jour"
+
+  /psw/login:
+    post:
+      tags:
+        - PSW
+      summary: Authentification utilisateur
+      description: >-
+        Authentifie un utilisateur a partir d'un login et d'un mot de passe.
+        Retourne un token JWT (signe HS256, expire dans 36000 secondes) en cas
+        de succes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginPSW"
+      responses:
+        "200":
+          description: Authentification reussie. Retour du token JWT.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenJWT"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur (login inconnu, mot de passe incorrect, etc.)
+          content:
+            application/json:
+              examples:
+                pasDeLogin:
+                  value: "Pas de login"
+                pasDeMotDePasse:
+                  value: "Pas de mot de passe"
+                erreur:
+                  value: "Erreur"
+                motDePasseIncorrect:
+                  value: "Mot de passe incorrecte"
+
+  /psw/historique_eleve:
+    get:
+      tags:
+        - PSW
+      summary: Historique d'absence/retard d'un eleve
+      description: >-
+        Retourne la liste des absences et retards d'un eleve a partir de son
+        id utilisateur.
+      parameters:
+        - in: query
+          name: utilisateur
+          required: true
+          description: Identifiant numerique de l'utilisateur
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Champ token (non encore implemente cote backend).
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyTokenPSW"
+      responses:
+        "200":
+          description: Operation reussie. Retour de l'historique d'absences.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoriqueAbsence"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur lors de la recherche.
+          content:
+            application/json:
+              example: "Erreur"
+
+  /psw/salle_crenaux:
+    get:
+      tags:
+        - PSW
+      summary: Liste des salles disponibles sur un creneau
+      description: >-
+        Retourne la liste des salles n'ayant aucun cours dans l'intervalle
+        [debut, fin]. Le parametre `salle` est requis par le controleur mais
+        n'est pas utilise par la logique de filtrage des salles disponibles.
+      parameters:
+        - in: query
+          name: salle
+          required: true
+          description: Salle (parametre requis par le controleur)
+          schema:
+            type: string
+        - in: query
+          name: debut
+          required: true
+          description: Timestamp UNIX (secondes) de debut de l'intervalle
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: fin
+          required: true
+          description: Timestamp UNIX (secondes) de fin de l'intervalle
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        description: Champ token (non encore implemente cote backend).
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyTokenPSW"
+      responses:
+        "200":
+          description: Operation reussie. Liste des salles disponibles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SalleDispo"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur lors de la recherche.
+          content:
+            application/json:
+              example: ""
+
+  /psw/planning:
+    get:
+      tags:
+        - PSW
+      summary: Planning d'une salle entre deux timestamps
+      description: >-
+        Retourne la liste des cours d'une salle dont l'heure de debut et
+        l'heure de fin sont comprises dans l'intervalle [debut, fin].
+      parameters:
+        - in: query
+          name: salle
+          required: true
+          description: Numero/identifiant de la salle
+          schema:
+            type: string
+        - in: query
+          name: debut
+          required: true
+          description: Timestamp UNIX (secondes) de debut
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: fin
+          required: true
+          description: Timestamp UNIX (secondes) de fin
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        description: Champ token (non encore implemente cote backend).
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyTokenPSW"
+      responses:
+        "200":
+          description: Operation reussie. Liste des cours de la salle dans l'intervalle.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CoursPlanning"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: La salle n'existe pas.
+          content:
+            application/json:
+              example: "La salle n'existe pas"
+
+  /psw/etat_salle:
+    get:
+      tags:
+        - PSW
+      summary: Etat actuel d'une salle a partir de son numero
+      description: >-
+        Recupere les informations du cours en cours dans la salle (classe,
+        duree, professeur, listes des presents/absents).
+      parameters:
+        - in: query
+          name: salle
+          required: true
+          description: Numero/identifiant de la salle
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Champ token (non encore implemente cote backend).
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyTokenPSW"
+      responses:
+        "200":
+          description: Operation reussie. Retour des informations du cours en cours.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EtatSalle"
+        "400":
+          description: Requete mal formulee. Veuillez verifier les champs.
+          content:
+            application/json:
+              example: "Requete mal formulee. Veuillez verifier les champs."
+        "404":
+          description: Erreur (pas de cours, classe ou professeur introuvable, etc.)
+          content:
+            application/json:
+              examples:
+                pasDeCours:
+                  value: "Pas de cours"
+                erreur:
+                  value: "Erreur"
+
+  /psw/liste_salle:
+    get:
+      tags:
+        - PSW
+      summary: Liste de toutes les salles existantes
+      description: Retourne la liste de toutes les salles enregistrees en base.
+      requestBody:
+        required: true
+        description: Champ token (non encore implemente cote backend).
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyTokenPSW"
+      responses:
+        "200":
+          description: Operation reussie. Retour de la liste des salles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Salle"
+        "404":
+          description: Erreur lors de la recherche.
+          content:
+            application/json:
+              example: "Erreur"
+
+components:
+  schemas:
+
+    ScannerBadgeBAE:
+      type: object
+      required:
+        - uuid
+        - MAC
+        - heure_badge
+      properties:
+        uuid:
+          type: string
+          description: Identifiant unique du badge
+        MAC:
+          type: string
+          description: Adresse MAC du BAE
+        heure_badge:
+          type: integer
+          format: int64
+          description: Timestamp UNIX (secondes) du badgeage
+      example:
+        uuid: "8UI90O"
+        MAC: "00:00:00:00:00:00"
+        heure_badge: 1293844775
+
+    EleveScanne:
+      type: object
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+        classe:
+          type: string
+          description: Nom de la classe ou "Introuvable"
+      example:
+        nom: "Dupont"
+        prenom: "Jean"
+        classe: "BTS-SIO-2"
+
+    EtatSalle:
+      type: object
+      properties:
+        classe:
+          type: string
+          description: Nom de la classe
+        duree:
+          type: integer
+          format: int64
+          description: Duree (en secondes) ecoulee depuis le debut du cours
+        professeur:
+          type: string
+          description: Nom du professeur
+        nb_absent:
+          type: integer
+        nb_present:
+          type: integer
+        listeAbsent:
+          type: array
+          items:
+            $ref: "#/components/schemas/UtilisateurBref"
+        listePresent:
+          type: array
+          items:
+            $ref: "#/components/schemas/UtilisateurBref"
+      example:
+        classe: "BTS-SIO-2"
+        duree: 1320
+        professeur: "Martin"
+        nb_absent: 2
+        nb_present: 18
+        listeAbsent:
+          - nom: "Durand"
+            prenom: "Lucie"
+          - nom: "Lefevre"
+            prenom: "Paul"
+        listePresent:
+          - nom: "Dupont"
+            prenom: "Jean"
+          - nom: "Bernard"
+            prenom: "Sophie"
+
+    UtilisateurBref:
+      type: object
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+      example:
+        nom: "Dupont"
+        prenom: "Jean"
+
+    VerifBadgePEA:
+      type: object
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+        classe:
+          type: string
+          description: >-
+            Nom de classe pour un eleve, role ("admin" ou "professeur") pour
+            les autres, "Introuvable" si la classe est inconnue.
+        autorisee:
+          type: boolean
+      example:
+        nom: "Dupont"
+        prenom: "Jean"
+        classe: "BTS-SIO-2"
+        autorisee: true
+
+    CoursPlanning:
+      type: object
+      properties:
+        id_cours:
+          type: integer
+        heure_debut:
+          type: integer
+          format: int64
+          description: Timestamp UNIX (secondes)
+        heure_fin:
+          type: integer
+          format: int64
+          description: Timestamp UNIX (secondes)
+        classe:
+          type: string
+          description: Nom de la classe ou "inconnue"
+      example:
+        id_cours: 42
+        heure_debut: 1293844775
+        heure_fin: 1293848375
+        classe: "BTS-SIO-2"
+
+    RechercheUtilisateur:
+      type: object
+      properties:
+        recherche_prenom:
+          type: array
+          items:
+            $ref: "#/components/schemas/UtilisateurResultat"
+        recherche_nom:
+          type: array
+          items:
+            $ref: "#/components/schemas/UtilisateurResultat"
+      example:
+        recherche_prenom:
+          - id_utilisateur: 12
+            prenom_utilisateur: "Jean"
+            nom_utilisateur: "Dupont"
+          - id_utilisateur: 27
+            prenom_utilisateur: "Jean"
+            nom_utilisateur: "Martin"
+        recherche_nom:
+          - id_utilisateur: 8
+            prenom_utilisateur: "Sophie"
+            nom_utilisateur: "Bernard"
+
+    UtilisateurResultat:
+      type: object
+      properties:
+        id_utilisateur:
+          type: integer
+        prenom_utilisateur:
+          type: string
+        nom_utilisateur:
+          type: string
+      example:
+        id_utilisateur: 12
+        prenom_utilisateur: "Jean"
+        nom_utilisateur: "Dupont"
+
+    HistoriqueAbsence:
+      type: object
+      properties:
+        nb_absence:
+          type: integer
+        listeAbsence:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbsenceItem"
+      example:
+        nb_absence: 2
+        listeAbsence:
+          - timestamp_debut_cours: 1293844775
+            temps_retard: 0
+            absence: true
+          - timestamp_debut_cours: 1294449575
+            temps_retard: 12
+            absence: false
+
+    AbsenceItem:
+      type: object
+      properties:
+        timestamp_debut_cours:
+          type: integer
+          format: int64
+        temps_retard:
+          type: integer
+          format: int64
+          description: Duree du retard en minutes (0 si absence)
+        absence:
+          type: boolean
+      example:
+        timestamp_debut_cours: 1293844775
+        temps_retard: 12
+        absence: false
+
+    ReservationPGS:
+      type: object
+      required:
+        - heure_debut
+        - heure_fin
+        - salle
+        - classe
+        - professeur
+      properties:
+        heure_debut:
+          type: integer
+          format: int64
+          description: Timestamp UNIX (secondes)
+        heure_fin:
+          type: integer
+          format: int64
+          description: Timestamp UNIX (secondes)
+        salle:
+          type: string
+          description: Numero/identifiant de la salle
+        classe:
+          type: string
+          description: Nom de la classe
+        professeur:
+          type: string
+          description: Nom du professeur
+        reserve_par:
+          type: string
+          description: >-
+            Optionnel. Si absent, la valeur "ADMIN" est utilisee par le
+            backend.
+      example:
+        heure_debut: 1293844775
+        heure_fin: 1293848375
+        salle: "B204"
+        classe: "BTS-SIO-2"
+        professeur: "Martin"
+        reserve_par: "Martin"
+
+    InformationBadge:
+      type: object
+      properties:
+        nom_user:
+          type: string
+        prenom_user:
+          type: string
+        statut:
+          type: string
+          description: Role de l'utilisateur (eleve, professeur, admin)
+        classe:
+          type: string
+          description: Present uniquement pour les eleves
+      example:
+        nom_user: "Dupont"
+        prenom_user: "Jean"
+        statut: "eleve"
+        classe: "BTS-SIO-2"
+
+    CreationBadge:
+      type: object
+      required:
+        - uuid_user
+      properties:
+        uuid_user:
+          type: integer
+          description: Identifiant numerique de l'utilisateur a lier au badge
+      example:
+        uuid_user: 12
+
+    ModificationBadge:
+      type: object
+      description: >-
+        Tous les champs sont optionnels. Seuls ceux presents dans le body
+        sont mis a jour.
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+        classe:
+          type: string
+          description: Nom de la classe (resolu en id_classe cote backend)
+        hash_mdp:
+          type: string
+        login:
+          type: string
+        role:
+          type: string
+      example:
+        nom: "Dupont"
+        prenom: "Jean"
+        classe: "BTS-SIO-2"
+        hash_mdp: "$argon2id$v=19$m=65536,t=3,p=4$abcdef$ghijkl"
+        login: "jdupont"
+        role: "eleve"
+
+    LoginPSW:
+      type: object
+      required:
+        - login
+        - motdepasse
+      properties:
+        login:
+          type: string
+        motdepasse:
+          type: string
+      example:
+        login: "jdupont"
+        motdepasse: "MotDePasse123!"
+
+    TokenJWT:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token JWT signe en HS256 (expiration 36000 secondes)
+      example:
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMiIsImlzcyI6ImF1dGgwIiwiZXhwIjoxNzAwMDAwMDAwfQ.abcdef1234567890"
+
+    Salle:
+      type: object
+      properties:
+        nom_salle:
+          type: string
+      example:
+        nom_salle: "B204"
+
+    SalleDispo:
+      type: object
+      properties:
+        id_salle:
+          type: string
+      example:
+        id_salle: "B204"
+
+    BodyTokenPSW:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: >-
+            Token JWT obtenu via /psw/login. Champ documente en prevision
+            de son ajout, non encore traite par le backend.
+      example:
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMiIsImlzcyI6ImF1dGgwIiwiZXhwIjoxNzAwMDAwMDAwfQ.abcdef1234567890"
