@@ -43,6 +43,27 @@ public:
         //Id de la salle
         const int64_t timestampdebut,
         const int64_t timestampfin);
+
+//Recherche cours qui commence maintenant (minutes)
+//Renvoie un vecteur de Cours
+static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> CoursDebutIntervalleMinute(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //timestamp debut
+    const int64_t timestampdebutminute,
+    //timestamp debut
+    const int64_t timestampfinminute);
+
+
+//Recherche cours qui finit maintenant (minutes)
+//Renvoie un vecteur de Cours
+static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> CoursFinIntervalleMinute(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //timestamp debut
+    const int64_t timestampdebutminute,
+    //timestamp debut
+    const int64_t timestampfinminute);
 };
 
 

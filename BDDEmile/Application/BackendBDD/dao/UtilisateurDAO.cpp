@@ -139,3 +139,30 @@ drogon::Task<ResultatCoro<>> UtilisateurDAO::MettreAJourUser(
     //Envoie du résultat
     co_return resultat;
 }
+
+
+//Recherche les utilisateur avec sa classe
+//Renvoie un vecteur d'utilisateur
+drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>>> UtilisateurDAO::ChercherUtilisateurParClasse(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //id classe utilisateur
+    const std::string &idclasse) {
+    //Variable pour le résultat / envoie du type vector Utilisateur pour la template
+    ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>> resultat;
+    //Mapper de Utilisateur / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::Utilisateur> mapperUtilisateur(db);
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL recherche dans la colonne _id_classe de la table utilisateur
+        resultat.donnee = co_await mapperUtilisateur.findBy(
+        Criteria(drogon_model::acces_campus_bdd::Utilisateur::Cols::_id_classe, CompareOperator::EQ, idclasse));
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    co_return resultat;
+}

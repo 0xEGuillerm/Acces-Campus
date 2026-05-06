@@ -63,6 +63,8 @@ add_executable(${PROJECT_NAME} main.cc
         dao/ClasseDAO.h
         dao/PresenceAbsenceCoursDAO.cpp
         dao/PresenceAbsenceCoursDAO.h
+        Logique/GestionCoursTemporelle.cpp
+        Logique/GestionCoursTemporelle.h
 )
 
 # ##############################################################################
