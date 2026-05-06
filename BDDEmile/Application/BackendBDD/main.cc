@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <sodium.h>
 #include "controllers/BAEController.h"
+#include "Logique/GestionCoursTemporelle.h"
 
 
 int main(int argc, char* argv[]) {
@@ -41,6 +42,17 @@ int main(int argc, char* argv[]) {
             return;
         }
         accb();
+    });
+
+
+    drogon::app().registerBeginningAdvice([]() {
+        auto loop = drogon::app().getLoop();
+        loop->runEvery(45.0, []() {
+            drogon::async_run([]() -> drogon::Task<> {
+            co_await GestionCoursTemporelle::traiterCoursADemarrer();
+            co_await GestionCoursTemporelle::traiterCoursACloturer();
+            });
+        });
     });
 
     //Lancement du backendbdd

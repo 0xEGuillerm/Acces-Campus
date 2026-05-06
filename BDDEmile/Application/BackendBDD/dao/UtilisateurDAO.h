@@ -56,6 +56,14 @@ public:
         const DbClientPtr &db,
         //Objet utilisateur avec les informations modifié
         const drogon_model::acces_campus_bdd::Utilisateur &UtilisateurModifier);
+
+    //Recherche les utilisateur avec sa classe
+    //Renvoie un vecteur d'utilisateur
+    static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>>> ChercherUtilisateurParClasse(
+        //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+        const DbClientPtr &db,
+        //id classe utilisateur
+        const std::string &idclasse);
 };
 
 

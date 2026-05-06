@@ -99,3 +99,67 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> C
     co_return resultat;
 }
 
+
+
+//Recherche cours qui commence maintenant (minutes)
+//Renvoie un vecteur de Cours
+drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> CoursDAO::CoursDebutIntervalleMinute(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //timestamp debut
+    const int64_t timestampdebutminute,
+    //timestamp debut
+    const int64_t timestampfinminute) {
+    //Mapper de classe / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::Cours> mappercours(db);
+    //Variable pour le résultat / envoie du type vector Cours pour la template
+    ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>> resultat;
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL recherche dans la colonne _num_salle de la table Cours
+        resultat.donnee = co_await mappercours.findBy(
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::GT, timestampdebutminute) &&
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LT, timestampfinminute)
+        );
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    //Envoie du résultat
+    co_return resultat;
+}
+
+
+//Recherche cours qui finit maintenant (minutes)
+//Renvoie un vecteur de Cours
+drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> CoursDAO::CoursFinIntervalleMinute(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //timestamp debut
+    const int64_t timestampdebutminute,
+    //timestamp debut
+    const int64_t timestampfinminute) {
+    //Mapper de classe / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::Cours> mappercours(db);
+    //Variable pour le résultat / envoie du type vector Cours pour la template
+    ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>> resultat;
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL recherche dans la colonne _num_salle de la table Cours
+        resultat.donnee = co_await mappercours.findBy(
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::GT, timestampdebutminute) &&
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::LT, timestampfinminute)
+        );
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    //Envoie du résultat
+    co_return resultat;
+}
