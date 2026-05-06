@@ -92,6 +92,34 @@ drogon::Task<ResultatCoro<>> PresenceAbsenceCoursDAO::SupprimerUtilisateurAbsenc
     co_return resultat;
 }
 
+
+//Supprime tous les utilisateur de la table d'absence à un cours à partir d'id cours
+//Renvoie rien dans donnee (verifier le bool)
+drogon::Task<ResultatCoro<>> PresenceAbsenceCoursDAO::SupprimerUtilisateurAbsenceCoursIDcour(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db,
+    //id de l'absence à supprimer
+    const int32_t &idcours) {
+    //Mapper de badge / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::AbsenceCours> mapperabsence(db);
+    //Variable pour le résultat / envoie du type nombre de suppression pour la template (rien monostate)
+    ResultatCoro<> resultat;
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL pour supprimer
+        co_await mapperabsence.deleteBy(
+        Criteria(drogon_model::acces_campus_bdd::AbsenceCours::Cols::_id_cours, CompareOperator::EQ, idcours));
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    //Envoie du résultat
+    co_return resultat;
+}
+
 //Ajout d'une entrée dans la table AbsenceCours
 //A besoin d'un objet AbsenceCours avec les informations remplis
 //insert vas ajouté une nouvelle entrée dans la table AbsenceCours

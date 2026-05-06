@@ -30,6 +30,7 @@ services:
       bddpostgres:
         condition: service_healthy
     restart: unless-stopped
+    tty: true
 
 volumes:
   postgresql_donnee:

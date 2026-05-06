@@ -44,10 +44,7 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::InformationBadge(
         resultat.MessageResultat = "Pas d'utilisateur trouvée";
         co_return resultat;
     }
-    if (UtilisateurTrouvee.donnee[0].getValueOfRoleUser() != std::string("eleve")) {
-        resultat.MessageResultat = "Professeur";
-    }
-    else {
+    if (UtilisateurTrouvee.donnee[0].getValueOfRoleUser() == std::string("eleve")) {
         //Recherche de la classe à partir d'id pour obtenir le nom de la classe
         auto classe = co_await ClasseDAO::ChercherClasseParID(db, UtilisateurTrouvee.donnee[0].getValueOfIdClasse());
         //Si pas de classe trouvee met la classe à introuvable --> la reponse est quand meme bonne
@@ -56,8 +53,9 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::InformationBadge(
         }
         //Si reponse trouvee on la met
         else {
-            resultat.donnee["classe"] = (UtilisateurTrouvee.donnee[0].getValueOfIdClasse());
+            resultat.donnee["classe"] = (classe.donnee[0].getValueOfNomClasse());
         }
+        resultat.donnee["statut"] = (*UtilisateurTrouvee.donnee[0].getRoleUser());
     }
     //Ajout des donnee à la réponse
     resultat.BoolResultat = true;resultat.donnee["nom_user"] = (*UtilisateurTrouvee.donnee[0].getNomUser());

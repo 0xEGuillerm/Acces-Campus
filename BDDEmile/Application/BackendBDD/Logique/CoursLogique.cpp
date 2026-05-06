@@ -59,6 +59,7 @@ drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
     else
         reserve_par = body["professeur"].asString();
     std::string professeur = body["professeur"].asString();
+
     //Verification des informations:
     //Trouver la salle
     //Verifier que la salle n'a pas de cours aux horaires actuelle
@@ -267,7 +268,7 @@ drogon::Task<ResultatCoro<Json::Value>> CoursLogique::SalleDisponible(
                 break;
             }
         }
-        if (!occupee) {
+        if (occupee != true) {
             Json::Value salleTemporaire;
             salleTemporaire["id_salle"] = salle.getPrimaryKey();
             listesalle.append(salleTemporaire);

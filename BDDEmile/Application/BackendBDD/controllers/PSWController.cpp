@@ -39,10 +39,9 @@ drogon::Task<drogon::HttpResponsePtr> PSWController::HistoriqueElevePSWControlle
 
 
 drogon::Task<drogon::HttpResponsePtr> PSWController::SalleCrenauxPSWController(drogon::HttpRequestPtr req){
-    std::string salle = req->getParameter("salle");
     int64_t timestamp_debut= std::stoll(req->getParameter("debut"));
     int64_t timestamp_fin= std::stoll(req->getParameter("fin"));
-    if (salle.empty() || timestamp_debut == 0 || timestamp_fin == 0)
+    if (timestamp_debut == 0 || timestamp_fin == 0)
     {
         Json::Value MessageErreur;
         MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
@@ -94,7 +93,7 @@ drogon::Task<drogon::HttpResponsePtr> PSWController::PlanningSallePSWController(
     std::string salle = req->getParameter("salle");
     int64_t timestamp_debut= std::stoll(req->getParameter("debut"));
     int64_t timestamp_fin= std::stoll(req->getParameter("fin"));
-    if (salle.empty())
+    if (salle.empty() || timestamp_debut == 0 || timestamp_fin == 0)
     {
         Json::Value MessageErreur;
         MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
