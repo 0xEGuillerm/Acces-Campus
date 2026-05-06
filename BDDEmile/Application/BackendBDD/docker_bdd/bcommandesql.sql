@@ -6,8 +6,8 @@ SET search_path TO pg_catalog,public;
 INSERT INTO public.classe (id_classe, nom_classe) VALUES 
 (1, 'BTS SIO 1 - SLAM'),
 (2, 'BTS SIO 1 - SISR'),
-(3, 'BTS SIO 2 - SLAM'),
-(4, 'BTS SIO 2 - SISR'),
+(3, 'BTS CIEL 2 - SLAM'),
+(4, 'BTS CIEL 2 - SISR'),
 (5, 'Licence Pro CDA'),
 (6, 'Licence Pro ASRALL'),
 (7, 'Bachelor Cybersécurité'),
@@ -161,3 +161,9 @@ INSERT INTO public.historique (id_historique, id_user, date_action, type_action)
 (10, 1, '2026-05-15 18:00:00', 'Exportation des statistiques d''assiduité');
 
 SELECT setval('historique_id_historique_seq', 10);
+
+INSERT INTO public.cours (num_salle, heure_debut, heure_fin, id_classe, reserve_par, professeur) VALUES
+('A101', CURRENT_DATE + TIME '08:00:00', CURRENT_DATE + TIME '10:00:00', 1, 1, 3),
+('A101', CURRENT_DATE + TIME '10:15:00', CURRENT_DATE + TIME '12:15:00', 1, 1, 3),
+('A101', CURRENT_DATE + TIME '13:30:00', CURRENT_DATE + TIME '15:30:00', 1, 1, 3),
+('A101', CURRENT_DATE + TIME '15:45:00', CURRENT_DATE + TIME '17:45:00', 1, 1, 3);

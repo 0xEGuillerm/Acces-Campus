@@ -81,6 +81,14 @@ static drogon::Task<ResultatCoro<>> SupprimerUtilisateurPresenceCours(
         //ID cour
         const int32_t &idutilisateur);
 
+
+    //Supprime tous les utilisateur de la table d'absence à un cours à partir d'id cours
+    //Renvoie rien dans donnee (verifier le bool)
+    static drogon::Task<ResultatCoro<>> SupprimerUtilisateurAbsenceCoursIDcour(
+        //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+        const DbClientPtr &db,
+        //id de l'absence à supprimer
+        const int32_t &idcours);
 };
 
 
