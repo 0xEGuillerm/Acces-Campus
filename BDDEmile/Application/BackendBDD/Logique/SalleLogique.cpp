@@ -187,7 +187,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleNumeroSalle(
     }
 
     //Stocker le cours qui se passe actuellement dans la salle du BAE
-    drogon_model::acces_campus_bdd::Cours cour;
+    drogon_model::acces_campus_bdd::Cours cour = CoursListe.donnee[0];
 
     //Obtention de l'horaire actuelle format int seconde
     int64_t TimestampSecond = trantor::Date::now().secondsSinceEpoch();

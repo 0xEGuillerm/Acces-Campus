@@ -208,7 +208,7 @@ drogon::Task<ResultatCoro<Json::Value>> CoursLogique::PlanningSalle(
     //Recherche parmis tout les cours si les horaire fournit rentre dans la plage horaire d'un cours de la salle et donc impossible de reservé
     for (const auto &cour : CoursListe.donnee) {
         //Si L'heure de debut du cours et l'heure de fin du cours fais partie du creneau de timestamp
-        if ((cour.getValueOfHeureDebut().secondsSinceEpoch() > timestamp_debut && cour.getValueOfHeureFin().secondsSinceEpoch() < timestamp_fin)){
+        if ((cour.getValueOfHeureDebut().secondsSinceEpoch() >= timestamp_debut && cour.getValueOfHeureFin().secondsSinceEpoch() <= timestamp_fin)){
             Json::Value CoursTemporaire;
             CoursTemporaire["id_cours"] = cour.getValueOfIdCours();
             CoursTemporaire["heure_debut"] = cour.getValueOfHeureDebut().secondsSinceEpoch();
