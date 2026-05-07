@@ -1,3 +1,7 @@
+----GENERER PAR IA----------
+
+
+
 SET search_path TO pg_catalog,public;
 
 ---------------------------------------------------------
@@ -167,3 +171,179 @@ INSERT INTO public.cours (num_salle, heure_debut, heure_fin, id_classe, reserve_
 ('A101', CURRENT_DATE + TIME '10:15:00', CURRENT_DATE + TIME '12:15:00', 1, 1, 3),
 ('A101', CURRENT_DATE + TIME '13:30:00', CURRENT_DATE + TIME '15:30:00', 1, 1, 3),
 ('A101', CURRENT_DATE + TIME '15:45:00', CURRENT_DATE + TIME '17:45:00', 1, 1, 3);
+
+
+SET search_path TO pg_catalog,public;
+
+---------------------------------------------------------
+-- EXTENSION DU JEU DE DONNÉES
+-- - 20 nouveaux badges (BDG00013 → BDG00032)
+-- - 20 nouveaux élèves (id_user 13 → 32)
+-- - ~45 nouveaux cours sur 3 semaines (id_cours 15 → 59)
+--
+-- Hypothèse : ce script s'exécute APRÈS bcommandesql.sql
+-- Les 4 cours sans ID explicite à la fin du fichier source
+-- prennent les IDs 11-14 via la séquence cours_id_cours_seq.
+---------------------------------------------------------
+
+
+---------------------------------------------------------
+-- 1. NOUVEAUX BADGES (20 enregistrements)
+---------------------------------------------------------
+INSERT INTO public.badge (uuid_badge, date_creation) VALUES
+('BDG00013', NOW() - INTERVAL '15 days'),
+('BDG00014', NOW() - INTERVAL '15 days'),
+('BDG00015', NOW() - INTERVAL '14 days'),
+('BDG00016', NOW() - INTERVAL '14 days'),
+('BDG00017', NOW() - INTERVAL '13 days'),
+('BDG00018', NOW() - INTERVAL '13 days'),
+('BDG00019', NOW() - INTERVAL '12 days'),
+('BDG00020', NOW() - INTERVAL '12 days'),
+('BDG00021', NOW() - INTERVAL '11 days'),
+('BDG00022', NOW() - INTERVAL '11 days'),
+('BDG00023', NOW() - INTERVAL '10 days'),
+('BDG00024', NOW() - INTERVAL '10 days'),
+('BDG00025', NOW() - INTERVAL '9 days'),
+('BDG00026', NOW() - INTERVAL '9 days'),
+('BDG00027', NOW() - INTERVAL '8 days'),
+('BDG00028', NOW() - INTERVAL '8 days'),
+('BDG00029', NOW() - INTERVAL '7 days'),
+('BDG00030', NOW() - INTERVAL '7 days'),
+('BDG00031', NOW() - INTERVAL '6 days'),
+('BDG00032', NOW() - INTERVAL '6 days');
+
+
+---------------------------------------------------------
+-- 2. NOUVEAUX UTILISATEURS (20 élèves, IDs 13 → 32)
+-- Répartition pondérée sur les 10 classes,
+-- priorité aux classes 7-10 (vides initialement).
+---------------------------------------------------------
+INSERT INTO public.utilisateur (id_user, nom_user, prenom_user, login_user, hash_mdp, id_classe, role_user, uuid_badge) VALUES
+-- Classe 1 (BTS SIO 1 - SLAM) : +2
+(13, 'Bernard',   'Lucas',    'lbernard',   'hash123', 1,  'eleve', 'BDG00013'),
+(14, 'Thomas',    'Chloé',    'cthomas',    'hash123', 1,  'eleve', 'BDG00014'),
+-- Classe 2 (BTS SIO 1 - SISR) : +2
+(15, 'Robert',    'Hugo',     'hrobert',    'hash123', 2,  'eleve', 'BDG00015'),
+(16, 'Richard',   'Léa',      'lrichard',   'hash123', 2,  'eleve', 'BDG00016'),
+-- Classe 3 (BTS CIEL 2 - SLAM) : +2
+(17, 'Garcia',    'Nathan',   'ngarcia',    'hash123', 3,  'eleve', 'BDG00017'),
+(18, 'Lefevre',   'Jade',     'jlefevre',   'hash123', 3,  'eleve', 'BDG00018'),
+-- Classe 4 (BTS CIEL 2 - SISR) : +2
+(19, 'Roy',       'Tom',      'troy',       'hash123', 4,  'eleve', 'BDG00019'),
+(20, 'Vincent',   'Manon',    'mvincent',   'hash123', 4,  'eleve', 'BDG00020'),
+-- Classe 5 (Licence Pro CDA) : +1
+(21, 'Fournier',  'Louis',    'lfournier',  'hash123', 5,  'eleve', 'BDG00021'),
+-- Classe 6 (Licence Pro ASRALL) : +1
+(22, 'Girard',    'Camille',  'cgirard',    'hash123', 6,  'eleve', 'BDG00022'),
+-- Classe 7 (Bachelor Cybersécurité) : +3 (vide auparavant)
+(23, 'Bonnet',    'Raphaël',  'rbonnet',    'hash123', 7,  'eleve', 'BDG00023'),
+(24, 'Dupuis',    'Sarah',    'sdupuis',    'hash123', 7,  'eleve', 'BDG00024'),
+(25, 'Lambert',   'Arthur',   'alambert',   'hash123', 7,  'eleve', 'BDG00025'),
+-- Classe 8 (Master 1 Ingénierie Web) : +3 (vide auparavant)
+(26, 'Fontaine',  'Inès',     'ifontaine',  'hash123', 8,  'eleve', 'BDG00026'),
+(27, 'Rousseau',  'Mathéo',   'mrousseau',  'hash123', 8,  'eleve', 'BDG00027'),
+(28, 'Mercier',   'Eva',      'emercier',   'hash123', 8,  'eleve', 'BDG00028'),
+-- Classe 9 (Master 2 Architecte Cloud) : +2 (vide auparavant)
+(29, 'Blanc',     'Léo',      'lblanc',     'hash123', 9,  'eleve', 'BDG00029'),
+(30, 'Guerin',    'Anaïs',    'aguerin',    'hash123', 9,  'eleve', 'BDG00030'),
+-- Classe 10 (Prépa Numérique) : +2 (vide auparavant)
+(31, 'Boyer',     'Noah',     'nboyer',     'hash123', 10, 'eleve', 'BDG00031'),
+(32, 'Brun',      'Mia',      'mbrun',      'hash123', 10, 'eleve', 'BDG00032');
+
+SELECT setval('utilisateur_id_user_seq', 32);
+
+
+---------------------------------------------------------
+-- 3. NOUVEAUX COURS (~45 cours sur 3 semaines)
+-- Semaines : 11/05/2026, 18/05/2026, 25/05/2026
+--
+-- Créneaux standards utilisés :
+--   M1 : 08:00 - 10:00
+--   M2 : 10:15 - 12:15
+--   A1 : 13:30 - 15:30
+--   A2 : 15:45 - 17:45
+--
+-- Les profs disponibles sont 3 (Ada), 4 (Alan), 5 (Grace).
+-- reserve_par : admins (1, 2) ou profs (3, 4, 5).
+-- Aucun chevauchement (salle, créneau).
+---------------------------------------------------------
+
+INSERT INTO public.cours (id_cours, num_salle, heure_debut, heure_fin, id_classe, reserve_par, professeur) VALUES
+
+-- ============ SEMAINE 1 : 11 → 15 mai 2026 ============
+-- Lundi 11/05
+(15, 'A101', '2026-05-11 08:00:00', '2026-05-11 10:00:00', 1,  3, 3),
+(16, 'A102', '2026-05-11 08:00:00', '2026-05-11 10:00:00', 2,  4, 4),
+(17, 'B101', '2026-05-11 10:15:00', '2026-05-11 12:15:00', 7,  5, 5),
+(18, 'A101', '2026-05-11 13:30:00', '2026-05-11 15:30:00', 3,  3, 3),
+
+-- Mardi 12/05
+(19, 'B102', '2026-05-12 08:00:00', '2026-05-12 10:00:00', 4,  4, 4),
+(20, 'A201', '2026-05-12 10:15:00', '2026-05-12 12:15:00', 8,  5, 5),
+(21, 'AMP1', '2026-05-12 13:30:00', '2026-05-12 15:30:00', 5,  1, 3),
+(22, 'C101', '2026-05-12 15:45:00', '2026-05-12 17:45:00', 9,  2, 4),
+
+-- Mercredi 13/05
+(23, 'A102', '2026-05-13 08:00:00', '2026-05-13 10:00:00', 6,  3, 5),
+(24, 'A202', '2026-05-13 10:15:00', '2026-05-13 12:15:00', 10, 4, 3),
+(25, 'B101', '2026-05-13 13:30:00', '2026-05-13 15:30:00', 7,  5, 4),
+
+-- Jeudi 14/05
+(26, 'A101', '2026-05-14 08:00:00', '2026-05-14 10:00:00', 1,  1, 3),
+(27, 'C102', '2026-05-14 10:15:00', '2026-05-14 12:15:00', 8,  2, 5),
+(28, 'AMP2', '2026-05-14 13:30:00', '2026-05-14 15:30:00', 9,  3, 4),
+
+-- Vendredi 15/05
+(29, 'A102', '2026-05-15 08:00:00', '2026-05-15 10:00:00', 2,  4, 4),
+(30, 'B102', '2026-05-15 10:15:00', '2026-05-15 12:15:00', 4,  5, 3),
+
+-- ============ SEMAINE 2 : 18 → 22 mai 2026 ============
+-- Lundi 18/05
+(31, 'A101', '2026-05-18 08:00:00', '2026-05-18 10:00:00', 1,  3, 3),
+(32, 'B101', '2026-05-18 08:00:00', '2026-05-18 10:00:00', 7,  5, 5),
+(33, 'A102', '2026-05-18 10:15:00', '2026-05-18 12:15:00', 2,  4, 4),
+(34, 'A201', '2026-05-18 13:30:00', '2026-05-18 15:30:00', 3,  1, 3),
+(35, 'C101', '2026-05-18 15:45:00', '2026-05-18 17:45:00', 8,  2, 5),
+
+-- Mardi 19/05
+(36, 'B102', '2026-05-19 08:00:00', '2026-05-19 10:00:00', 4,  4, 4),
+(37, 'AMP1', '2026-05-19 10:15:00', '2026-05-19 12:15:00', 5,  3, 3),
+(38, 'A202', '2026-05-19 13:30:00', '2026-05-19 15:30:00', 9,  5, 5),
+(39, 'A101', '2026-05-19 15:45:00', '2026-05-19 17:45:00', 1,  1, 4),
+
+-- Mercredi 20/05
+(40, 'B101', '2026-05-20 08:00:00', '2026-05-20 10:00:00', 6,  3, 3),
+(41, 'C102', '2026-05-20 10:15:00', '2026-05-20 12:15:00', 10, 2, 4),
+(42, 'A102', '2026-05-20 13:30:00', '2026-05-20 15:30:00', 7,  4, 5),
+
+-- Jeudi 21/05
+(43, 'AMP2', '2026-05-21 08:00:00', '2026-05-21 10:00:00', 8,  5, 4),
+(44, 'A201', '2026-05-21 10:15:00', '2026-05-21 12:15:00', 3,  3, 3),
+(45, 'B102', '2026-05-21 13:30:00', '2026-05-21 15:30:00', 4,  1, 5),
+
+-- Vendredi 22/05
+(46, 'A101', '2026-05-22 08:00:00', '2026-05-22 10:00:00', 1,  4, 3),
+(47, 'C101', '2026-05-22 10:15:00', '2026-05-22 12:15:00', 9,  2, 4),
+
+-- ============ SEMAINE 3 : 25 → 29 mai 2026 ============
+-- Lundi 25/05
+(48, 'A102', '2026-05-25 08:00:00', '2026-05-25 10:00:00', 2,  3, 4),
+(49, 'B101', '2026-05-25 10:15:00', '2026-05-25 12:15:00', 5,  4, 3),
+(50, 'A101', '2026-05-25 13:30:00', '2026-05-25 15:30:00', 1,  5, 5),
+
+-- Mardi 26/05
+(51, 'B102', '2026-05-26 08:00:00', '2026-05-26 10:00:00', 4,  1, 4),
+(52, 'AMP1', '2026-05-26 10:15:00', '2026-05-26 12:15:00', 6,  2, 3),
+(53, 'A202', '2026-05-26 13:30:00', '2026-05-26 15:30:00', 7,  3, 5),
+(54, 'C102', '2026-05-26 15:45:00', '2026-05-26 17:45:00', 10, 4, 4),
+
+-- Mercredi 27/05
+(55, 'A201', '2026-05-27 08:00:00', '2026-05-27 10:00:00', 3,  5, 3),
+(56, 'AMP2', '2026-05-27 10:15:00', '2026-05-27 12:15:00', 8,  3, 5),
+(57, 'B101', '2026-05-27 13:30:00', '2026-05-27 15:30:00', 9,  1, 4),
+
+-- Jeudi 28/05
+(58, 'A102', '2026-05-28 08:00:00', '2026-05-28 10:00:00', 2,  2, 3),
+(59, 'C101', '2026-05-28 10:15:00', '2026-05-28 12:15:00', 7,  4, 5);
+
+SELECT setval('cours_id_cours_seq', 59);
