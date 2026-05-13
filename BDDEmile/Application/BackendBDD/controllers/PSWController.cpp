@@ -14,16 +14,8 @@
 using namespace drogon::orm;
 
 drogon::Task<drogon::HttpResponsePtr> PSWController::HistoriqueElevePSWController(drogon::HttpRequestPtr req){
-    std::string utilisateurStr = req->getParameter("utilisateur");
-    if (utilisateurStr.empty())
-    {
-        Json::Value MessageErreur;
-        MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
-        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
-        ReponseAPI->setStatusCode(drogon::k400BadRequest);
-        co_return ReponseAPI;
-    }
-    int32_t utilisateur = stoi(utilisateurStr);
+    //Recuperation de l'id envoyer depuis le filtre a partir du token
+    int32_t utilisateur = req->getAttributes()->get<int32_t>("idUtilisateur");
     auto DbClientPtr = drogon::app().getDbClient();
     auto resultat = co_await RetardAbsenceLogique::AbsenceEleve(DbClientPtr, utilisateur);
     if (resultat.BoolResultat == false)
@@ -39,8 +31,18 @@ drogon::Task<drogon::HttpResponsePtr> PSWController::HistoriqueElevePSWControlle
 
 
 drogon::Task<drogon::HttpResponsePtr> PSWController::SalleCrenauxPSWController(drogon::HttpRequestPtr req){
-    int64_t timestamp_debut= std::stoll(req->getParameter("debut"));
-    int64_t timestamp_fin= std::stoll(req->getParameter("fin"));
+    int64_t timestamp_debut;
+    int64_t timestamp_fin;
+    try {
+        timestamp_debut= std::stoll(req->getParameter("debut"));
+        timestamp_fin= std::stoll(req->getParameter("fin"));
+    }catch (const std::invalid_argument&) {
+        Json::Value MessageErreur;
+        MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        ReponseAPI->setStatusCode(drogon::k400BadRequest);
+        co_return ReponseAPI;
+    }
     if (timestamp_debut == 0 || timestamp_fin == 0)
     {
         Json::Value MessageErreur;
@@ -91,8 +93,18 @@ drogon::Task<drogon::HttpResponsePtr> PSWController::ReserverSallePSWController(
 
 drogon::Task<drogon::HttpResponsePtr> PSWController::PlanningSallePSWController(drogon::HttpRequestPtr req){
     std::string salle = req->getParameter("salle");
-    int64_t timestamp_debut= std::stoll(req->getParameter("debut"));
-    int64_t timestamp_fin= std::stoll(req->getParameter("fin"));
+    int64_t timestamp_debut;
+    int64_t timestamp_fin;
+    try {
+        timestamp_debut= std::stoll(req->getParameter("debut"));
+        timestamp_fin= std::stoll(req->getParameter("fin"));
+    }catch (const std::invalid_argument&) {
+        Json::Value MessageErreur;
+        MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        ReponseAPI->setStatusCode(drogon::k400BadRequest);
+        co_return ReponseAPI;
+    }
     if (salle.empty() || timestamp_debut == 0 || timestamp_fin == 0)
     {
         Json::Value MessageErreur;
@@ -148,14 +160,14 @@ drogon::Task<drogon::HttpResponsePtr> PSWController::LoginPSWController(drogon::
         ReponseAPI->setStatusCode(drogon::k400BadRequest);
         co_return ReponseAPI;
     }
-    auto DbClientPtr = drogon::app().getDbClient();
     std::string login = (*body)["login"].asString();
     std::string motdepasse = (*body)["motdepasse"].asString();
+    auto DbClientPtr = drogon::app().getDbClient();
     auto resultat = co_await UtilisateurLogique::LoginPSW(DbClientPtr, login, motdepasse);
     if (resultat.BoolResultat == false)
     {
         auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
-        ReponseAPI->setStatusCode(drogon::k404NotFound);
+        ReponseAPI->setStatusCode(drogon::k401Unauthorized);
         co_return ReponseAPI;
     }
     auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);

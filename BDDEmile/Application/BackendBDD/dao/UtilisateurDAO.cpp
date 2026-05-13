@@ -147,7 +147,7 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateu
     //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
     //id classe utilisateur
-    const std::string &idclasse) {
+    const std::int32_t &idclasse) {
     //Variable pour le résultat / envoie du type vector Utilisateur pour la template
     ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>> resultat;
     //Mapper de Utilisateur / objet <--> SQL
@@ -164,5 +164,30 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateu
             resultat.BoolResultat = false;
             resultat.MessageResultat = e.base().what();
         }
+    co_return resultat;
+}
+
+//Recherche tous les professeur
+//Renvoie un vecteur d'utilisateur
+drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>>> UtilisateurDAO::ListeProfesseur(
+    //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+    const DbClientPtr &db) {
+    //Mapper de utilisateur / objet <--> SQL
+    CoroMapper<drogon_model::acces_campus_bdd::Utilisateur> mapperutilisateur(db);
+    //Variable pour le résultat / envoie rien pour la template (monostate)
+    ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Utilisateur>> resultat;
+    //Gestion des erreurs avec try/catch
+    try {
+        //Execution commande SQL recherche dans la colonne _role_utilisateur de la table utilisateur
+        resultat.donnee = co_await mapperutilisateur.findBy(
+        Criteria(drogon_model::acces_campus_bdd::Utilisateur::Cols::_role_user, CompareOperator::EQ, "professeur"));
+        resultat.BoolResultat = true;
+    } catch
+        //Exception stocker dans le message du resultat
+        (const DrogonDbException& e) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = e.base().what();
+        }
+    //Envoie du résultat
     co_return resultat;
 }

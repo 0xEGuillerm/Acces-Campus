@@ -6,7 +6,7 @@
 #define BACKENDBDD_COURSLOGIQUE_H
 
 
-#include "CoursLogique.h"
+
 #include "models/Salle.h"
 #include <drogon/utils/coroutine.h>
 #include "models/Utilisateur.h"

@@ -5,7 +5,7 @@
 #ifndef BACKENDBDD_CLASSEDAO_H
 #define BACKENDBDD_CLASSEDAO_H
 
-#include "ClasseDAO.h"
+
 #include "models/Utilisateur.h"
 #include "models/Classe.h"
 #include <drogon/utils/coroutine.h>
@@ -31,6 +31,12 @@ public:
         const DbClientPtr &db,
         //nom de la classe
         const std::string &nomclasse);
+
+    //Chercher toutes les classe
+    //Renvoie une liste de classe
+    static drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Classe>>> ListeClasse(
+        //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
+        const DbClientPtr &db);
 };
 
 #endif //BACKENDBDD_CLASSEDAO_H

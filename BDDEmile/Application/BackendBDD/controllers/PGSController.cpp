@@ -7,6 +7,7 @@
 #include <drogon/HttpController.h>
 #include "resultat/StructResultat.h"
 #include "Logique/BadgeLogique.h"
+#include "Logique/ClasseLogique.h"
 #include "Logique/SalleLogique.h"
 #include "Logique/CoursLogique.h"
 #include "Logique/RetardAbsenceLogique.h"
@@ -18,8 +19,20 @@ using namespace drogon::orm;
 
 drogon::Task<drogon::HttpResponsePtr> PGSController::PlanningSallePGSController(drogon::HttpRequestPtr req){
     std::string salleStr = req->getParameter("salle");
-    int64_t timestamp_debut= std::stoll(req->getParameter("debut"));
-    int64_t timestamp_fin= std::stoll(req->getParameter("fin"));
+    int64_t timestamp_debut;
+    int64_t timestamp_fin;
+
+    try {
+        timestamp_debut= std::stoll(req->getParameter("debut"));
+        timestamp_fin= std::stoll(req->getParameter("fin"));
+
+    } catch (const std::invalid_argument&) {
+        Json::Value MessageErreur;
+        MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        ReponseAPI->setStatusCode(drogon::k400BadRequest);
+        co_return ReponseAPI;
+    }
     if (salleStr.empty() || timestamp_debut == 0 || timestamp_fin == 0)
     {
         Json::Value MessageErreur;
@@ -101,7 +114,16 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::HistoriqueBadgePGSControlle
         ReponseAPI->setStatusCode(drogon::k400BadRequest);
         co_return ReponseAPI;
     }
-    int32_t idUtilisateur = stoi(uuidUserStr);
+    int32_t idUtilisateur;
+    try {
+        idUtilisateur = stoi(uuidUserStr);
+    } catch (const std::invalid_argument&) {
+        Json::Value MessageErreur;
+        MessageErreur = "Requete mal formulee. Veuillez verifier les champs.";
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(MessageErreur);
+        ReponseAPI->setStatusCode(drogon::k400BadRequest);
+        co_return ReponseAPI;
+    }
     auto DbClientPtr = drogon::app().getDbClient();
     auto resultat = co_await RetardAbsenceLogique::AbsenceEleve(DbClientPtr, idUtilisateur);
     if (resultat.BoolResultat == false)
@@ -231,5 +253,47 @@ drogon::Task<drogon::HttpResponsePtr> PGSController::ModifierBadgePGSController(
     }
     auto ReponseAPI = drogon::HttpResponse::newHttpResponse();
     ReponseAPI->setStatusCode(drogon::k204NoContent);
+    co_return ReponseAPI;
+}
+
+drogon::Task<drogon::HttpResponsePtr> PGSController::ListeSalleExistante(drogon::HttpRequestPtr req){
+    auto DbClientPtr = drogon::app().getDbClient();
+    auto resultat = co_await SalleLogique::ListedeSalle(DbClientPtr);
+    if (resultat.BoolResultat == false)
+    {
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
+        ReponseAPI->setStatusCode(drogon::k404NotFound);
+        co_return ReponseAPI;
+    }
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);
+    ReponseAPI->setStatusCode(drogon::k200OK);
+    co_return ReponseAPI;
+}
+
+drogon::Task<drogon::HttpResponsePtr> PGSController::ListeProfesseur(drogon::HttpRequestPtr req){
+    auto DbClientPtr = drogon::app().getDbClient();
+    auto resultat = co_await UtilisateurLogique::ListeProfesseur(DbClientPtr);
+    if (resultat.BoolResultat == false)
+    {
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
+        ReponseAPI->setStatusCode(drogon::k404NotFound);
+        co_return ReponseAPI;
+    }
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);
+    ReponseAPI->setStatusCode(drogon::k200OK);
+    co_return ReponseAPI;
+}
+
+drogon::Task<drogon::HttpResponsePtr> PGSController::ListeClasse(drogon::HttpRequestPtr req){
+    auto DbClientPtr = drogon::app().getDbClient();
+    auto resultat = co_await ClasseLogique::ListeClasse(DbClientPtr);
+    if (resultat.BoolResultat == false)
+    {
+        auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.MessageResultat);
+        ReponseAPI->setStatusCode(drogon::k404NotFound);
+        co_return ReponseAPI;
+    }
+    auto ReponseAPI = drogon::HttpResponse::newHttpJsonResponse(resultat.donnee);
+    ReponseAPI->setStatusCode(drogon::k200OK);
     co_return ReponseAPI;
 }

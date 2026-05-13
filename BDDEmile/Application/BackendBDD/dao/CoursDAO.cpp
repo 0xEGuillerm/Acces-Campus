@@ -83,11 +83,15 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> C
     //Gestion des erreurs avec try/catch
     try {
         //Execution commande SQL recherche dans la colonne _num_salle de la table Cours
-        resultat.donnee = co_await mappercours.findBy((
+        resultat.donnee = co_await mappercours.findBy(/*
         Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::GT, timestampdebut*1000000) &&
         Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::LT, timestampfin*1000000)) ||
         (Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::GT, timestampdebut*1000000) &&
         Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LT, timestampfin*1000000)));
+*/
+
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LT, timestampfin*1000000) &&
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin,   CompareOperator::GT, timestampdebut*1000000));
         resultat.BoolResultat = true;
     } catch
         //Exception stocker dans le message du resultat
@@ -118,8 +122,8 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> C
     try {
         //Execution commande SQL recherche dans la colonne _num_salle de la table Cours
         resultat.donnee = co_await mappercours.findBy(
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::GT, timestampdebutminute) &&
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LT, timestampfinminute)
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::GE, timestampdebutminute) &&
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LE, timestampfinminute)
         );
         resultat.BoolResultat = true;
     } catch
@@ -150,8 +154,8 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> C
     try {
         //Execution commande SQL recherche dans la colonne _num_salle de la table Cours
         resultat.donnee = co_await mappercours.findBy(
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::GT, timestampdebutminute) &&
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::LT, timestampfinminute)
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::GE, timestampdebutminute) &&
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::LE, timestampfinminute)
         );
         resultat.BoolResultat = true;
     } catch
@@ -163,3 +167,4 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> C
     //Envoie du résultat
     co_return resultat;
 }
+

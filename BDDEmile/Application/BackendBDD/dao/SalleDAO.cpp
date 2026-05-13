@@ -65,6 +65,8 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Salle>>> S
     co_return resultat;
 }
 
+//Chercher une salle à partir d'un nom de salle
+//Renvoie une liste de salle
 drogon::Task<ResultatCoro<>> SalleDAO::VerifierExistanceSalle(
     //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db,
@@ -97,7 +99,8 @@ drogon::Task<ResultatCoro<>> SalleDAO::VerifierExistanceSalle(
 }
 
 
-
+//Chercher toutes les salles
+//Renvoie une liste de salle
 drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Salle>>> SalleDAO::ListeSalle(
     //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
     const DbClientPtr &db) {

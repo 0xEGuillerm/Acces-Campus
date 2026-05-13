@@ -32,6 +32,15 @@ public:
         const DbClientPtr &db,
         const std::string &login,
         const std::string &motdepasse);
+
+    //renvoie toutes les professeur
+    //JSON liste professeur
+    //nom_professeur
+    //prenom_professeur
+    //id_professeur
+    //peut renvoyer des erreur
+    static drogon::Task<ResultatCoro<Json::Value>> ListeProfesseur(
+        const DbClientPtr &db);
 };
 
 

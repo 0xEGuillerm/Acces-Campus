@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 
     drogon::app().registerBeginningAdvice([]() {
         auto loop = drogon::app().getLoop();
-        loop->runEvery(45.0, []() {
+        loop->runEvery(60.0, []() {
             drogon::async_run([]() -> drogon::Task<> {
             co_await GestionCoursTemporelle::traiterCoursADemarrer();
             co_await GestionCoursTemporelle::traiterCoursACloturer();
