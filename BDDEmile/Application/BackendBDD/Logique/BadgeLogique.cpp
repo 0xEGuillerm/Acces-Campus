@@ -7,6 +7,8 @@
 #include "models/Utilisateur.h"  // Classe générée par drogon_ctl
 #include <functional>
 #include <json/json.h>
+#include <sodium/crypto_pwhash.h>
+
 #include "dao/BadgeDAO.h"
 #include "resultat/StructResultat.h"
 #include "models/Retardabsence.h"
@@ -55,12 +57,14 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::InformationBadge(
         else {
             resultat.donnee["classe"] = (classe.donnee[0].getValueOfNomClasse());
         }
-        resultat.donnee["statut"] = (*UtilisateurTrouvee.donnee[0].getRoleUser());
+    }
+    else {
+        resultat.donnee["classe"] = UtilisateurTrouvee.donnee[0].getValueOfRoleUser();
     }
     //Ajout des donnee à la réponse
-    resultat.BoolResultat = true;resultat.donnee["nom_user"] = (*UtilisateurTrouvee.donnee[0].getNomUser());
-    resultat.donnee["prenom_user"] = (*UtilisateurTrouvee.donnee[0].getPrenomUser());
-    resultat.donnee["statut"] = (*UtilisateurTrouvee.donnee[0].getRoleUser());
+    resultat.BoolResultat = true;resultat.donnee["nom_user"] = UtilisateurTrouvee.donnee[0].getValueOfNomUser();
+    resultat.donnee["prenom_user"] = UtilisateurTrouvee.donnee[0].getValueOfPrenomUser();
+    resultat.donnee["statut"] = UtilisateurTrouvee.donnee[0].getValueOfRoleUser();
 
     co_return resultat;
 }
@@ -176,9 +180,37 @@ drogon::Task<ResultatCoro<>> BadgeLogique::ModifierInfoUtilisateur(
             utilisateurModifier.setIdClasse(classe.donnee[0].getValueOfIdClasse());
         }
     }
-    //a modifier
-    if (body.isMember("hash_mdp"))
-        utilisateurModifier.setHashMdp(body["hash_mdp"].asString());
+    //Verifier la presence d'un mot de passe à changer
+    if (body.isMember("hash_mdp")) {
+        //stock le mot de passe temporairement
+        std::string mot_de_passe_temp = body["hash_mdp"].asCString();
+        //prepare la variable pour stocker le hash
+        std::string hash_temp;
+        //Augment la taille de la variable pour stocker le hash (128 bytes pour libsoidum)
+        hash_temp.resize(crypto_pwhash_STRBYTES);
+        //Hashage du mot de passe
+        int resultat_changement_mdp = crypto_pwhash_str(
+            //Endroit ou stocker le hash
+            hash_temp.data(),
+            //Envoi du mot de passe à hasher
+            mot_de_passe_temp.c_str(),
+            //La taille du mot de passe à hasher
+            mot_de_passe_temp.length(),
+            //Definit le nombre de processeur pour hasher le mot de passe (faible)
+            crypto_pwhash_OPSLIMIT_INTERACTIVE,
+            //Definit le nombre byte de RAM pour hasher le mot de passe (faible)
+            crypto_pwhash_MEMLIMIT_INTERACTIVE  );
+        //Veriffication que l'operation c'est bien passer
+        if (resultat_changement_mdp != 0) {
+            resultat.BoolResultat = false;
+            resultat.MessageResultat = "Erreur changement de mot de passe";
+            co_return resultat;
+        }
+        //Changement de la taille car bug dans postgres \0 pour le padddinng
+        hash_temp.resize(std::strlen(hash_temp.c_str()));
+        //Changement du hash pour l'utilisateur
+        utilisateurModifier.setHashMdp(hash_temp);
+    }
     if (body.isMember("login"))
         utilisateurModifier.setLoginUser(body["login"].asString());
     if (body.isMember("role"))
@@ -223,11 +255,11 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::VerifierBadgePEA(
     //On garde uniquement le premier
     auto utilisateur = UtilisateurTrouvee.donnee[0];
     //Si c'est un professeur ou un admin il a accès a toutes les salles donc:
-    if ((*utilisateur.getRoleUser()) == "admin" || (*utilisateur.getRoleUser()) == "professeur") {
-        resultat.donnee["nom"] = (*utilisateur.getNomUser());
-        resultat.donnee["prenom"] = (*utilisateur.getPrenomUser());
+    if (utilisateur.getValueOfRoleUser() == "admin" || utilisateur.getValueOfRoleUser() == "professeur") {
+        resultat.donnee["nom"] = utilisateur.getValueOfNomUser();
+        resultat.donnee["prenom"] = utilisateur.getValueOfPrenomUser();
         //Les professeur et admin n'on pas de classe donc je met leur role
-        resultat.donnee["classe"] = (*utilisateur.getRoleUser());
+        resultat.donnee["classe"] = utilisateur.getValueOfRoleUser();
         resultat.donnee["autorisee"] = true;
         //envoi du resultat
         co_return resultat;
@@ -243,7 +275,7 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::VerifierBadgePEA(
     //On garde uniquement le premier
     auto salle = salletrouvee.donnee[0];
     //recherche de cours dans la salle
-    auto CoursListe = co_await CoursDAO::ChercherCoursParSalle(db, (*salle.getNumSalle()));
+    auto CoursListe = co_await CoursDAO::ChercherCoursParSalle(db, salle.getValueOfNumSalle());
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si aucun cours dans cette salle
     if (CoursListe.BoolResultat == false || CoursListe.donnee.empty()) {
         resultat.BoolResultat = false;
@@ -265,8 +297,8 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::VerifierBadgePEA(
     }
     //Ajout des reponse obtenu
     resultat.BoolResultat = true;
-    resultat.donnee["nom"] = (*utilisateur.getNomUser());
-    resultat.donnee["prenom"] = (*utilisateur.getPrenomUser());
+    resultat.donnee["nom"] = utilisateur.getValueOfNomUser();
+    resultat.donnee["prenom"] = utilisateur.getValueOfPrenomUser();
     //recherche de classe pour obtenir le nom
     auto classe = co_await ClasseDAO::ChercherClasseParID(db, utilisateur.getValueOfIdClasse());
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si aucun cours dans cette salle
@@ -308,7 +340,12 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::ScanneBadgeBAE(
         co_return resultat;
     }
     //On garde uniquement le premier
-    auto utilisateur = UtilisateurTrouvee.donnee[0];
+    drogon_model::acces_campus_bdd::Utilisateur utilisateur = UtilisateurTrouvee.donnee[0];
+    if (utilisateur.getValueOfRoleUser() == "admin" || utilisateur.getValueOfRoleUser() == "professeur") {
+        resultat.BoolResultat = false;
+        resultat.MessageResultat = "Professeur/admin";
+        co_return resultat;
+    }
     //recherche de la salle correspondant à l'adresse mac
     auto salletrouvee = co_await SalleDAO::ChercherSalleAdresseMACbae(db, mac);
     //renvoie un bool false et un message d'erreur correspondant si probleme
@@ -320,7 +357,7 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::ScanneBadgeBAE(
     //garde uniquement la salle renvoyé
     auto salle = salletrouvee.donnee[0];
     //recherche de cours dans la salle
-    auto CoursListe = co_await CoursDAO::ChercherCoursParSalle(db, (*salle.getNumSalle()));
+    auto CoursListe = co_await CoursDAO::ChercherCoursParSalle(db, salle.getValueOfNumSalle());
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si aucun cours dans cette salle
     if (CoursListe.BoolResultat == false || CoursListe.donnee.empty()) {
         resultat.BoolResultat = false;
@@ -338,7 +375,7 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::ScanneBadgeBAE(
     bool trouvee = false;
     for (const auto &coursrecherche : CoursListe.donnee) {
         //PostgreSQL stock les timestamp en microseconde donc .secondsSinceEpoch()
-        if (TimestampSecond > coursrecherche.getValueOfHeureDebut().secondsSinceEpoch() && TimestampSecond < coursrecherche.getValueOfHeureFin().secondsSinceEpoch()) {
+        if (TimestampSecond >= coursrecherche.getValueOfHeureDebut().secondsSinceEpoch() && TimestampSecond <= coursrecherche.getValueOfHeureFin().secondsSinceEpoch()) {
             trouvee = true;
             cour = coursrecherche;
             break;
@@ -353,14 +390,14 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::ScanneBadgeBAE(
     //Verification de la présence de l'élève dans la table des absences lié à ce cours. Autrement cela signifie surement qu'il la déjà scanner
     auto AbsenceTable = co_await PresenceAbsenceCoursDAO::ChercherUtilisateurDansAbsencecoursID(db, utilisateur.getValueOfIdUser());
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si l'utilisateur à déjà badgé
-    if (AbsenceTable.donnee.empty()) {
-        resultat.BoolResultat = false;
-        resultat.MessageResultat = "badge déjà scanné";
-        co_return resultat;
-    }
     if (AbsenceTable.BoolResultat == false){
         resultat.BoolResultat = false;
         resultat.MessageResultat = AbsenceTable.MessageResultat;
+        co_return resultat;
+    }
+    if (AbsenceTable.donnee.empty()) {
+        resultat.BoolResultat = false;
+        resultat.MessageResultat = "badge déjà scanné";
         co_return resultat;
     }
     //Verification des horaire pour savoir si l'utilisateur est en retard

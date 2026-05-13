@@ -25,6 +25,9 @@ public:
     ADD_METHOD_TO(PGSController::SupprimerBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Delete);
     ADD_METHOD_TO(PGSController::CreationBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Post);
     ADD_METHOD_TO(PGSController::ModifierBadgePGSController, "/pgs/badges/{badgeid}", drogon::HttpMethod::Put);
+    ADD_METHOD_TO(PGSController::ListeSalleExistante, "/pgs/liste_salle", drogon::HttpMethod::Get);
+    ADD_METHOD_TO(PGSController::ListeProfesseur, "/pgs/liste_professeur", drogon::HttpMethod::Get);
+    ADD_METHOD_TO(PGSController::ListeClasse, "/pgs/liste_classe", drogon::HttpMethod::Get);
     METHOD_LIST_END
     static drogon::Task<drogon::HttpResponsePtr> PlanningSallePGSController(
         drogon::HttpRequestPtr req);
@@ -48,6 +51,12 @@ public:
     static drogon::Task<drogon::HttpResponsePtr> ModifierBadgePGSController(
         drogon::HttpRequestPtr req,
         std::string badgeid);
+    static drogon::Task<drogon::HttpResponsePtr> ListeSalleExistante(
+        drogon::HttpRequestPtr req);
+    static drogon::Task<drogon::HttpResponsePtr> ListeProfesseur(
+        drogon::HttpRequestPtr req);
+    static drogon::Task<drogon::HttpResponsePtr> ListeClasse(
+        drogon::HttpRequestPtr req);
 };
 
 

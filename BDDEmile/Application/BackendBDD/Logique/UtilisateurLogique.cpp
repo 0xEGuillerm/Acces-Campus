@@ -146,9 +146,9 @@ drogon::Task<ResultatCoro<Json::Value>> UtilisateurLogique::LoginPSW(
     //Type Json web token
     .set_type("JWT")
     //celui qui delivre le token
-    .set_issuer("auth0")
+    .set_issuer("acces-campus")
     //met l'expiration du token
-    .set_expires_in(std::chrono::seconds{36000})
+    .set_expires_in(std::chrono::hours{1})
     //Le token stock l'id de l'utilisateur
     .set_payload_claim("sub", jwt::claim(std::to_string(Utilisateur.donnee[0].getValueOfIdUser())))
     //Methode pour signer le token (avec clée de chiffrmeent et algorithme hs256)
@@ -156,5 +156,38 @@ drogon::Task<ResultatCoro<Json::Value>> UtilisateurLogique::LoginPSW(
     //Renvoie du resultat
     resultat.BoolResultat = true;
     resultat.donnee["token"]= token;
+    co_return resultat;
+}
+
+
+//renvoie toutes les professeur
+//JSON liste professeur
+//nom_professeur
+//prenom_professeur
+//id_professeur
+//peut renvoyer des erreur
+drogon::Task<ResultatCoro<Json::Value>> UtilisateurLogique::ListeProfesseur(
+    const DbClientPtr &db) {
+    //Création de la structure réponse
+    ResultatCoro<Json::Value> resultat;
+    //Creation des liste professeur
+    Json::Value listeprofesseur(Json::arrayValue);
+    //obtention de toutes les professeurs vecteur
+    auto VecteurProfesseur = co_await UtilisateurDAO::ListeProfesseur(db);
+    //renvoie un bool false et un message d'erreur correspondant si probleme
+    if (VecteurProfesseur.BoolResultat == false) {
+        resultat.BoolResultat = false;
+        resultat.MessageResultat = "Erreur";
+        co_return resultat;
+    }
+    for (const auto& professeur : VecteurProfesseur.donnee){
+        Json::Value ProfesseurTemp;
+        ProfesseurTemp["nom_professeur"] = professeur.getValueOfNomUser();
+        ProfesseurTemp["prenom_professeur"] = professeur.getValueOfPrenomUser();
+        ProfesseurTemp["id_professeur"] = professeur.getValueOfIdUser();
+        listeprofesseur.append(ProfesseurTemp);
+    }
+    resultat.donnee = listeprofesseur;
+    resultat.BoolResultat = true;
     co_return resultat;
 }

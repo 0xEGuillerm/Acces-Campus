@@ -69,7 +69,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleMac(
     bool trouvee = false;
     for (const auto &coursrecherche : CoursListe.donnee) {
         //PostgreSQL stock les timestamp en microseconde donc .secondsSinceEpoch()
-        if (TimestampSecond > coursrecherche.getValueOfHeureDebut().secondsSinceEpoch() && TimestampSecond < coursrecherche.getValueOfHeureFin().secondsSinceEpoch()) {
+        if (TimestampSecond >= coursrecherche.getValueOfHeureDebut().secondsSinceEpoch() && TimestampSecond <= coursrecherche.getValueOfHeureFin().secondsSinceEpoch()) {
             trouvee = true;
             cour = coursrecherche;
             break;
@@ -84,7 +84,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleMac(
     //recherche d'une classe avec son id
     auto classeverif = co_await ClasseDAO::ChercherClasseParID(db, cour.getValueOfIdClasse());
     //si l'id correspond à une classe existante
-    if (classeverif.BoolResultat == false) {
+    if (classeverif.BoolResultat == false || classeverif.donnee.empty()) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Erreur";
         co_return resultat;
@@ -92,7 +92,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleMac(
     //Recherche du professeur à partir d'id
     auto ProfesseurVecteur = co_await UtilisateurDAO::ChercherUtilisateurParID(db, cour.getValueOfProfesseur());
     //renvoie un bool false et un message d'erreur correspondant si probleme
-    if (ProfesseurVecteur.BoolResultat == false) {
+    if (ProfesseurVecteur.BoolResultat == false || ProfesseurVecteur.donnee.empty()) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Erreur";
         co_return resultat;
@@ -187,8 +187,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleNumeroSalle(
     }
 
     //Stocker le cours qui se passe actuellement dans la salle du BAE
-    drogon_model::acces_campus_bdd::Cours cour = CoursListe.donnee[0];
-
+    drogon_model::acces_campus_bdd::Cours cour;
     //Obtention de l'horaire actuelle format int seconde
     int64_t TimestampSecond = trantor::Date::now().secondsSinceEpoch();
 
@@ -196,7 +195,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleNumeroSalle(
     bool trouvee = false;
     for (const auto &coursrecherche : CoursListe.donnee) {
         //PostgreSQL stock les timestamp en microseconde donc .secondsSinceEpoch()
-        if (TimestampSecond > coursrecherche.getValueOfHeureDebut().secondsSinceEpoch() && TimestampSecond < coursrecherche.getValueOfHeureFin().secondsSinceEpoch()) {
+        if (TimestampSecond >= coursrecherche.getValueOfHeureDebut().secondsSinceEpoch() && TimestampSecond <= coursrecherche.getValueOfHeureFin().secondsSinceEpoch()) {
             trouvee = true;
             cour = coursrecherche;
             break;
@@ -211,7 +210,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleNumeroSalle(
     //recherche d'une classe avec son id
     auto classeverif = co_await ClasseDAO::ChercherClasseParID(db, cour.getValueOfIdClasse());
     //si l'id correspond à une classe existante
-    if (classeverif.BoolResultat == false) {
+    if (classeverif.BoolResultat == false || classeverif.donnee.empty()) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Erreur";
         co_return resultat;
@@ -219,7 +218,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleNumeroSalle(
     //Recherche du professeur à partir d'id
     auto ProfesseurVecteur = co_await UtilisateurDAO::ChercherUtilisateurParID(db, cour.getValueOfProfesseur());
     //renvoie un bool false et un message d'erreur correspondant si probleme
-    if (ProfesseurVecteur.BoolResultat == false) {
+    if (ProfesseurVecteur.BoolResultat == false || ProfesseurVecteur.donnee.empty()) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Erreur";
         co_return resultat;

@@ -28,7 +28,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 #fichier a compiler
 add_executable(${PROJECT_NAME} main.cc
-        models/Badge.cc
         dao/BadgeDAO.cpp
         dao/BadgeDAO.h
         models/AbsenceCours.h
@@ -65,6 +64,10 @@ add_executable(${PROJECT_NAME} main.cc
         dao/PresenceAbsenceCoursDAO.h
         Logique/GestionCoursTemporelle.cpp
         Logique/GestionCoursTemporelle.h
+        filters/FiltreJWT.cpp
+        filters/FiltreJWT.h
+        Logique/ClasseLogique.cpp
+        Logique/ClasseLogique.h
 )
 
 # ##############################################################################

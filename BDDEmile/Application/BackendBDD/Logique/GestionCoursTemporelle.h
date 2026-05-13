@@ -5,9 +5,9 @@
 #ifndef BACKENDBDD_GESTIONCOURSTEMPORELLE_H
 #define BACKENDBDD_GESTIONCOURSTEMPORELLE_H
 
-#include "GestionCoursTemporelle.h"
+
 #include <drogon/utils/coroutine.h>
-#include "dao/UtilisateurDAO.h"
+
 
 
 

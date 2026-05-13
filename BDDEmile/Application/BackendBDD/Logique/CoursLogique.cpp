@@ -19,10 +19,10 @@ using namespace drogon::orm;
 //Reserver une salle à partir des info:
 //heure_debut (timestamp)
 //heure_fin (timestamp)
-//salle
-//classe
-//reserver_par (nom professeur
-//professeur
+//salle (id)
+//classe (id)
+//reserver_par (id)
+//professeur (id)
 //renvoie un bool et potentiellement un message en cas d'erreur (pas de donnee)
 drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
     //Alias d'un shared pointeur vers le client postgres (pour gère la connexion)(nécessaire pour utiliser la db au niveau du DAO)
@@ -43,6 +43,8 @@ drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
         champ_manquant = true;
     if (!body.isMember("professeur"))
         champ_manquant = true;
+    if (!body.isMember("reserve_par"))
+        champ_manquant = true;
     if (champ_manquant == true) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Un champ est manquant";
@@ -52,13 +54,16 @@ drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
     int64_t heure_debut = body["heure_debut"].asInt64();
     int64_t heure_fin = body["heure_fin"].asInt64();
     std::string salle = body["salle"].asString();
-    std::string classe = body["classe"].asString();
-    std::string reserve_par;
-    if (!body.isMember("reserve_par"))
-        reserve_par = "ADMIN";
-    else
-        reserve_par = body["professeur"].asString();
-    std::string professeur = body["professeur"].asString();
+    std::int32_t classe = body["classe"].asInt();
+    std::int32_t reserve_par = body["reserve_par"].asInt();
+    std::int32_t professeur = body["professeur"].asInt();
+
+    //Verification pour être sur
+    if (heure_debut >= heure_fin) {
+        resultat.BoolResultat = false;
+        resultat.MessageResultat = "Erreur horaire";
+        co_return resultat;
+    }
 
     //Verification des informations:
     //Trouver la salle
@@ -67,12 +72,12 @@ drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
     //Verifier le professeur existe
 
     //verification que la salle existe/ bonne
-    auto salletrouvee = co_await SalleDAO::VerifierExistanceSalle(db, salle);
+    /*auto salletrouvee = co_await SalleDAO::VerifierExistanceSalle(db, salle);
     if (salletrouvee.BoolResultat == false) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Salle introuvable";
         co_return resultat;
-    }
+    }*/
     //recherche de cours dans la salle
     auto CoursListe = co_await CoursDAO::ChercherCoursParSalle(db, salle);
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si aucun cours dans cette salle
@@ -99,17 +104,25 @@ drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
     }
 
     //recherche d'une classe avec ce nom
-    auto classeverif = co_await ClasseDAO::ChercherClasseParNom(db, classe);
+    auto classeverif = co_await ClasseDAO::ChercherClasseParID(db, classe);
     //si le nom correspond à une classe existante on modifie autrement rien
     if (classeverif.donnee.empty() || classeverif.BoolResultat == false) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Classe inexistante";
         co_return resultat;
     }
-    //recherche d'un professeur avec son nom
-    auto profverif = co_await UtilisateurDAO::ChercherUtilisateurParNom(db, professeur);
+    //recherche d'un professeur avec son id
+    auto profverif = co_await UtilisateurDAO::ChercherUtilisateurParID(db, professeur);
     //si le nom correspond à une classe existante on modifie autrement rien
     if (profverif.donnee.empty() || profverif.BoolResultat == false) {
+        resultat.BoolResultat = false;
+        resultat.MessageResultat = "Professeur inexistante";
+        co_return resultat;
+    }
+    //Recherche de l'utilisateur qui reserve
+    auto reserve_parVerif = co_await UtilisateurDAO::ChercherUtilisateurParID(db, reserve_par);
+    //si le nom correspond à une classe existante on modifie autrement rien
+    if (reserve_parVerif.donnee.empty() || reserve_parVerif.BoolResultat == false) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Professeur inexistante";
         co_return resultat;
@@ -124,7 +137,7 @@ drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
     Reservation.setHeureDebut(heureDebutTrantor);
     Reservation.setHeureFin(heureFinTrantor);
     Reservation.setNumSalle(salle);
-    if (reserve_par == "ADMIN")
+    if (reserve_parVerif.donnee[0].getValueOfRoleUser() == "admin")
         Reservation.setReservePar(0);
     else
         Reservation.setReservePar(profverif.donnee[0].getValueOfIdUser());
@@ -251,12 +264,15 @@ drogon::Task<ResultatCoro<Json::Value>> CoursLogique::SalleDisponible(
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si aucun cours dans cette salle
     if (ListeSalle.BoolResultat == false) {
         resultat.BoolResultat = false;
+        resultat.MessageResultat = "Aucune salle disponible";
         co_return resultat;
     }
     auto ListeCour = co_await CoursDAO::CoursIntervalleTimestamp(db, timestamp_debut, timestamp_fin);
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si aucun cours dans cette salle
     if (ListeCour.BoolResultat == false) {
         resultat.BoolResultat = false;
+        resultat.MessageResultat = "Aucune cours disponible";
+
         co_return resultat;
     }
     //Recherche des salle qui ne sont pas presente dans liste de cours de l'intervalle
