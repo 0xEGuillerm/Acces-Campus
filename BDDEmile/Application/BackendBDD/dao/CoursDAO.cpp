@@ -123,7 +123,7 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> C
         //Execution commande SQL recherche dans la colonne _num_salle de la table Cours
         resultat.donnee = co_await mappercours.findBy(
         Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::GE, timestampdebutminute) &&
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LE, timestampfinminute)
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LT, timestampfinminute)
         );
         resultat.BoolResultat = true;
     } catch
@@ -155,7 +155,7 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> C
         //Execution commande SQL recherche dans la colonne _num_salle de la table Cours
         resultat.donnee = co_await mappercours.findBy(
         Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::GE, timestampdebutminute) &&
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::LE, timestampfinminute)
+        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::LT, timestampfinminute)
         );
         resultat.BoolResultat = true;
     } catch
