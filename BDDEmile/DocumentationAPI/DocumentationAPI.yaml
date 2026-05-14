@@ -6,9 +6,11 @@ info:
     Cette API expose les routes utilisees par le PGS (Poste de Gestion
     de Salle), PSW (Poste Serveur Web), BAE (Borne d'Appel Etudiant) et PEA
     (Poignee Electrique Autonome).
+    Les routes PSW (sauf /psw/login) nécessite un token JWT
+    (expiration 1 heure).
   contact:
     email: emile.guillerm@saintaubinlasalle.fr
-  version: 2.0.0
+  version: 2.6.0
 servers:
   - url: http://localhost
     description: Serveur de developpement local
@@ -504,6 +506,73 @@ paths:
                 infoNonMisesAJour:
                   value: "Les informations n'ont pus etre mis a jour"
 
+  /pgs/liste_salle:
+    get:
+      tags:
+        - PGS
+      summary: Liste de toutes les salles existantes
+      description: Retourne la liste de toutes les salles enregistrees en base.
+      responses:
+        "200":
+          description: Operation reussie. Retour de la liste des salles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Salle"
+        "404":
+          description: Erreur lors de la recherche.
+          content:
+            application/json:
+              example: "Erreur"
+
+  /pgs/liste_professeur:
+    get:
+      tags:
+        - PGS
+      summary: Liste de tous les professeurs
+      description: >-
+        Retourne la liste de tous les utilisateurs ayant le role "professeur"
+        (nom, prenom et identifiant).
+      responses:
+        "200":
+          description: Operation reussie. Retour de la liste des professeurs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Professeur"
+        "404":
+          description: Erreur lors de la recherche.
+          content:
+            application/json:
+              example: "Erreur"
+
+  /pgs/liste_classe:
+    get:
+      tags:
+        - PGS
+      summary: Liste de toutes les classes
+      description: >-
+        Retourne la liste de toutes les classes enregistrees en base
+        (nom et identifiant).
+      responses:
+        "200":
+          description: Operation reussie. Retour de la liste des classes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Classe"
+        "404":
+          description: Erreur lors de la recherche.
+          content:
+            application/json:
+              example: "Erreur"
+
   /psw/login:
     post:
       tags:
@@ -511,8 +580,10 @@ paths:
       summary: Authentification utilisateur
       description: >-
         Authentifie un utilisateur a partir d'un login et d'un mot de passe.
-        Retourne un token JWT (signe HS256, expire dans 36000 secondes) en cas
-        de succes.
+        Retourne un token JWT (signe HS256, issuer "acces-campus", expiration
+        1 heure) en cas de succes. Ce token doit ensuite etre transmis dans
+        l'en-tete "Authorization: Bearer <token>" pour acceder aux autres
+        routes PSW.
       requestBody:
         required: true
         content:
@@ -531,8 +602,8 @@ paths:
           content:
             application/json:
               example: "Requete mal formulee. Veuillez verifier les champs."
-        "404":
-          description: Erreur (login inconnu, mot de passe incorrect, etc.)
+        "401":
+          description: Erreur d'authentification (login inconnu, mot de passe incorrect, etc.)
           content:
             application/json:
               examples:
@@ -549,24 +620,12 @@ paths:
     get:
       tags:
         - PSW
-      summary: Historique d'absence/retard d'un eleve
+      summary: Historique d'absence/retard de l'utilisateur connecte
       description: >-
-        Retourne la liste des absences et retards d'un eleve a partir de son
-        id utilisateur.
-      parameters:
-        - in: query
-          name: utilisateur
-          required: true
-          description: Identifiant numerique de l'utilisateur
-          schema:
-            type: string
-      requestBody:
-        required: true
-        description: Champ token (non encore implemente cote backend).
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/BodyTokenPSW"
+        Retourne la liste des absences et retards de l'utilisateur identifie. 
+        Aucun parametre n'est attendu : obtention de l'id grâce au token.
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Operation reussie. Retour de l'historique d'absences.
@@ -574,11 +633,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HistoriqueAbsence"
-        "400":
-          description: Requete mal formulee. Veuillez verifier les champs.
-          content:
-            application/json:
-              example: "Requete mal formulee. Veuillez verifier les champs."
+        "401":
+          $ref: "#/components/responses/TokenInvalide"
         "404":
           description: Erreur lors de la recherche.
           content:
@@ -592,15 +648,10 @@ paths:
       summary: Liste des salles disponibles sur un creneau
       description: >-
         Retourne la liste des salles n'ayant aucun cours dans l'intervalle
-        [debut, fin]. Le parametre `salle` est requis par le controleur mais
-        n'est pas utilise par la logique de filtrage des salles disponibles.
+        [debut, fin].
+      security:
+        - bearerAuth: []
       parameters:
-        - in: query
-          name: salle
-          required: true
-          description: Salle (parametre requis par le controleur)
-          schema:
-            type: string
         - in: query
           name: debut
           required: true
@@ -615,13 +666,6 @@ paths:
           schema:
             type: integer
             format: int64
-      requestBody:
-        required: true
-        description: Champ token (non encore implemente cote backend).
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/BodyTokenPSW"
       responses:
         "200":
           description: Operation reussie. Liste des salles disponibles.
@@ -636,6 +680,8 @@ paths:
           content:
             application/json:
               example: "Requete mal formulee. Veuillez verifier les champs."
+        "401":
+          $ref: "#/components/responses/TokenInvalide"
         "404":
           description: Erreur lors de la recherche.
           content:
@@ -650,6 +696,8 @@ paths:
       description: >-
         Retourne la liste des cours d'une salle dont l'heure de debut et
         l'heure de fin sont comprises dans l'intervalle [debut, fin].
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: salle
@@ -671,13 +719,6 @@ paths:
           schema:
             type: integer
             format: int64
-      requestBody:
-        required: true
-        description: Champ token (non encore implemente cote backend).
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/BodyTokenPSW"
       responses:
         "200":
           description: Operation reussie. Liste des cours de la salle dans l'intervalle.
@@ -692,6 +733,8 @@ paths:
           content:
             application/json:
               example: "Requete mal formulee. Veuillez verifier les champs."
+        "401":
+          $ref: "#/components/responses/TokenInvalide"
         "404":
           description: La salle n'existe pas.
           content:
@@ -706,6 +749,8 @@ paths:
       description: >-
         Recupere les informations du cours en cours dans la salle (classe,
         duree, professeur, listes des presents/absents).
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: salle
@@ -713,13 +758,6 @@ paths:
           description: Numero/identifiant de la salle
           schema:
             type: string
-      requestBody:
-        required: true
-        description: Champ token (non encore implemente cote backend).
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/BodyTokenPSW"
       responses:
         "200":
           description: Operation reussie. Retour des informations du cours en cours.
@@ -732,6 +770,8 @@ paths:
           content:
             application/json:
               example: "Requete mal formulee. Veuillez verifier les champs."
+        "401":
+          $ref: "#/components/responses/TokenInvalide"
         "404":
           description: Erreur (pas de cours, classe ou professeur introuvable, etc.)
           content:
@@ -748,13 +788,8 @@ paths:
         - PSW
       summary: Liste de toutes les salles existantes
       description: Retourne la liste de toutes les salles enregistrees en base.
-      requestBody:
-        required: true
-        description: Champ token (non encore implemente cote backend).
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/BodyTokenPSW"
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Operation reussie. Retour de la liste des salles.
@@ -764,6 +799,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Salle"
+        "401":
+          $ref: "#/components/responses/TokenInvalide"
         "404":
           description: Erreur lors de la recherche.
           content:
@@ -771,6 +808,25 @@ paths:
               example: "Erreur"
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >-
+        Token JWT signe en HS256, obtenu via /psw/login. Le filtre
+        FiltreJWT verifie l'issuer ("acces-campus") et la signature, puis
+        extrait l'id utilisateur depuis le claim "sub". A passer dans
+        l'en-tete "Authorization: Bearer <token>".
+
+  responses:
+    TokenInvalide:
+      description: >-
+        Token JWT manquant, mal forme, expire ou signature invalide.
+      content:
+        application/json:
+          example: "Token invalide"
+
   schemas:
 
     ScannerBadgeBAE:
@@ -808,7 +864,7 @@ components:
       example:
         nom: "Dupont"
         prenom: "Jean"
-        classe: "BTS-SIO-2"
+        classe: "CIEL-1"
 
     EtatSalle:
       type: object
@@ -836,7 +892,7 @@ components:
           items:
             $ref: "#/components/schemas/UtilisateurBref"
       example:
-        classe: "BTS-SIO-2"
+        classe: "CIEL-1"
         duree: 1320
         professeur: "Martin"
         nb_absent: 2
@@ -880,7 +936,7 @@ components:
       example:
         nom: "Dupont"
         prenom: "Jean"
-        classe: "BTS-SIO-2"
+        classe: "CIEL-1"
         autorisee: true
 
     CoursPlanning:
@@ -903,7 +959,7 @@ components:
         id_cours: 42
         heure_debut: 1293844775
         heure_fin: 1293848375
-        classe: "BTS-SIO-2"
+        classe: "CIEL-1"
 
     RechercheUtilisateur:
       type: object
@@ -1014,7 +1070,7 @@ components:
         heure_debut: 1293844775
         heure_fin: 1293848375
         salle: "B204"
-        classe: "BTS-SIO-2"
+        classe: "CIEL-1"
         professeur: "Martin"
         reserve_par: "Martin"
 
@@ -1035,7 +1091,7 @@ components:
         nom_user: "Dupont"
         prenom_user: "Jean"
         statut: "eleve"
-        classe: "BTS-SIO-2"
+        classe: "CIEL-1"
 
     CreationBadge:
       type: object
@@ -1070,7 +1126,7 @@ components:
       example:
         nom: "Dupont"
         prenom: "Jean"
-        classe: "BTS-SIO-2"
+        classe: "CIEL-1"
         hash_mdp: "$argon2id$v=19$m=65536,t=3,p=4$abcdef$ghijkl"
         login: "jdupont"
         role: "eleve"
@@ -1094,9 +1150,12 @@ components:
       properties:
         token:
           type: string
-          description: Token JWT signe en HS256 (expiration 36000 secondes)
+          description: >-
+            Token JWT signe en HS256, issuer "acces-campus", contenant l'id
+            utilisateur dans le claim "sub". Expiration : 1 heure (3600 sec).
+            A transmettre dans l'en-tete "Authorization: Bearer <token>".
       example:
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMiIsImlzcyI6ImF1dGgwIiwiZXhwIjoxNzAwMDAwMDAwfQ.abcdef1234567890"
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMiIsImlzcyI6ImFjY2VzLWNhbXB1cyIsImV4cCI6MTcwMDAwMDAwMH0.abcdef1234567890"
 
     Salle:
       type: object
@@ -1114,15 +1173,29 @@ components:
       example:
         id_salle: "B204"
 
-    BodyTokenPSW:
+    Professeur:
       type: object
-      required:
-        - token
       properties:
-        token:
+        id_professeur:
+          type: integer
+          description: Identifiant numerique du professeur (id_user)
+        nom_professeur:
           type: string
-          description: >-
-            Token JWT obtenu via /psw/login. Champ documente en prevision
-            de son ajout, non encore traite par le backend.
+        prenom_professeur:
+          type: string
       example:
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMiIsImlzcyI6ImF1dGgwIiwiZXhwIjoxNzAwMDAwMDAwfQ.abcdef1234567890"
+        id_professeur: 7
+        nom_professeur: "Martin"
+        prenom_professeur: "Claire"
+
+    Classe:
+      type: object
+      properties:
+        id_classe:
+          type: integer
+          description: Identifiant numerique de la classe
+        nom_classe:
+          type: string
+      example:
+        id_classe: 3
+        nom_classe: "CIEL-1"
