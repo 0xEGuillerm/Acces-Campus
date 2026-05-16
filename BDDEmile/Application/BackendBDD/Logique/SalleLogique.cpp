@@ -51,7 +51,7 @@ drogon::Task<ResultatCoro<Json::Value>> SalleLogique::EtatSalleMac(
     //garde uniquement la salle renvoyé
     auto salle = salletrouvee.donnee[0];
     //recherche de cours dans la salle
-    auto CoursListe = co_await CoursDAO::ChercherCoursParSalle(db, (*salle.getNumSalle()));
+    auto CoursListe = co_await CoursDAO::ChercherCoursParSalle(db, salle.getValueOfNumSalle());
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si aucun cours dans cette salle
     if (CoursListe.BoolResultat == false || CoursListe.donnee.empty()) {
         resultat.BoolResultat = false;

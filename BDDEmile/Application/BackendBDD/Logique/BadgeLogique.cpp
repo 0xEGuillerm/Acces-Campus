@@ -8,7 +8,7 @@
 #include <functional>
 #include <json/json.h>
 #include <sodium/crypto_pwhash.h>
-
+#include <cstring>
 #include "dao/BadgeDAO.h"
 #include "resultat/StructResultat.h"
 #include "models/Retardabsence.h"
@@ -183,7 +183,7 @@ drogon::Task<ResultatCoro<>> BadgeLogique::ModifierInfoUtilisateur(
     //Verifier la presence d'un mot de passe à changer
     if (body.isMember("hash_mdp")) {
         //stock le mot de passe temporairement
-        std::string mot_de_passe_temp = body["hash_mdp"].asCString();
+        std::string mot_de_passe_temp = body["hash_mdp"].asString();
         //prepare la variable pour stocker le hash
         std::string hash_temp;
         //Augment la taille de la variable pour stocker le hash (128 bytes pour libsoidum)
@@ -292,7 +292,8 @@ drogon::Task<ResultatCoro<Json::Value>> BadgeLogique::VerifierBadgePEA(
     }
     //Verification de la recherche et envoie un bool false si l'utilisateur n'a jamais eu cours dans cette salle
     if (!trouvee) {
-        resultat.BoolResultat = false;
+        resultat.BoolResultat = true;
+        resultat.donnee["autorisee"] = "false";
         co_return resultat;
     }
     //Ajout des reponse obtenu

@@ -82,16 +82,14 @@ drogon::Task<ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>>> C
     ResultatCoro<std::vector<drogon_model::acces_campus_bdd::Cours>> resultat;
     //Gestion des erreurs avec try/catch
     try {
+        // utilisation de trantor pour comparé des meme valeur timestamp <--> timestamp + conversion
+        trantor::Date debutDate(timestampdebut * 1000000);
+        trantor::Date finDate(timestampfin * 1000000);
         //Execution commande SQL recherche dans la colonne _num_salle de la table Cours
-        resultat.donnee = co_await mappercours.findBy(/*
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::GT, timestampdebut*1000000) &&
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin, CompareOperator::LT, timestampfin*1000000)) ||
-        (Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::GT, timestampdebut*1000000) &&
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LT, timestampfin*1000000)));
-*/
-
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LT, timestampfin*1000000) &&
-        Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin,   CompareOperator::GT, timestampdebut*1000000));
+        resultat.donnee = co_await mappercours.findBy(
+            Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_debut, CompareOperator::LT, finDate) &&
+            Criteria(drogon_model::acces_campus_bdd::Cours::Cols::_heure_fin,   CompareOperator::GT, debutDate)
+        );
         resultat.BoolResultat = true;
     } catch
         //Exception stocker dans le message du resultat

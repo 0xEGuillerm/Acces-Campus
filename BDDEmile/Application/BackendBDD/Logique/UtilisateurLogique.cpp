@@ -44,7 +44,7 @@ drogon::Task<ResultatCoro<Json::Value>> UtilisateurLogique::UtilisateurParNomPre
         //Ajout des donné renvoyer par le DAO dans dans le tableau JSON (ajouter en append permis par la boucle)
         for (const auto& utilisateur : ListeUtilisateurPrenom.donnee) {
             Json::Value user;
-            user["id_utilisateur"] = (*utilisateur.getIdUser());
+            user["id_utilisateur"] = utilisateur.getValueOfIdUser();
             user["prenom_utilisateur"] = utilisateur.getValueOfPrenomUser();
             user["nom_utilisateur"] = utilisateur.getValueOfNomUser();
             listeprenom.append(user);
@@ -74,7 +74,7 @@ drogon::Task<ResultatCoro<Json::Value>> UtilisateurLogique::UtilisateurParNomPre
             //Ajout des donnée si n'existe pas deja
             if (!doublon) {
                 Json::Value user;
-                user["id_utilisateur"] = (*utilisateur.getIdUser());
+                user["id_utilisateur"] = utilisateur.getValueOfIdUser();
                 user["prenom_utilisateur"] = utilisateur.getValueOfPrenomUser();
                 user["nom_utilisateur"] = utilisateur.getValueOfNomUser();
                 listenom.append(user);
@@ -130,11 +130,17 @@ drogon::Task<ResultatCoro<Json::Value>> UtilisateurLogique::LoginPSW(
         resultat.MessageResultat = "Erreur";
         co_return resultat;
     }
+    const std::string &hashtemp = Utilisateur.donnee[0].getValueOfHashMdp();
+    if (hashtemp.empty()) {
+        resultat.BoolResultat = false;
+        resultat.MessageResultat = "Mot de passe incorrecte";
+        co_return resultat;
+    }
     //Verification du mot de passe avec compariason de hash
     //Fonction fournit par libsodium
     //Prend le mot de passe à verifier et le hash stocker de l'utilisateur au format char ainsi que la taille
     //Renvoie 0 si il correspond et -1 si non
-    int resultat_verif_hash = crypto_pwhash_str_verify(Utilisateur.donnee[0].getHashMdp()->c_str(), motdepasse.c_str(), motdepasse.length());
+    int resultat_verif_hash = crypto_pwhash_str_verify(hashtemp.c_str(), motdepasse.c_str(), motdepasse.length());
     //Verification du resultat de la verification
     if (resultat_verif_hash < 0) {
         resultat.BoolResultat = false;
