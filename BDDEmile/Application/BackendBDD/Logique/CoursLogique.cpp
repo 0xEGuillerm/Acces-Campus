@@ -124,7 +124,7 @@ drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
     //si le nom correspond à une classe existante on modifie autrement rien
     if (reserve_parVerif.donnee.empty() || reserve_parVerif.BoolResultat == false) {
         resultat.BoolResultat = false;
-        resultat.MessageResultat = "Professeur inexistante";
+        resultat.MessageResultat = "utilisateur introuvable";
         co_return resultat;
     }
     //Drogon à besoin d'un trantor pour stocker un timestamp
@@ -140,7 +140,7 @@ drogon::Task<ResultatCoro<>> CoursLogique::ReservationSallePGS(
     if (reserve_parVerif.donnee[0].getValueOfRoleUser() == "admin")
         Reservation.setReservePar(0);
     else
-        Reservation.setReservePar(profverif.donnee[0].getValueOfIdUser());
+        Reservation.setReservePar(reserve_parVerif.donnee[0].getValueOfIdUser());
     Reservation.setProfesseur(profverif.donnee[0].getValueOfIdUser());
     //Enregistrement en base de donnée
     auto EnregistrementCours= co_await CoursDAO::AjoutReservation(db, Reservation);
@@ -262,7 +262,7 @@ drogon::Task<ResultatCoro<Json::Value>> CoursLogique::SalleDisponible(
     //recherche de cours dans la salle
     auto ListeSalle = co_await SalleDAO::ListeSalle(db);
     //renvoie un bool false et un message d'erreur correspondant si probleme ou si aucun cours dans cette salle
-    if (ListeSalle.BoolResultat == false) {
+    if (ListeSalle.BoolResultat == false || ListeSalle.donnee.empty()) {
         resultat.BoolResultat = false;
         resultat.MessageResultat = "Aucune salle disponible";
         co_return resultat;

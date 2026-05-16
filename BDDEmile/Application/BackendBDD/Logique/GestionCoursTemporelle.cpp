@@ -22,8 +22,8 @@
 drogon::Task<> GestionCoursTemporelle::traiterCoursADemarrer() {
     auto db = drogon::app().getDbClient();
     //Obtention de l'horaire actuelle format int seconde
-    int64_t TimestampMinuteDebut = (trantor::Date::now().microSecondsSinceEpoch()/60000000)*60000000;
-    int64_t TimestampMinuteFin = TimestampMinuteDebut + 60000000;
+    int64_t TimestampMinuteDebut = (trantor::Date::now().microSecondsSinceEpoch()/60)*60;
+    int64_t TimestampMinuteFin = TimestampMinuteDebut + 60;
     auto ListeCours = co_await CoursDAO::CoursDebutIntervalleMinute(db, TimestampMinuteDebut, TimestampMinuteFin);
     if (!ListeCours.donnee.empty()) {
         for (const auto &coursAjout : ListeCours.donnee) {
