@@ -10,7 +10,7 @@ const std::string CLEE_CHIFFREMENT_JWT = "password";
 
 //Filtre pour vérifier le token pour les endpoint liée au PSW (sauf login)
 //Dois override les fonction native de doFilter
-drogon::Task<drogon::HttpResponsePtr> FiltreJWT::doFilter(drogon::HttpRequestPtr req) {
+drogon::Task<drogon::HttpResponsePtr> FiltreJWT::doFilter(const drogon::HttpRequestPtr &req) {
     //Recuperation du token
     std::string token = req->getHeader("Authorization");
     //Verification de la presence d'un token
