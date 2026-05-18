@@ -9,7 +9,7 @@
 
 class FiltreJWT : public drogon::HttpCoroFilter<FiltreJWT>{
 public:
-    drogon::Task<drogon::HttpResponsePtr> doFilter(drogon::HttpRequestPtr req) override;
+    drogon::Task<drogon::HttpResponsePtr> doFilter(const drogon::HttpRequestPtr &req) override;
 };
 
 

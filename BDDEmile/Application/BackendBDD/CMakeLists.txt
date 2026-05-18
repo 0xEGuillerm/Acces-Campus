@@ -70,6 +70,14 @@ add_executable(${PROJECT_NAME} main.cc
         Logique/ClasseLogique.h
 )
 
+#Fix une erreur de compilation sur mon pc à cause de certaines méthode plus exposé
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+        _LIBCPP_ENABLE_CXX26_REMOVED_CODECVT
+        _LIBCPP_ENABLE_CXX26_REMOVED_WSTRING_CONVERT)
+
+target_compile_options(${PROJECT_NAME} PRIVATE
+        "SHELL:-include codecvt"
+        "SHELL:-include locale")
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method
 # to add drogon 
@@ -138,9 +146,6 @@ target_include_directories(${PROJECT_NAME}  PRIVATE ${CMAKE_SOURCE_DIR}/librairi
 target_link_libraries(${PROJECT_NAME}  PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 #ajout librairie libsodium (chiffrement)
-#recherche
 find_package(PkgConfig REQUIRED)
-#ajout du pkg
-pkg_check_modules(SODIUM REQUIRED libsodium)
-target_include_directories(${PROJECT_NAME} PRIVATE ${SODIUM_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${SODIUM_LIBRARIES})
+pkg_check_modules(SODIUM REQUIRED IMPORTED_TARGET libsodium)
+target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::SODIUM)
